@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV2.xhtml">
+	<!-- propiedade templete define qual master page sera aplicada nessa pagina -->
+	
+	<!-- ui define, onde ficara todo conteudo à ser adicionado na master page (dentro do body definido na master page) -->
+	<ui:define name="contentV2">
+			<div class="horizontal-center rcf-card">
+            	<h:form>
+				<div>
+					<p:panel id="cadastroUsuario" header="Cadastre Seu Usuario de Acesso">
+						<h:panelGrid columns="1" cellpadding="9">
+							<div class="input-full">	
+								<p:inputText label="Nome Completo" type="text" class="ui-input-login col-lg-12" required="true" id="name" placeholder="Nome Completo" value="#{usuarioMB.editUsuario.nome}" />
+							</div>
+							<div class="input-full">	
+								<p:inputText label="E-mail" required="true" type="text" class="ui-input-login col-lg-12" id="email" value="#{usuarioMB.editUsuario.email}" 
+										placeholder="Seu email de acesso">
+									<f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+								</p:inputText>
+							</div>
+							<div class="input-full">	
+								<p:inputText label="Nome de Login" type="text" class="ui-input-login col-lg-12" id="username" placeholder="Nome de Login" value="#{usuarioMB.editUsuario.login}" 
+									required="true"/>
+							</div>
+							<div class="input-full">	
+								<p:password id="senha" class="ui-input-login col-lg-12" value="#{usuarioMB.editUsuario.senha}" match="senha2" 
+									placeholder="Digite uma senha" required="true" label="Digite uma senha"/>
+							</div>
+							<div class="input-full">	
+								<p:password id="senha2" class="ui-input-login col-lg-12" value="#{usuarioMB.editUsuario.confirmSenha}" 
+									placeholder="Confirmar senha" required="true" label="Confirmar senha" />
+							</div>
+							<div class="input-full">
+								<p:commandButton class="btn-lg btn-block rcf-button-login" icon="ui-icon-check" value="Cadastrar" actionListener="#{usuarioMB.doSave}">
+									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+								</p:commandButton>
+							</div>
+						</h:panelGrid>
+					</p:panel>
+				</div>
+			</h:form>
+            
+            </div>
+			<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+		    	<p:graphicImage name="ajaxloader.gif" library="images" />
+			</p:dialog>
+	</ui:define>
+</ui:composition>

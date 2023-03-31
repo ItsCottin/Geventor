@@ -1,0 +1,467 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+	
+	<ui:define name="contentV3">
+		
+		<!-- <p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false"
+			life="7500" /> -->
+			
+		<ul class="nav nav-tabs">
+			<li class="active">
+				<a data-toggle="pill" class="nav-link active" aria-current="page" href="#gerenciar">Gerenciar</a>
+			</li>
+			<li>
+				<a data-toggle="pill" class="nav-link" href="#visualizar">Visualizar</a>
+			</li>
+		</ul>
+		<div class="tab-content py-4">
+			<div id="gerenciar" class="tab-pane active">
+				<h1 class="">Eventos</h1>
+				<p:separator style="width:99%;" />
+				<table class="table" id="">
+				  <thead>
+				    <tr>
+				      <th scope="col">Título</th>
+				      <th class="d-none d-lg-block" scope="col">Data</th>
+				      <th scope="col">Cidade</th>
+				      <th class="d-none d-sm-block" scope="col">Estado</th>
+				      <th scope="col">Vaga</th>
+				      <th class="d-none d-md-block" scope="col">Preço</th>
+				      <th scope="col">Ações</th>
+				    </tr>
+				  </thead>
+				  <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+				  <tr>
+				  	<th scope="col">#{even.titulo}</th>
+				  	<th class="d-none d-lg-block" scope="col">#{even.dataInicio}</th>
+				  	<th scope="col">#{even.cidade}</th>
+				  	<th class="d-none d-sm-block" scope="col">#{even.estado}</th>
+				  	<th scope="col">#{even.vagas}</th>
+				  	<th class="d-none d-md-block" scope="col">#{even.preco}</th>				  	
+				  	<th scope="col">Ações</th>
+				  	</tr>
+				  </c:forEach>				 
+				  </table>
+				<!-- <div class="col py-3 px-md-5 border bg-light">
+				<h:panelGroup id="tblEven">
+					<p:dataTable var="even" value="#{eventoMB.resultadoEvento}" >
+				        <p:column headerText="Título">
+				            <h:outputText value="#{even.titulo}" />
+				        </p:column>
+				        <p:column headerText="Data">
+				            <h:outputText value="#{even.dataInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+				        </p:column>
+				        <p:column headerText="Estado">
+				            <h:outputText value="#{even.estado}" />
+				        </p:column>
+				        <p:column headerText="Cidade">
+				            <h:outputText value="#{even.cidade}" />
+				        </p:column>
+				        <p:column headerText="Preço">
+				            <h:outputText value="#{even.preco}" />
+				        </p:column>
+				        <p:column headerText="Vaga">
+				            <h:outputText value="#{even.vagas}" />
+				        </p:column>
+				        <p:column headerText="Ações">
+				            <p:commandButton immediate="true"
+								icon="ui-icon-wrench" title="Editar"
+								actionListener="#{eventoMB.doEdit(even)}" update="form:dlgAdicionarEven"
+								process="@this" oncomplete="PF('dlgAdicionarEven').show()">
+							</p:commandButton>
+							<p:commandButton immediate="true" icon="ui-icon-trash"
+								title="Excluir" actionListener="#{eventoMB.doRemove(even)}"
+								update=":msgs">
+								<p:confirm header="Confirmação"
+									message="Tem certeza que você quer deletar?"
+									icon="ui-icon-alert" />
+									<f:ajax render="tblEven" />
+							</p:commandButton>
+				        </p:column>
+				    </p:dataTable>
+				    </h:panelGroup>
+				    </div>
+				</div>-->
+				</div>
+				<div id="visualizar" class="tab-pane">
+					<h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar novo Evento' : 'Editar Evento'}</h3>
+					<p:separator style="width:99%;" />
+					
+					<div class="col-md-12">
+					<h:form id="formEvent">
+	      				<div class="col-md-8 col-lg-8">
+							<div class="row mb-3">
+								<label for="titulo" class="col-sm-3 col-form-label">Título:</label>
+								<div class="col-sm-9">
+									<p:inputText class="form-control" id="titulo" value="#{eventoMB.editEvento.titulo}" label="Nome" required="true"/>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label for="from" class="col-sm-3 col-form-label">Começa:</label>
+								<div class="col-sm-9">
+									<p:inputText pt:type="date" label="Data inicio"
+										styleClass="rcf-input-form col-md-4"
+										value="#{eventoMB.editEvento.dataInicio}" required="true"
+										id="dataInicio" placeholder="Data inicio" >
+											<f:convertDateTime pattern="yyyy-MM-dd" />
+									</p:inputText>
+								</div>								
+							</div>
+							<div class="row mb-3">
+								<label for="horafrom" class="col-sm-3 col-form-label">Hora Começo:</label>
+								<div class="col-sm-9">
+									<p:calendar pattern="HH:mm" timeOnly="true" styleClass="col-md-4"
+										value="#{eventoMB.editEvento.horaInicio}" required="true"
+										label="Hora inicio" id="horafrom" />
+								</div>								
+							</div>
+							<div class="row mb-3">
+								<label for="to" class="col-sm-3 col-form-label">Vai até:</label>
+								<div class="col-sm-9">
+									<p:inputMask label="Vai até" id="to" mask="99/99/9999 99:99" styleClass="form-control" value="#{eventoMB.editEvento.dataFim}" required="true" />
+								</div>								
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-9">
+									<h:inputText styleClass="form-control" placeholder="Site proprio do Evento"
+								value="#{eventoMB.editEvento.site}"
+								disabled="#{eventoMB.editEvento.siteProprio}"
+								label="site do evento" id="cbxSiteProprio" />
+								</div>
+								<label for="to" class="col-sm-3 col-form-label">.eventor.com.br</label>								
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-2 align-items-end align-text-end">
+									<h:selectBooleanCheckbox styleClass="form-check-input align-items-end align-text-end"
+										value="#{eventoMB.editEvento.siteProprio}">
+										<p:ajax event="change" update="cbxSiteProprio" />
+									</h:selectBooleanCheckbox>
+								</div>
+								<label for="to" class="col-sm-10 col-form-label">utilizar site fornecido pelo geventor.</label>								
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-12">
+									<h:selectOneMenu styleClass="form-control" styname="uf"
+										id="uf" required="true" value="#{eventoMB.editEvento.estado}"
+										label="Selecione um Estado">
+										<f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
+										<f:selectItem itemValue="" itemLabel="Estado"
+											noSelectionOption="true" />
+										<f:selectItems value="#{eventoMB.estados}" var="est"
+											itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+									</h:selectOneMenu>
+								</div>							
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-12">
+									<h:selectOneMenu required="true" styleClass="form-control"
+										value="#{eventoMB.editEvento.cidade}" label="Cidade"
+										id="cidades">
+										<f:selectItem itemValue="" itemLabel="Cidade"
+											noSelectionOption="true" />
+										<f:selectItems value="#{eventoMB.cidades}" var="cid"
+											itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+									</h:selectOneMenu>
+								</div>							
+							</div>
+							<div class="row mb-3">
+								<label for="local" class="col-sm-3 col-form-label">Local:</label>
+								<div class="col-sm-9">
+									<h:inputText class="form-control" id="local" value="#{eventoMB.editEvento.local}" label="Local" required="true"/>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label for="email" class="col-sm-3 col-form-label">E-mail:</label>
+								<div class="col-sm-9">
+									<h:inputText styleClass="form-control"
+										value="#{eventoMB.editEvento.email}" id="email"
+										validatorMessage="formato de email inválido" label="E-mail">
+										<f:validateRegex
+											pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+									</h:inputText>
+								</div>
+							</div>
+							<div class="row mb-3">
+								<label for="telefone" class="col-sm-3 col-form-label">Telefone:</label>
+								<div class="col-sm-9">
+									<p:inputMask pt:type="" styleClass="form-control" id="telefone"
+										label="Telefone" mask="(999)99999-9999"
+										value="#{eventoMB.editEvento.telefone}" />
+								</div>								
+							</div>
+							<div class="row mb-3">
+								<label for="preco" class="col-sm-3 col-form-label">Preço:</label>
+								<div class="col-sm-9">
+									<p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
+									mask="R$ 999,99" value="#{eventoMB.editEvento.preco}" />
+								</div>								
+							</div>
+							<div class="row mb-3">
+								<label for="vagas" class="col-sm-3 col-form-label">Vagas pro Evento:</label>
+								<div class="col-sm-9">
+									<h:inputText styleClass="form-control" id="vagas"
+									value="#{eventoMB.editEvento.vagas}" label="Vagas" />
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-9">
+									<h:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
+									maxlength="250" counterTemplate="{0} caracteres restantes."
+									autoResize="false" value="#{eventoMB.editEvento.descricao}"
+									label="Descrição" styleClass="form-control" />
+								</div>
+								<h:outputLabel id="display" styleClass="col-sm-3"/>
+							</div>
+							<div class="form-group">
+								<p:commandButton
+								value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Editar Evento'}"
+								id="btnEdit" styleClass="btn btn-primary"
+								actionListener="#{eventoMB.doSave}"
+								oncomplete="onCompleteSave(xhr, status, args);" >
+									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+									<f:ajax render="tblEven" />
+								</p:commandButton>
+								
+							</div>
+						</div>
+						</h:form>
+						<p:commandButton actionListener="#{eventoMB.doPrepareInsert}" process="@this" value="Teste" />
+					<!-- <h:form>
+						<h:panelGrid columnClasses="value">
+							<h3 style="margin-top: 0">Seu Calendário</h3>
+							<p:schedule id="schedule" value="#{eventoMB.eventModel}"
+								widgetVar="myschedule" timeZone="GMT+2">
+
+								<p:ajax event="dateSelect"
+									listener="" update="form:dlgAdicionarEven"
+									oncomplete="PF('dlgAdicionarEven').show();" />
+								<p:ajax event="eventSelect"
+									listener="" update="form:dlgAdicionarEven"
+									oncomplete="PF('dlgAdicionarEven').show();" />
+								<p:ajax event="eventMove" listener=""
+									update="" />
+								<p:ajax event="eventResize"
+									listener="" update="" />
+
+							</p:schedule>
+						</h:panelGrid>
+
+						<p:dialog widgetVar="eventDialog" header="Event Details"
+							showEffect="clip" hideEffect="clip">
+							<h:panelGrid id="eventDetails" columns="2">
+								<p:outputLabel for="title" value="Titles:" />
+								<p:inputText id="title" value="#{eventoMB.event.title}"
+									required="true" />
+
+								<p:outputLabel for="from" value="From:" />
+								<p:calendar id="from" value="#{eventoMB.event.startDate}"
+									timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" />
+
+								<p:outputLabel for="to" value="To:" />
+								<p:calendar id="to" value="#{eventoMB.event.endDate}"
+									timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" />
+
+								<p:outputLabel for="allDay" value="All Day:" />
+								<h:selectBooleanCheckbox id="allDay"
+									value="#{eventoMB.event.allDay}" />
+
+								<p:commandButton type="reset" value="Reset" />
+								<p:commandButton id="addButton" value="Save"
+									actionListener=""
+									oncomplete="PF('myschedule').update();PF('eventDialog').hide();" />
+							</h:panelGrid>
+						</p:dialog>
+					</h:form>-->
+
+					<script type="text/javascript">
+						PrimeFaces.locales['tr'] = {
+							closeText : 'kapat',
+							prevText : 'geri',
+							nextText : 'ileri',
+							currentText : 'bugün',
+							monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
+									'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
+									'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
+							monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
+									'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
+									'Kas', 'Ara' ],
+							dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
+									'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
+							dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
+									'Cu', 'Ct' ],
+							dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
+									'Ct' ],
+							weekHeader : 'Hf',
+							firstDay : 1,
+							isRTL : false,
+							showMonthAfterYear : false,
+							yearSuffix : '',
+							month : 'Ay',
+							week : 'Hafta',
+							day : 'Gün',
+							allDayText : 'Tüm Gün'
+						};
+					</script>
+					<!-- <style type="text/css">
+					.value {
+						width: 1000px;
+					}
+					</style>
+		<p:dialog widgetVar="dlgAdicionarEven"
+			header="#{eventoMB.editEvento.id eq null ? 'Adicionar novo Evento' : 'Editar Evento'}"
+			modal="true" id="dlgAdicionarEven" styleClass="rcf-dialog">
+			<p:panel id="pnlGridEven">
+					<div class="col py-3 px-md-5 border bg-light">
+						<p:inputText label="Titulo do evento" pt:type="text"
+							styleClass="ui-input-login col-12" value="#{eventoMB.editEvento.titulo}"
+							required="true" placeholder="Titulo do evento" />
+					</div>
+					<div class="col py-3 px-md-5 border bg-light">
+						<p:outputLabel value="Data Inicio" styleClass="rcf-input-form col-md-2" />
+						<p:inputText pt:type="date" label="Data inicio"
+							styleClass="rcf-input-form col-md-4"
+							value="#{eventoMB.editEvento.dataInicio}" required="true"
+							id="dataInicio" placeholder="Data inicio" >
+								<f:convertDateTime pattern="yyyy-MM-dd" />
+						</p:inputText>
+					
+						<p:outputLabel value="Data Fim" styleClass="rcf-input-form col-md-2" />
+						<p:inputText pt:type="date" label="Data fim"
+							styleClass="rcf-input-form col-md-4" value="#{eventoMB.editEvento.dataFim}"
+							required="true" placeholder="Data fim">
+							<f:convertDateTime pattern="yyyy-MM-dd" />
+						</p:inputText>
+					</div>
+					<div class="col py-3 px-md-5 border bg-light">
+						<div class="col-md-12">
+						<p:outputLabel value="Hora Inicio" styleClass="rcf-input-form col-md-2" />
+						
+							<p:calendar pattern="HH:mm" timeOnly="true" styleClass="col-md-4"
+								value="#{eventoMB.editEvento.horaInicio}" required="true"
+								label="Hora inicio" />
+						</div>
+						<div class="col-md-12">
+						<p:outputLabel value="Hora Fim" styleClass="rcf-input-form col-md-2" />
+						
+							<p:calendar pattern="HH:mm" timeOnly="true" styleClass="col-md-4"
+								value="#{eventoMB.editEvento.horaFim}" required="true"
+								label="Hora fim" />
+						</div>
+					</div>
+					<div class="col py-3 px-md-5 border bg-light">
+							<p:inputText styleClass="rcf-input-form col-lg-4 col-7" placeholder="Site proprio do Evento"
+								value="#{eventoMB.editEvento.site}"
+								disabled="#{eventoMB.editEvento.siteProprio}"
+								label="site do evento" id="cbxSiteProprio" />
+
+							<p:outputLabel class="col-lg-2 col-5" value=".eventor.com.br"/>
+
+							<p:selectBooleanCheckbox styleClass="rcf-input-form col-lg-2 col-1"
+									value="#{eventoMB.editEvento.siteProprio}">
+									<p:ajax event="change" update="cbxSiteProprio" />
+							</p:selectBooleanCheckbox> 
+							<p:outputLabel value="utilizar site fornecido pelo geventor." styleClass="rcf-input-form col-lg-4 col-11" />
+					</div>
+					
+					<div class="col py-3 px-md-5 border bg-light">
+					<table>
+						<tbody>
+						<tr>
+						<td>
+						<p:selectOneMenu styleClass="rcf-input-form" styname="uf"
+								id="uf" required="true" value="#{eventoMB.editEvento.estado}"
+								label="Estado">
+								<f:ajax listener="" render="cidades" />
+								<f:selectItem itemValue="" itemLabel="Estado"
+									noSelectionOption="true" />
+								<f:selectItems value="#{eventoMB.estados}" var="est"
+									itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+						</p:selectOneMenu>
+						</td><td>
+						<p:selectOneMenu required="true" styleClass="rcf-input-form"
+								value="#{eventoMB.editEvento.cidade}" label="Cidade"
+								id="cidades">
+								<f:selectItem itemValue="" itemLabel="Cidade"
+									noSelectionOption="true" />
+								<f:selectItems value="#{eventoMB.cidades}" var="cid"
+									itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+						</p:selectOneMenu>
+						</td>
+						<td>
+						<p:inputText pt:type="" required="true" styleClass="rcf-input-form col-md-10" placeholder="Local do Evento"
+								value="#{eventoMB.editEvento.local}" label="Local" />
+							</td><td>
+						<p:inputText styleClass="rcf-input-form col-md-10"
+								value="#{eventoMB.editEvento.email}" id="email" placeholder="Email comercial do Evento"
+								validatorMessage="formato de email inválido" label="E-mail">
+								<f:validateRegex
+									pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+						</p:inputText>
+						</td>
+						</tr>
+						</tbody>
+						</table>
+					</div>
+					<div class="col py-3 px-md-5 border bg-light">
+						<p:inputMask pt:type="" styleClass="rcf-input-form col-md-3" placeholder="Telefone do Evento"
+								label="Telefone" mask="(999)99999-9999"
+								value="#{eventoMB.editEvento.telefone}" />
+
+						<p:inputMask pt:type="" styleClass="rcf-input-form col-md-3" label="Preço" placeholder="Preço do Evento"
+								mask="R$ 999,99" value="#{eventoMB.editEvento.preco}" />
+						
+						<p:outputLabel value="Vagas pro Evento:" styleClass="rcf-input-form col-md-3"/>
+						<p:inputText pt:type="" styleClass="rcf-input-form col-md-2" placeholder="Vagas pro Evento"
+								value="#{eventoMB.editEvento.vagas}" label="Vagas" />
+					</div>
+					<div class="col py-3 px-md-5 border bg-light">
+								<p:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
+									maxlength="250" counterTemplate="{0} caracteres restantes."
+									autoResize="false" value="#{eventoMB.editEvento.descricao}"
+									label="Descrição" styleClass="rcf-input-form col-md-7" />
+
+								<p:outputLabel id="display" styleClass="rcf-input-form col-md-5"/>
+					</div>
+						<f:facet name="footer">
+					
+							<p:commandButton
+								value="#{eventoMB.editEvento.id eq null ? 'Criar evento' : 'Editar evento'}"
+								id="btnEdit" styleClass="btn btn-primary"
+								actionListener=""
+								oncomplete="onCompleteSave(xhr, status, args);" update=":msgs form:tabGerenc:j_idt35">
+								<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+								<f:ajax render="tblEven" />
+							</p:commandButton>
+
+						</f:facet>
+			</p:panel>
+		</p:dialog> -->
+		
+		<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+			<p:graphicImage name="ajaxloader.gif" library="images" />
+		</p:dialog>
+		<p:ajaxStatus onstart="PF('status').show()"
+			onsuccess="PF('status').hide()" />
+
+		<!-- <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			<f:ajax render="">
+				<p:commandButton value="Sim" type="button" update="form:tblEven"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</f:ajax>
+		</p:confirmDialog> -->
+		</div>
+		</div>
+		</div>
+		
+	</ui:define>
+</ui:composition>
