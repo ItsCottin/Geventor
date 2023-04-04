@@ -6,13 +6,72 @@ body {
     padding-top: 56px;
 }
 
-.ui-widget {
+.ui-growl {
 	margin-top: 70px;
+}
+
+.hasDatepicker {
+    display: block!important;
+    width: 100%!important;
+    height: calc(1.5em + .75rem + 2px)!important;
+    padding: .375rem .75rem!important;
+    font-size: 1rem!important;
+    font-weight: 400!important;
+    line-height: 1.5!important;
+    color: #495057!important;
+    background-color: #fff!important;
+    background-clip: padding-box!important;
+    border: 1px solid #ced4da!important;
+    border-radius: .25rem!important;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out!important;
+}
+
+.hasDatepicker:focus {
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25)!important;
 }
 
 .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
 	background: #47235e 50% 50% repeat-x!important;
 	border: 1px solid #47235e!important;
+}
+
+
+
+.ui-widget-button-success-rcf {
+	font-family: inherit!important;
+	background: #28a745!important;
+	border-color: #28a745!important;
+	padding: 0!important;
+}
+
+.ui-widget-button-success-rcf:hover {
+	color: #fff!important;
+	background-color: #218838!important;
+	border-color: #1e7e34!important;
+	box-shadow: 0 0 0 .2rem rgba(72, 180, 97, .5)!important;
+}
+
+.btn-group>.btn-group:not(:first-child)>.btn, .btn-group>.btn:not(:first-child) {
+	border-top-left-radius: 0.25rem!important;
+	border-bottom-left-radius: 0.25rem!important;
+}
+
+.ui-widget-button-danger-rcf {
+	background: #dc3545!important;
+	border-color: #dc3545!important;
+	font-family: inherit!important;
+	padding: 0!important;
+}
+
+.ui-widget-button-danger-rcf:hover {
+	color: #fff!important;
+	background-color: #c82333!important;
+	border-color: #bd2130!important;
+	box-shadow: 0 0 0 .2rem rgba(72, 180, 97, .5)!important;
+}
+
+.ui-icon-button-rcf {
+	width: 1.4em!important;
 }
 
 @media (min-width: 200px){
@@ -24,6 +83,18 @@ body {
 		flex: 0 0 auto!important;
 		width: 58.33333333%!important;
 	}
+}
+
+@media (max-width: 575px) {
+	.mt-3-rcf {
+		margin-top: 1rem;
+	}
+}
+
+.border-rcf {
+	border-radius: 0.25rem!important;
+	border: 1px solid #dee2e6!important;
+	padding: 1rem;
 }
 
 .jumbotron {
