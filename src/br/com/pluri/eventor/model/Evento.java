@@ -77,6 +77,9 @@ public class Evento extends BaseORM {
 	@Column(name="TELEFONE_EVEN")
 	private String telefone;
 	
+	@Column(name="SITE_PROPRIO")
+	private boolean siteProprio;
+	
 	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
 	@ManyToOne
 	private Usuario usuario;
@@ -88,16 +91,14 @@ public class Evento extends BaseORM {
 	@Transient
 	private Date horaFim;
 	
-	@Transient
-	private boolean siteProprio;
 	
-	// relação de evento para demanada (muitos pra 1)
+	// relaï¿½ï¿½o de evento para demanada (muitos pra 1)
 	/*@ManyToOne
 	@JoinColumn(name="ID_DEMAN", referencedColumnName="ID_DEMAN")
 	private Demanda demanda;*/
 	
 	
-	// relação de Evento para visitantes (muitos pra muitos)
+	// relaï¿½ï¿½o de Evento para visitantes (muitos pra muitos)
 	/*@ManyToMany
 	@JoinTable(
 			name="TBL_EVENTO_VISITANTE",
@@ -105,7 +106,7 @@ public class Evento extends BaseORM {
 			inverseJoinColumns=@JoinColumn(name="ID_VISIT", referencedColumnName="ID_VISIT"))
 	private List<Visitante> visitantes;
 	
-	// relação de evento para medalha (1 pra muitos)
+	// relaï¿½ï¿½o de evento para medalha (1 pra muitos)
 	@OneToMany(mappedBy="evento")
 	private List<Medalha> medalhas;*/
 	
