@@ -207,7 +207,7 @@
                               <div class="col-sm-12">
                               	 <div class="btn-group" role="group" aria-label="Basic example">
 	                                 <p:commandButton rendered="#{!atividadeMB.modoConsulta}"
-	                                    value="#{atividadeMB.editAtividade.id eq null ? 'Cadastra Atividade' : 'Editar Atividade'}"
+	                                    value="#{atividadeMB.editAtividade.id eq null ? 'Cadastra Atividade' : 'Salvar Alterações'}"
 	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
 	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv"
 	                                    oncomplete="selAbaTbl();" >
