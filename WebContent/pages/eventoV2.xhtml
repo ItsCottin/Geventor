@@ -20,6 +20,14 @@
    			$('.nav-tabs a[href="#adicionareditar"]').tab('show');
    			
 		}
+		function openConfirmedDel() {
+	        $('#confirmDel').modal('show');
+	    }
+		
+		function closeConfirmedDel() {
+	        $('#confirmDel').modal('hide');
+	        window.location.reload();
+	    }
 	  </script>
       <ul class="nav nav-tabs">
          <li class="active">
@@ -58,13 +66,13 @@
                      </thead>
                      <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
                         <tr>
-                           <th scope="col">#{even.titulo}</th>
-                           <th class="d-none d-lg-block" scope="col">#{even.dataInicio}</th>
-                           <th scope="col">#{even.cidade}</th>
-                           <th class="d-none d-sm-block" scope="col">#{even.estado}</th>
-                           <th scope="col">#{even.vagas}</th>
-                           <th class="d-none d-md-block" scope="col">#{even.preco}</th>
-                           <th scope="col">
+                           <th scope="col" class="p-3 mb-2 bg-light text-dark">#{even.titulo}</th>
+                           <th class="d-none d-lg-block font-weight-normal" scope="col">#{even.dataInicio}</th>
+                           <th scope="col" class="font-weight-normal">#{even.cidade}</th>
+                           <th class="d-none d-sm-block font-weight-normal" scope="col">#{even.estado}</th>
+                           <th scope="col" class="font-weight-normal">#{even.vagas}</th>
+                           <th class="d-none d-md-block font-weight-normal" scope="col">#{even.preco}</th>
+                           <th scope="col" class="font-weight-normal">
                            	<p:commandButton immediate="true" id="consultar_#{even.id}"
 								icon="ui-icon-search" title="Consultar"
 								actionListener="#{eventoMB.doConsulta(even)}" update=":formEvent"
@@ -76,14 +84,32 @@
 								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
 							</p:commandButton>
 							<p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{even.id}"
-								title="Excluir"
-								update=":msgs" onclick="PF('confirmationDialog').show();" styleClass="ui-icon-button-rcf" />
-							<p:confirmDialog header="Confirmação" widgetVar="confirmationDialog">
-								<p>Deseja realmente excluir o registro?</p>
-							    <p:commandButton value="Sim" oncomplete="PF('confirmationDialog').hide()" 
-							        actionListener="#{eventoMB.doRemove(even)}" update=":msgs :formtbl" />
-							    <p:commandButton value="Não" onclick="PF('confirmationDialog').hide()" type="button" />
-							</p:confirmDialog>
+								title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.setEvenSel(even)}"
+								update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
+							<!-- Modal -->
+							<div class="modal fade" id="confirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+							  <div class="modal-dialog" role="document">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							          <span aria-hidden="true"></span>
+							        </button>
+							      </div>
+							      <div class="modal-body">
+							      <h:form id="formmodal">
+								      <h:outputLabel value="Deseja realmente excluir esse evento ?" />
+							      </h:form>
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn" data-dismiss="modal">Não</button>
+							        <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+							        	oncomplete="closeConfirmedDel()" 
+							        	actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+							      </div>
+							    </div>
+							  </div>
+							</div>
                            </th>
                         </tr>
                      </c:forEach>
@@ -94,13 +120,13 @@
                   
                   <div class="col-md-12">
                      <h:form id="formEvent">
-                     <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar novo Evento' : 'Editar Evento'}</h3>
+                     <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
                   		<p:separator style="width:99%;" />
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
                               <label for="titulo" class="col-sm-3 col-form-label">Título:</label>
                               <div class="col-sm-9">
-                                 <p:inputText class="form-control" id="titulo" value="#{eventoMB.editEvento.titulo} #{eventoMB.modoConsulta}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta eq false ? 'enabled' : 'disabled'}" />
+                                 <p:inputText class="form-control" id="titulo" value="#{eventoMB.editEvento.titulo}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
@@ -109,7 +135,7 @@
                               </div>
                               <div class="col-sm-3">
                                  <p:inputText pt:type="date" label="Data inicio"
-                                    styleClass="form-control"
+                                    styleClass="form-control" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataInicio}" required="true"
                                     id="dataInicio" placeholder="Data inicio" >
                                     <f:convertDateTime pattern="yyyy-MM-dd" />
@@ -121,7 +147,7 @@
                               <div class="col-sm-3">
                                  <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
                                     value="#{eventoMB.editEvento.horaInicio}" required="true"
-                                    label="Hora inicio" id="horafrom" />
+                                    label="Hora inicio" id="horafrom" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
@@ -130,7 +156,7 @@
                               </div>
                               <div class="col-sm-3">
                                  <p:inputText pt:type="date" label="Data inicio"
-                                    styleClass="form-control"
+                                    styleClass="form-control" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataFim}" required="true"
                                     id="datafim" placeholder="Data inicio" >
                                     <f:convertDateTime pattern="yyyy-MM-dd" />
@@ -142,13 +168,13 @@
                               <div class="col-sm-3">
                                  <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
                                     value="#{eventoMB.editEvento.horaFim}" required="true"
-                                    label="Hora inicio" id="horafim" />
+                                    label="Hora inicio" id="horafim" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
                               <div class="col-sm-6 input-group">
                                  <h:inputText styleClass="form-control" placeholder="Site proprio do Evento"
-                                    value="#{eventoMB.editEvento.site}"
+                                    value="#{eventoMB.editEvento.site}" 
                                     disabled="#{eventoMB.editEvento.siteProprio}"
                                     label="site do evento" id="cbxSiteProprio" />
                                  <div class="input-group-prepend">
@@ -158,20 +184,21 @@
                               <div class="col-sm-6 input-group mt-3-rcf">
                                  <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                       <h:selectBooleanCheckbox styleClass=""
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
                                           value="#{eventoMB.editEvento.siteProprio}">
                                           <p:ajax event="change" update="cbxSiteProprio" />
                                        </h:selectBooleanCheckbox>
                                     </div>
                                  </div>
-                                 <input type="text" class="form-control" aria-label="Text input with checkbox" value="utilizar site fornecido pelo geventor." disabled="true" />
+                                 <input type="text" class="form-control" aria-label="Text input with checkbox" 
+                                 	value="utilizar site fornecido pelo geventor." disabled="true" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
                               <div class="col-sm-6">
                                  <h:selectOneMenu styleClass="form-control" styname="uf"
                                     id="uf" required="true" value="#{eventoMB.editEvento.estado}"
-                                    label="Estado">
+                                    label="Estado" disabled="#{eventoMB.modoConsulta}" >
                                     <f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
                                     <f:selectItem itemValue="" itemLabel="Selecione um Estado"
                                        noSelectionOption="true" />
@@ -182,7 +209,7 @@
                               <div class="col-sm-6 mt-3-rcf">
                                  <h:selectOneMenu required="true" styleClass="form-control"
                                     value="#{eventoMB.editEvento.cidade}" label="Cidade"
-                                    id="cidades">
+                                    id="cidades" disabled="#{eventoMB.modoConsulta}" >
                                     <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
                                        noSelectionOption="true" />
                                     <f:selectItems value="#{eventoMB.cidades}" var="cid"
@@ -195,13 +222,14 @@
                                  <label for="local" class="col-form-label">Local:</label>
                               </div>
                               <div class="col-sm-4">
-                                 <h:inputText class="form-control" id="local" value="#{eventoMB.editEvento.local}" label="Local" required="true"/>
+                                 <h:inputText class="form-control" id="local" value="#{eventoMB.editEvento.local}" label="Local" required="true"
+                                 	disabled="#{eventoMB.modoConsulta}" />
                               </div>
                               <div class="col-sm-2">
                                  <label for="email" class="col-form-label">E-mail:</label>
                               </div>
                               <div class="col-sm-4">
-                                 <h:inputText styleClass="form-control"
+                                 <h:inputText styleClass="form-control" disabled="#{eventoMB.modoConsulta}"
                                     value="#{eventoMB.editEvento.email}" id="email"
                                     validatorMessage="formato de email inválido" label="E-mail">
                                     <f:validateRegex
@@ -215,7 +243,7 @@
                               </div>
                               <div class="col-sm-4">
                                  <p:inputMask pt:type="" styleClass="form-control" id="telefone"
-                                    label="Telefone" mask="(99) 99999-9999"
+                                    label="Telefone" mask="(99) 99999-9999" disabled="#{eventoMB.modoConsulta}"
                                     value="#{eventoMB.editEvento.telefone}" />
                               </div>
                               <div class="col-sm-2">
@@ -223,7 +251,7 @@
                               </div>
                               <div class="col-sm-4">
                                  <p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
-                                    mask="R$ 99,99" value="#{eventoMB.editEvento.preco}" />
+                                    mask="R$ 99,99" value="#{eventoMB.editEvento.preco}" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
@@ -231,14 +259,14 @@
                                  <label for="vagas" class="col-form-label">Vagas pro Evento:</label>
                               </div>
                               <div class="col-sm-4">
-                                 <h:inputText styleClass="form-control" id="vagas"
+                                 <h:inputText styleClass="form-control" id="vagas" disabled="#{eventoMB.modoConsulta}"
                                     value="#{eventoMB.editEvento.vagas}" label="Vagas" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
                               <div class="col-sm-12">
                                  <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
-                                    maxlength="250" counterTemplate="{0} caracteres restantes."
+                                    maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{eventoMB.modoConsulta}"
                                     autoResize="false" value="#{eventoMB.editEvento.descricao}"
                                     label="Descrição" styleClass="form-control" />
                               </div>
@@ -246,7 +274,7 @@
                            <div class="row mb-3">
                               <div class="col-sm-12">
                               	 <div class="btn-group" role="group" aria-label="Basic example">
-	                                 <p:commandButton
+	                                 <p:commandButton rendered="#{!eventoMB.modoConsulta}"
 	                                    value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Editar Evento'}"
 	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
 	                                    actionListener="#{eventoMB.doSave}" update=":formtbl :formEvent"
@@ -255,7 +283,7 @@
 	                                    <f:ajax render="tblEven" />
 	                                 </p:commandButton>
 	                                 <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
-	                                    value="Cancelar"
+	                                    value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
 	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
 	                                    actionListener="#{eventoMB.doPrepareSave}" update=":formEvent"
 	                                    oncomplete="selAbaTbl();"  >

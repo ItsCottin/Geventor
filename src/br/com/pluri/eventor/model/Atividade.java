@@ -67,7 +67,7 @@ public class Atividade extends BaseORM {
 	private List<Demanda> demandas;*/
 	@ManyToOne
 	@JoinColumn(name="ID_EVEN", referencedColumnName="ID_EVEN")
-	private Evento evento;
+	public Evento evento;
 	
 	public Atividade(){}
 	

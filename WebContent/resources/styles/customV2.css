@@ -74,6 +74,13 @@ body {
 	width: 1.4em!important;
 }
 
+.ui-state-disabled {
+	background-color: #e9ecef!important;
+	opacity: 1!important;
+	width: 100%;
+	font-size: 1rem!important;
+}
+
 @media (min-width: 200px){
 	.col-sm-2-no-100-width {
 		flex: 0 0 auto!important;
@@ -208,8 +215,6 @@ body {
 .tab-button.active {
   border-bottom: 2px solid #000;
 }
-
-
 
 .ui-inputfield, .ui-widget-content .ui-inputfield, .ui-widget-header .ui-inputfield {
 	box-shadow: none!important;

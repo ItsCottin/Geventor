@@ -37,6 +37,18 @@ import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
 
+/**
+ * Adicionado método "retTitleEven(Evento even)" para retornar o titulo do evento
+ * 
+ * <pre>
+ * Last Modified  $Date: 2023/04/04 12:27:45 $
+ * Last Modified by $Author: Rodrigo Cotting $
+ * </pre>
+ * 
+ * @author Rodrigo Cotting
+ * @version $Revision: 1.0 $
+ */
+
 @Getter
 @Setter
 @Scope("view")
@@ -61,16 +73,18 @@ public class EventoMB extends BaseMB {
 	private List<Evento> resultEven;
 	private static final long serialVersionUID = 1L;
 	private ScheduleModel eventModel;
-        private ScheduleModel lazyEventModel;
-        private ScheduleEvent event = new DefaultScheduleEvent();
+    private ScheduleModel lazyEventModel;
+    private ScheduleEvent event = new DefaultScheduleEvent();
 	private boolean confirmaExclui = false;
 	public boolean modoConsulta;
+	public Evento evenSel;
 	
 	@PostConstruct
 	public void postConstruct(){
 		onEventos();
 		estados = estadoSB.findAll();
 		this.modoConsulta = false;
+		this.evenSel = new Evento();
 	}
 	
 	public void onTabChange(TabChangeEvent event) {
@@ -111,11 +125,11 @@ public class EventoMB extends BaseMB {
 	private boolean validarDatasEvento() {
 		if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
 			if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-				showErrorMessage("Data InÃ­cio estÃ¡ depois da data final do evento");
+				showErrorMessage("Data Início está depois da data final do evento");
 				return false;
 			}
 		} else if (editEvento.getDataInicio() != null || editEvento.getDataFim() != null) {
-			showErrorMessage("Data InÃ­cio estÃ¡ depois da data final do evento");
+			showErrorMessage("Data Início está depois da data final do evento");
 			return false;
 		}
 		return true;
@@ -129,6 +143,7 @@ public class EventoMB extends BaseMB {
 		
 		//TODO Linha com erro "The entity must not be null!" - ajustar linha para funcionamento correto
 		eventoSB.delete(exclui);
+		showInfoMessage("Evento excluído com sucesso");
 		onEventos();
 	}
 	
@@ -144,6 +159,16 @@ public class EventoMB extends BaseMB {
 		doPrepareSave();
 		this.modoConsulta = true;
 		this.editEvento = eventoSB.findById(edit.getId());
+		editEvento.setSiteProprio(true);
+	}
+	
+	public String retTitleEven(Evento even) {
+		try {
+			return eventoSB.findById(even.getId()).getTitulo();
+		} catch (NullPointerException e){
+			return "Nao deu certo";
+		}
+		
 	}
 	
 	public void doPrepareInsert(){
@@ -214,13 +239,9 @@ public class EventoMB extends BaseMB {
          
         public void onEventMove(ScheduleEntryMoveEvent event) {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-             
-            
         }
          
         public void onEventResize(ScheduleEntryResizeEvent event) {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-             
-
         }
 }

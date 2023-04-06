@@ -1,0 +1,268 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+	
+	<ui:define name="contentV3">
+
+		<script type="text/javascript">
+		function selAbaTbl() {
+   			$('.nav-tabs a[href="#visualizar"]').tab('show');
+		}
+		
+		function selAbaEdit() {
+			$('.nav-tabs a[href="#gerenciar"]').tab('show');
+   			
+		}
+		function openConfirmedDel() {
+	        $('#confirmDel').modal('show');
+	    }
+		
+		function closeConfirmedDel() {
+	        $('#confirmDel').modal('hide');
+	        window.location.reload();
+	    }
+	  </script>
+		
+		<ul class="nav nav-tabs">
+	        <li class="active">
+	            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#visualizar">Visualizar</a>
+	         </li>
+	         <li>
+	            <a data-toggle="pill" class="nav-link" href="#gerenciar">Gerenciar</a>
+	         </li>
+     	 </ul>
+     	 <div class="tab-content py-4">
+     	 	<div id="visualizar" class="tab-pane active">
+     	 		<h:form id="formtblAtiv">
+     	 		<div class="row">
+     	 		<div class="col-sm-8 col-sx-6">
+     	 		  <h1 class="">Atividades</h1>
+     	 		 </div>
+     	 		 <div class="col-sm-4 col-sx-6">
+     	 		 	
+	     	 		  
+					</div>
+					</div>
+                  <p:separator style="width:99%;" />
+                  <table class="table" id="tblAtiv">
+                     <thead>
+                        <tr>
+                           <th scope="col">Evento</th>
+                           <th class="d-none d-sm-block" scope="col">Detalhes</th>
+                           <th scope="col">Atividade</th>
+                           <th class="d-none d-lg-block" scope="col">Data</th>
+                           <th scope="col">Configurar</th>
+                        </tr>			   
+                     </thead>
+                     <c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+                        <tr>
+                           <th scope="col" class="p-3 mb-2 bg-light text-dark">#{ativ.evento.titulo}</th>
+                           <th class="d-none d-sm-block font-weight-normal" scope="col">#{ativ.detalhes}</th>
+                           <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
+                           <th class="d-none d-sm-block font-weight-normal" scope="col">#{ativ.dataInicio}</th>
+                           <th scope="col" >
+                           	<p:commandButton immediate="true" id="consultar_#{ativ.id}"
+								icon="ui-icon-search" title="Consultar"
+								actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv"
+								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
+							</p:commandButton>
+                           	<p:commandButton immediate="true" id="editar_#{ativ.id}"
+								icon="ui-icon-wrench" title="Editar"
+								actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv"
+								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
+							</p:commandButton>
+							<p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{ativ.id}"
+								title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{atividadeMB.setAtivSel(ativ)}"
+								update=":msgs" styleClass="ui-icon-button-rcf" />
+							<!-- Modal -->
+							<div class="modal fade" id="confirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+							  <div class="modal-dialog" role="document">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							          <span aria-hidden="true"></span>
+							        </button>
+							      </div>
+							      <div class="modal-body">
+							      <h:form id="formmodal">
+								      <h:outputLabel value="Deseja realmente excluir essa Atividade ?" />
+							      </h:form>
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn" data-dismiss="modal">Não</button>
+							        <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+							        	oncomplete="closeConfirmedDel()" 
+							        	actionListener="#{atividadeMB.doRemove(atividadeMB.ativSel)}" update=":msgs" />
+							      </div>
+							    </div>
+							  </div>
+							</div>
+                           </th>
+                        </tr>
+                     </c:forEach>
+                  </table>
+                  </h:form>
+     	 	</div>
+     	 	<div id="gerenciar" class="tab-pane">
+     	 		<div class="col-md-12">
+                     <h:form id="formAtiv">
+                     <h3 class="">#{atividadeMB.editAtividade.id eq null ? 'Adicionar Atividade' : (atividadeMB.modoConsulta ? 'Consultando a Atividade' : 'Editar Atividade')}</h3>
+                  		<p:separator style="width:99%;" />
+                        <div class="col-md-12 col-lg-12">
+                           <div class="row mb-3 border-rcf">
+                           		<div class="col-sm-3">
+                              		<label for="titulo" class="col-form-label">Nome:</label>
+                              	</div>
+                              	<div class="col-sm-3">
+                                 	<p:inputText class="form-control" id="titulo" value="#{atividadeMB.editAtividade.nome}" label="Nome" required="true" disabled="#{atividadeMB.modoConsulta}" />
+                              	</div>
+                              	<div class="col-sm-3">
+                              		<label for="eventos" class="col-form-label">Evento:</label>
+                              	</div>
+                              	<div class="col-sm-3">
+	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control" label="Evento" required="true"
+											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta}">
+										<f:ajax listener="#{atividadeMB.onEventoChangeV2}"
+											render="tblAtiv" update="" />
+										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
+											noSelectionOption="true" />
+										<f:selectItems value="#{eventoMB.resultadoEvento}" var="event"
+											itemLabel="#{event.titulo}" itemValue="#{event.id}" />
+									</h:selectOneMenu>
+								</div>
+                           </div>
+                           <div class="row mb-3 border-rcf">
+                              <div class="col-sm-3">
+                                 <label for="from" class="col-form-label">Começa:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <p:inputText pt:type="date" label="Data inicio"
+                                    styleClass="form-control" disabled="#{atividadeMB.modoConsulta}" 
+                                    value="#{atividadeMB.editAtividade.dataInicio}" required="true"
+                                    id="dataInicio" placeholder="Data inicio" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                 </p:inputText>
+                              </div>
+                              <div class="col-sm-3">
+                                 <label for="horafrom" class="col-form-label">Hora Começo:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
+                                    value="#{atividadeMB.editAtividade.horaInicio}" required="true"
+                                    label="Hora inicio" id="horafrom" disabled="#{atividadeMB.modoConsulta}" />
+                              </div>
+                           </div>
+                           <div class="row mb-3 border-rcf">
+                              <div class="col-sm-3">
+                                 <label for="datafim" class="col-form-label">Termina:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <p:inputText pt:type="date" label="Data inicio"
+                                    styleClass="form-control" disabled="#{atividadeMB.modoConsulta}" 
+                                    value="#{atividadeMB.editAtividade.dataFim}" required="true"
+                                    id="datafim" placeholder="Data inicio" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                 </p:inputText>
+                              </div>
+                              <div class="col-sm-3">
+                                 <label for="horafim" class="col-form-label">Hora Termino:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
+                                    value="#{atividadeMB.editAtividade.horaFim}" required="true"
+                                    label="Hora inicio" id="horafim" disabled="#{atividadeMB.modoConsulta}" />
+                              </div>
+                           </div>
+                           <div class="row mb-3 border-rcf">
+                              <div class="col-sm-3">
+                                 <label for="preco" class="col-form-label">Preço:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
+                                    mask="R$ 99,99" value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta}" />
+                              </div>
+                              <div class="col-sm-3">
+                                 <label for="vagas" class="col-form-label">Vagas para Atividade:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                 <h:inputText styleClass="form-control" id="vagas" disabled="#{atividadeMB.modoConsulta}"
+                                    value="#{atividadeMB.editAtividade.vagas}" label="Vagas" />
+                              </div>
+                           </div>
+                           <div class="row mb-3 border-rcf">
+                              <div class="col-sm-12">
+                                 <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Detalhes da Atividade"
+                                    maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{atividadeMB.modoConsulta}"
+                                    autoResize="false" value="#{atividadeMB.editAtividade.detalhes}"
+                                    label="Descrição" styleClass="form-control" />
+                              </div>
+                           </div>
+                           <div class="row mb-3">
+                              <div class="col-sm-12">
+                              	 <div class="btn-group" role="group" aria-label="Basic example">
+	                                 <p:commandButton rendered="#{!atividadeMB.modoConsulta}"
+	                                    value="#{atividadeMB.editAtividade.id eq null ? 'Cadastra Atividade' : 'Editar Atividade'}"
+	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
+	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv"
+	                                    oncomplete="selAbaTbl();" >
+	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                    <f:ajax render="tblAtiv" />
+	                                 </p:commandButton>
+	                                 <p:commandButton rendered="#{atividadeMB.editAtividade.id eq null ? 'false' : 'true'}"
+	                                    value="#{atividadeMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
+	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
+	                                    actionListener="#{atividadeMB.doPrepareSave}" update=":formAtiv"
+	                                    oncomplete="selAbaTbl();"  >
+	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                    <f:ajax render="tblAtiv" />
+	                                 </p:commandButton>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </h:form>
+                     <script type="text/javascript">
+                        PrimeFaces.locales['tr'] = {
+                        	closeText : 'kapat',
+                        	prevText : 'geri',
+                        	nextText : 'ileri',
+                        	currentText : 'bugün',
+                        	monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
+                        			'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
+                        			'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
+                        	monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
+                        			'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
+                        			'Kas', 'Ara' ],
+                        	dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
+                        			'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
+                        	dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
+                        			'Cu', 'Ct' ],
+                        	dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
+                        			'Ct' ],
+                        	weekHeader : 'Hf',
+                        	firstDay : 1,
+                        	isRTL : false,
+                        	showMonthAfterYear : false,
+                        	yearSuffix : '',
+                        	month : 'Ay',
+                        	week : 'Hafta',
+                        	day : 'Gün',
+                        	allDayText : 'Tüm Gün'
+                        };
+                     </script>
+                     <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="ajaxloader.gif" library="images" />
+                     </p:dialog>
+                     <p:ajaxStatus onstart="PF('status').show()"
+                        onsuccess="PF('status').hide()" />
+                  </div>
+     	 	</div>
+     	 </div>
+	</ui:define>
+</ui:composition>

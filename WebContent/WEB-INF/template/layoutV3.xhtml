@@ -21,64 +21,82 @@
 		<h:outputScript library="js" name="customV2.js" />
 	
 	</h:head>
+
 	<h:body>
-		<div class="my-7">	
-			<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false" 
-				life="2000" />
-		</div>
-		<h:form id="menuForm" >		
-			<nav class="navbar navbar-expand-lg fixed-top shadow navbar-dark navbar-offcanvas" style="background-color: #47235e;">
-		    	<div class="mr-3">
-		        	<a class="navbar-brand mr-auto">PLURI LTDA</a>
-		        </div>
-				<button class="navbar-toggler d-block me-3" type="button" id="navToggle">
-		            <span class="navbar-toggler-icon"></span>
-		        </button>
-		        <div class="navbar-collapse offcanvas-collapse">
-		            <ul class="navbar-nav mr-auto my-2">
-		                <li class="nav-item">
-		                	<h:link styleClass="nav-link" value="Realizar Login" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="loginV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                	<h:link styleClass="nav-link" value="Cadastre seu Usuario" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="registrarV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="indexV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="eventoV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="atividadesV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Participantes" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="participantesV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="inscricoesV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Informações do Usuario" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="edit-userV2.xhtml" />
-		                </li>
-		                <li class="nav-item">
-		                    <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"  />
-		                </li>
-		                <li class="nav-item">
-		                	<h:outputLink styleClass="nav-link" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
-								<h:outputText value="Sair" />
-							</h:outputLink>
-		                </li>
-		            </ul>
-		        </div>
-		    </nav>
-    	</h:form>
-    	<div class="container my-5">
-			<section class="">
-				<ui:insert name="contentV3" />
-			</section>
-		</div>	
-		<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-			<p:graphicImage name="ajaxloader.gif" library="images" />
-		</p:dialog>
+		
+	<div class="my-7">	
+	<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false" 
+			life="100000" />
+	</div>
+		
+			
+		
+   <h:form id="menuForm" >		
+    <nav class="navbar navbar-expand-lg fixed-top shadow navbar-dark navbar-offcanvas" style="background-color: #47235e;">
+    			<div class="mr-3">
+        			<a class="navbar-brand mr-auto">PLURI LTDA</a>
+        		</div>
+
+        		<button class="navbar-toggler d-block me-3" type="button" id="navToggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse offcanvas-collapse">
+            <ul class="navbar-nav mr-auto my-2">
+                <li class="nav-item">
+                	<h:link styleClass="nav-link" value="Realizar Login" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="loginV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                	<h:link styleClass="nav-link" value="Cadastre seu Usuario" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="registrarV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="indexV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="eventoV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="atividadesV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Participantes" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="participantesV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="inscricoesV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Usuario" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="edit-userV2.xhtml" />
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"  />
+                </li>
+                <li class="nav-item">
+                	<h:outputLink styleClass="nav-link" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+						<h:outputText value="Sair" />
+					</h:outputLink>
+                	
+                </li>
+            </ul>
+
+
+        </div>
+    </nav>
+    </h:form>
+    
+    			
+    			<div class="container my-5">
+				<section class="">
+					<ui:insert name="contentV3" />
+				</section>
+				</div>
+			
+
+
+			
+			<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+				<p:graphicImage name="ajaxloader.gif" library="images" />
+			</p:dialog>
+		
 	</h:body>
+
 </ui:composition>

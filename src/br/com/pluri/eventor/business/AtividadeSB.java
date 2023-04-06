@@ -12,6 +12,7 @@ import br.com.etechoracio.common.business.BaseSB;
 import br.com.pluri.eventor.dao.AtividadeDAO;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.utils.DataTimeUtils;
 
 @Service
@@ -38,6 +39,11 @@ public class AtividadeSB extends BaseSB {
 		return atividadeDAO.findByEventos(idEvento);
 	}
 	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<Atividade> findAllAtividade(){
+		return atividadeDAO.findAll();
+	}
+	
 	private Date merge(Date data, Date hora) {
 		return DataTimeUtils.merge(data, hora);
 	}
@@ -54,5 +60,12 @@ public class AtividadeSB extends BaseSB {
 		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;
 	 }
+	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void editAtiv (Atividade ativ, Long idEven) {
+		ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
+		ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
+		atividadeDAO.save(ativ);
+	}
 
 }
