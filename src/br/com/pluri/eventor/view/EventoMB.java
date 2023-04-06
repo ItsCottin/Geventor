@@ -38,7 +38,7 @@ import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
 
 /**
- * Adicionado método "retTitleEven(Evento even)" para retornar o titulo do evento
+ * Adicionado mï¿½todo "retTitleEven(Evento even)" para retornar o titulo do evento
  * 
  * <pre>
  * Last Modified  $Date: 2023/04/04 12:27:45 $
@@ -125,11 +125,11 @@ public class EventoMB extends BaseMB {
 	private boolean validarDatasEvento() {
 		if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
 			if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-				showErrorMessage("Data Início está depois da data final do evento");
+				showErrorMessage("Data InÃ­cio estÃ¡ depois da data final do evento");
 				return false;
 			}
 		} else if (editEvento.getDataInicio() != null || editEvento.getDataFim() != null) {
-			showErrorMessage("Data Início está depois da data final do evento");
+			showErrorMessage("Data InÃ­cio estÃ¡ depois da data final do evento");
 			return false;
 		}
 		return true;
@@ -143,7 +143,7 @@ public class EventoMB extends BaseMB {
 		
 		//TODO Linha com erro "The entity must not be null!" - ajustar linha para funcionamento correto
 		eventoSB.delete(exclui);
-		showInfoMessage("Evento excluído com sucesso");
+		showInfoMessage("Evento excluÃ­do com sucesso");
 		onEventos();
 	}
 	
@@ -159,7 +159,6 @@ public class EventoMB extends BaseMB {
 		doPrepareSave();
 		this.modoConsulta = true;
 		this.editEvento = eventoSB.findById(edit.getId());
-		editEvento.setSiteProprio(true);
 	}
 	
 	public String retTitleEven(Evento even) {
