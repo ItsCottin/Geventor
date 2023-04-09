@@ -83,23 +83,7 @@ public class Usuario extends BaseORM {
 		this.id = id;
 	}
 	
-	@ManyToMany
-	@JoinTable(
-			name="TBL_PARTICIPANTE_USUARIO",
-			joinColumns=@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA"),
-			inverseJoinColumns=@JoinColumn(name="ID_PART", referencedColumnName="ID_PART"))
-	private List<Participante> participantes;
-	
-	/*@ManyToMany
-	@JoinTable(
-			name="TBL_MEDALHA_USUARIO",
-			joinColumns=@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA"),
-			inverseJoinColumns=@JoinColumn(name="ID_RECOM", referencedColumnName="ID_RECOM"))
-	private List<Medalha> medalhas;*/
-	
 	@OneToMany(mappedBy="usuario")
- 	private List<UsuarioNotificacao> usuarioNotificacao;
+	private List<UsuarioAtividade> usuarioAtividade;
 	
-	/*@OneToMany(mappedBy="usuario")
- 	private List<UsuarioEvento> usuarioEvento;*/
 }

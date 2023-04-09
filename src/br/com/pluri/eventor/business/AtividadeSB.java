@@ -40,8 +40,8 @@ public class AtividadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public List<Atividade> findAllAtividade(){
-		return atividadeDAO.findAll();
+	public List<Atividade> findAllAtividadeByUsuario(Long idUsu){
+		return atividadeDAO.findAllAtividadeByUsuario(idUsu);
 	}
 	
 	private Date merge(Date data, Date hora) {

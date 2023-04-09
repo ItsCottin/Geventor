@@ -1,5 +1,7 @@
 package br.com.pluri.eventor.view;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.EventoSB;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.utils.DataTimeUtils;
 
 @Getter
 @Setter
@@ -46,6 +49,7 @@ public class AtividadeMB extends BaseMB {
 	public Atividade ativSel;
 	public Evento evenSel;
 	private List<Evento> resultadoEvento;
+	private String htmlModalAtiv;
 	
 	public Long idEvento;
 	
@@ -82,8 +86,12 @@ public class AtividadeMB extends BaseMB {
 		editAtividade.evento = eventoSB.findById(idEvento);
 	}
 	
+	public void listAtividadeByEvento(Long idEvento){
+		resultadoAtividadeByEvento = atividadeSB.findByEventos(idEvento);
+	}
+	
 	public void onAllAtividade() {
-		resultadoAtividadeByEvento = atividadeSB.findAllAtividade();
+		resultadoAtividadeByEvento = atividadeSB.findAllAtividadeByUsuario(getCurrentUserId());
 	}
 	
 	public void onEventos(){
@@ -122,7 +130,61 @@ public class AtividadeMB extends BaseMB {
 	public void prepareEditOuConsulta(Atividade edit){
 		this.editAtividade = atividadeSB.findById(edit.getId());
 		this.idEvento = editAtividade.evento.getId();
+		setModalConsultaAtiv();
 	}
 	
-
+	public String formatarData(Date data, String formato) {
+        SimpleDateFormat sdf = new SimpleDateFormat(formato);
+        String dataFormatada = sdf.format(data);
+        return dataFormatada;
+    }
+	
+	public void setModalConsultaAtiv() {
+		this.htmlModalAtiv = 
+			  " <div class=\"modal fade\" id=\"modalConsAtividade\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"confirmDel\" aria-hidden=\"true\">\n" +
+              "   <div class=\"modal-dialog modal-xl\" role=\"document\">\n" +
+              "      <div class=\"modal-content\">\n" +
+              "         <div class=\"modal-header ui-display-block-rcf\">\n" +
+              "            <h5 class=\"modal-title\" id=\"exampleModalLabel\">Evento: " + editAtividade.evento.getTitulo() + "</h5>\n" +
+              "            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
+              "              <span aria-hidden=\"true\"></span>\n" +
+              "            </button>\n" +
+              "         </div>\n" +
+              "         <div class=\"modal-body\">\n" +
+              "            <h:form id=\"modalformAtiv\">\n" +
+              "               <h5 class=\"mb-3\">Atividade: " + editAtividade.getNome() + "</h5>\n" +
+              "               <div class=\"col-md-12 col-lg-12\">\n" +
+              "                  <div class=\"row mb-3 border-rcf\">\n" +
+              "                     <div class=\"col-sm-12 row\">\n" +
+              "                        <p class=\"font-weight-normal\">Detalhes da Atividade:  " + editAtividade.getDetalhes() + "</p>\n" +
+              "                     </div>\n" +
+              "                     <div class=\"col-sm-6 row\">\n" +
+              "                        <p class=\"font-weight-normal\">Começa: " + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + " às " +
+              																	   formatarData(editAtividade.getDataInicio(), "HH:mm") + "</p>\n" +
+              "                     </div>\n" +
+              "                     <div class=\"col-sm-6 row\">\n" +
+              "                        <p class=\"font-weight-normal\">Termina:  " + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + " às " + 
+              																		 formatarData(editAtividade.getDataFim(), "HH:mm") + "</p>\n" +
+              "                     </div>\n" +
+              "                     <div class=\"col-sm-12\">\n" +
+              "                        <div class=\"row\">\n" +
+              "                           <p class=\"font-weight-normal\">Preço:  " + editAtividade.getPreco() + "</p>\n" +
+              "                        </div>\n" +
+              "                        <div class=\"row\">\n" +
+              "                        	 <p class=\"font-weight-normal\">Vagas:  " + editAtividade.getVagas() + "</p>\n" +
+              "                        </div>\n" +
+              "                     </div>" +
+              "                  </div>" +
+              "               </div>" +
+              "               <div class=\"col-md-12 col-lg-12 ui-padding-right-0-rcf\">" +
+		      "                  <div class=\"d-flex align-items-end flex-column\"> " +
+              "                    <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Fechar</button>" +
+		      "                  </div>" +
+              "               </div>" +
+		      "            </h:form>" +
+              "          </div>" +
+              "       </div>" +
+              "    </div>" +
+              " </div>";
+	} 
 }

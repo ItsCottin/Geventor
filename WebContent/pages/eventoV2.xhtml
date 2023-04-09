@@ -8,37 +8,50 @@
    template="/WEB-INF/template/layoutV3.xhtml">
    <ui:define name="contentV3">
       <script type="text/javascript">
-		function selAbaTbl() {
-   			$('.nav-tabs a[href="#visualizar"]').tab('show');
-		}
-		
-		function selAbaEdit() {
-			var tabEditTitle = document.getElementById("tabEditTitle");
-
-   	        // Atualiza o conteudo do elemento
-   	        tabEditTitle.innerHTML = "#{eventoMB.editEvento.id eq null ? 'Adicionar' : 'Editar'}";
-   			$('.nav-tabs a[href="#adicionareditar"]').tab('show');
-   			
-		}
-		function openConfirmedDel() {
-	        $('#confirmDel').modal('show');
-	    }
-		
-		function closeConfirmedDel() {
-	        $('#confirmDel').modal('hide');
-	        window.location.reload();
-	    }
-	  </script>
+         var voltarCard;
+         function selAbaTbl() {
+        	 if (voltarCard == 'nao') {
+          		 $('.nav-tabs a[href="#visualizar"]').tab('show');
+        	 } else {
+        		 $('.nav-tabs a[href="#disponiveis"]').tab('show');
+        		 $('.nav-tabs a[href="#visualizar"]').tab('show');
+        	 }
+         }
+         
+         function selAbaEdit(voltar) {
+        	 voltarCard = voltar;
+         	var tabEditTitle = document.getElementById("tabEditTitle");
+         	voltarCard
+          	        // Atualiza o conteudo do elemento
+          	        tabEditTitle.innerHTML = "#{eventoMB.editEvento.id eq null ? 'Adicionar' : 'Editar'}";
+          	     	$('.nav-tabs a[href="#gerenciar"]').tab('show');
+          			$('.nav-tabs a[href="#adicionareditar"]').tab('show');
+          			
+         }
+         function openConfirmedDel() {
+                $('#confirmDel').modal('show');
+            }
+         
+         function openModalConsAtividade() {
+                $('#modalConsAtividade').modal('show');
+            }
+         
+         function closeConfirmedDel() {
+                $('#confirmDel').modal('hide');
+                window.location.reload();
+            }
+          
+      </script>
       <ul class="nav nav-tabs">
-         <li class="active">
-            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#gerenciar">Gerenciar</a>
-         </li>
          <li>
-            <a data-toggle="pill" class="nav-link" href="#calendario">Calendario</a>
+            <a data-toggle="pill" class="nav-link" href="#gerenciar">Gerenciar</a>
+         </li>
+         <li class="active">
+            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#disponiveis">Eventos Disponíveis</a>
          </li>
       </ul>
       <div class="tab-content py-4">
-         <div id="gerenciar" class="tab-pane active">
+         <div id="gerenciar" class="tab-pane">
             <ul class="nav nav-tabs">
                <li class="active">
                   <a data-toggle="pill" class="nav-link active" aria-current="page" href="#visualizar">Visualizar</a>
@@ -52,76 +65,75 @@
                   <h1 class="">Eventos</h1>
                   <p:separator style="width:99%;" />
                   <h:form id="formtbl">
-                  <table class="table" id="tblEven">
-                     <thead>
-                        <tr>
-                           <th scope="col">Título</th>
-                           <th class="d-none d-lg-block" scope="col">Data</th>
-                           <th scope="col">Cidade</th>
-                           <th class="d-none d-sm-block" scope="col">Estado</th>
-                           <th scope="col">Vaga</th>
-                           <th class="d-none d-md-block" scope="col">Preço</th>
-                           <th scope="col">Configurar</th>
-                        </tr>			   
-                     </thead>
-                     <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
-                        <tr>
-                           <th scope="col" class="p-3 mb-2 bg-light text-dark">#{even.titulo}</th>
-                           <th class="d-none d-lg-block font-weight-normal" scope="col">#{even.dataInicio}</th>
-                           <th scope="col" class="font-weight-normal">#{even.cidade}</th>
-                           <th class="d-none d-sm-block font-weight-normal" scope="col">#{even.estado}</th>
-                           <th scope="col" class="font-weight-normal">#{even.vagas}</th>
-                           <th class="d-none d-md-block font-weight-normal" scope="col">#{even.preco}</th>
-                           <th scope="col" class="font-weight-normal">
-                           	<p:commandButton immediate="true" id="consultar_#{even.id}"
-								icon="ui-icon-search" title="Consultar"
-								actionListener="#{eventoMB.doConsulta(even)}" update=":formEvent"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-                           	<p:commandButton immediate="true" id="editar_#{even.id}"
-								icon="ui-icon-wrench" title="Editar"
-								actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-							<p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{even.id}"
-								title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.setEvenSel(even)}"
-								update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
-							<!-- Modal -->
-							<div class="modal fade" id="confirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
-							  <div class="modal-dialog" role="document">
-							    <div class="modal-content">
-							      <div class="modal-header">
-							        <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
-							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							          <span aria-hidden="true"></span>
-							        </button>
-							      </div>
-							      <div class="modal-body">
-							      <h:form id="formmodal">
-								      <h:outputLabel value="Deseja realmente excluir esse evento ?" />
-							      </h:form>
-							      </div>
-							      <div class="modal-footer">
-							        <button type="button" class="btn" data-dismiss="modal">Não</button>
-							        <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-							        	oncomplete="closeConfirmedDel()" 
-							        	actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
-							      </div>
-							    </div>
-							  </div>
-							</div>
-                           </th>
-                        </tr>
-                     </c:forEach>
-                  </table>
+                     <table class="table table-hover" id="tblEven">
+                        <thead>
+                           <tr>
+                              <th scope="col">Título</th>
+                              <th class="d-none d-lg-block" scope="col">Data</th>
+                              <th scope="col">Cidade</th>
+                              <th class="d-none d-sm-block" scope="col">Estado</th>
+                              <th scope="col">Vaga</th>
+                              <th class="d-none d-md-block" scope="col">Preço</th>
+                              <th scope="col">Configurar</th>
+                           </tr>
+                        </thead>
+                        <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+                           <tr>
+                              <th scope="col" class="p-3 mb-2 bg-light text-dark">#{even.titulo}</th>
+                              <th class="d-none d-lg-block font-weight-normal" scope="col">#{even.dataInicio}</th>
+                              <th scope="col" class="font-weight-normal">#{even.cidade}</th>
+                              <th class="d-none d-sm-block font-weight-normal" scope="col">#{even.estado}</th>
+                              <th scope="col" class="font-weight-normal">#{even.vagas}</th>
+                              <th class="d-none d-md-block font-weight-normal" scope="col">#{even.preco}</th>
+                              <th scope="col" class="font-weight-normal">
+                                 <p:commandButton immediate="true" id="consultar_#{even.id}"
+                                    icon="ui-icon-search" title="Consultar"
+                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
+                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+                                 </p:commandButton>
+                                 <p:commandButton immediate="true" id="editar_#{even.id}"
+                                    icon="ui-icon-wrench" title="Editar"
+                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
+                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+                                 </p:commandButton>
+                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{even.id}"
+                                    title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.setEvenSel(even)}"
+                                    update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
+                                 <!-- Modal -->
+                                 <div class="modal fade" id="confirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                       <div class="modal-content">
+                                          <div class="modal-header">
+                                             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                             <span aria-hidden="true"></span>
+                                             </button>
+                                          </div>
+                                          <div class="modal-body">
+                                             <h:form id="formmodal">
+                                                <h:outputLabel value="Deseja realmente excluir esse evento ?" />
+                                             </h:form>
+                                          </div>
+                                          <div class="modal-footer">
+                                             <button type="button" class="btn" data-dismiss="modal">Não</button>
+                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+                                                oncomplete="closeConfirmedDel()" 
+                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </th>
+                           </tr>
+                        </c:forEach>
+                     </table>
                   </h:form>
                </div>
                <div id="adicionareditar" class="tab-pane">
-                  
                   <div class="col-md-12">
                      <h:form id="formEvent">
-                     <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
-                  		<p:separator style="width:99%;" />
+                        <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
+                        <p:separator style="width:99%;" />
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
                               <label for="titulo" class="col-sm-3 col-form-label">Título:</label>
@@ -175,7 +187,7 @@
                               <div class="col-sm-6 input-group">
                                  <h:inputText styleClass="form-control" placeholder="Site proprio do Evento"
                                     value="#{eventoMB.editEvento.site}" 
-                                    disabled="#{eventoMB.editEvento.siteProprio}"
+                                    disabled="#{eventoMB.editEvento.siteProprio or eventoMB.modoConsulta}"
                                     label="site do evento" id="cbxSiteProprio" />
                                  <div class="input-group-prepend">
                                     <span class="input-group-text" id="basic-addon3">.eventor.com.br</span>
@@ -191,7 +203,7 @@
                                     </div>
                                  </div>
                                  <input type="text" class="form-control" aria-label="Text input with checkbox" 
-                                 	value="utilizar site fornecido pelo geventor." disabled="true" />
+                                    value="utilizar site fornecido pelo geventor." disabled="true" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
@@ -223,7 +235,7 @@
                               </div>
                               <div class="col-sm-4">
                                  <h:inputText class="form-control" id="local" value="#{eventoMB.editEvento.local}" label="Local" required="true"
-                                 	disabled="#{eventoMB.modoConsulta}" />
+                                    disabled="#{eventoMB.modoConsulta}" />
                               </div>
                               <div class="col-sm-2">
                                  <label for="email" class="col-form-label">E-mail:</label>
@@ -273,27 +285,125 @@
                            </div>
                            <div class="row mb-3">
                               <div class="col-sm-12">
-                              	 <div class="btn-group" role="group" aria-label="Basic example">
-	                                 <p:commandButton rendered="#{!eventoMB.modoConsulta}"
-	                                    value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Editar Evento'}"
-	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
-	                                    actionListener="#{eventoMB.doSave}" update=":formtbl :formEvent"
-	                                    oncomplete="selAbaTbl();" >
-	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-	                                    <f:ajax render="tblEven" />
-	                                 </p:commandButton>
-	                                 <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
-	                                    value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
-	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
-	                                    actionListener="#{eventoMB.doPrepareSave}" update=":formEvent"
-	                                    oncomplete="selAbaTbl();"  >
-	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-	                                    <f:ajax render="tblEven" />
-	                                 </p:commandButton>
+                                 <div class="btn-group" role="group" aria-label="Basic example">
+                                    <p:commandButton rendered="#{!eventoMB.modoConsulta}"
+                                       value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
+                                       id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
+                                       actionListener="#{eventoMB.doSave}" update=":formtbl :formEvent"
+                                       oncomplete="selAbaTbl();" >
+                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                                       <f:ajax render="tblEven" />
+                                    </p:commandButton>
+                                    <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
+                                       value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
+                                       id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
+                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent"
+                                       oncomplete="selAbaTbl();"  >
+                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                                       <f:ajax render="tblEven" />
+                                    </p:commandButton>
                                  </div>
                               </div>
                            </div>
+                           <table class="table table-hover text-center" id="tblAtiv" >
+                              <thead>
+                                 <tr>
+                                    <th scope="col">Atividade</th>
+                                    <th scope="col">Vagas</th>
+                                    <th scope="col">Configurar</th>
+                                 </tr>
+                              </thead>
+                              <c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
+                                 <tr>
+                                    <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
+                                    <th class="font-weight-normal" scope="col">#{ativ.vagas}</th>
+                                    <th scope="col" class="align-items-end">
+                                       <div class="btn-group" role="group" aria-label="Basic example">
+	                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
+	                                          icon="ui-icon-search" title="Consultar"
+	                                          actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formHtmlModal"
+	                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf">
+	                                          <p:ajaxStatus onstart="PF('status').show()"
+                        						onsuccess="PF('status').hide()" />
+	                                       </p:commandButton> <!-- adicionar condição pra deixar de se inscrever e mudar o 'icon' para 'ui-icon-minusthick' ou 'ui-icon-minus'  -->
+	                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
+	                                          icon="ui-icon-plus" title="Consultar" value="Increver" 
+	                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formHtmlModal"
+	                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="btn btn-secondary ui-widget-button-secundary-rcf">
+	                                          <p:ajaxStatus onstart="PF('status').show()"
+                        						onsuccess="PF('status').hide()" />
+	                                       </p:commandButton>
+                                       </div>
+                                    </th>
+                                 </tr>
+                              </c:forEach>
+                           </table>  
                         </div>
+                     </h:form>
+                     <h:form id="formHtmlModal">
+                     
+                     <!-- modal -->
+					 <!-- <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						         <div class="modal-header">
+						            <h5 class="modal-title" id="exampleModalLabel">
+						               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						               </button>
+						               <h:outputText value="Evento: #{editAtividade.evento.titulo}" />
+						            </h5>
+						         </div>
+						         <div class="modal-body">
+						            <h:form id="modalformAtiv">
+						               <h3 class="mb-3">
+						                  <h:outputText value="Atividade: #{editAtividade.nome}" />
+						               </h3>
+						               <div class="col-md-12 col-lg-12">
+						                  <div class="row mb-3 border-rcf">
+						                     <div class="col-sm-12 row">
+						                        <p class="font-weight-normal">
+						                           <h:outputText value="Detalhes da Atividade: #{editAtividade.detalhes}" />
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-6 row">
+						                        <p class="font-weight-normal">
+						                           <h:outputText value="Começa: #{editAtividade.dataInicio}" />
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-6 row">
+						                        <p class="font-weight-normal">
+						                           <h:outputText value="Termina: #{editAtividade.dataFim}" />
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-12">
+						                        <div class="row">
+						                           <p class="font-weight-normal">
+						                              <h:outputText value="Preço: #{editAtividade.preco}" />
+						                           </p>
+						                        </div>
+						                        <div class="row">
+						                        	<p class="font-weight-normal">
+						                              <h:outputText value="Vagas: #{editAtividade.vagas}" />
+						                            </p>
+						                        </div>
+						                        <div class="row">
+						                        	<button class="btn btn-outline-secondary" type="button" id="button-addon2">Inscrever</button>
+						                        </div>
+						                     </div>
+						                  </div>
+						               </div>
+						               <div class="col-md-12 col-lg-12 ui-padding-right-0-rcf">
+						                  <div class="d-flex align-items-end flex-column">
+								            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+								         </div>
+								       </div>
+						            </h:form>
+						         </div>
+						      </div>
+						   </div>
+						</div> -->
+                        <h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
                      </h:form>
                      <script type="text/javascript">
                         PrimeFaces.locales['tr'] = {
@@ -333,58 +443,38 @@
                </div>
             </div>
          </div>
-         <div id="calendario" class="tab-pane">
-	         <h:form>
-	         	<h3>Seu Calendário</h3>
-	         	<p:panelGrid columnClasses="value">
-					
-					
-					<p:schedule id="schedule" value="#{eventoMB.eventModel}" widgetVar="myschedule" timeZone="GMT+2">
-	 					<p:ajax event="dateSelect" listener="#{eventoMB.onDateSelect}" update="" 
-	 						oncomplete="" />
-						<p:ajax event="eventSelect" listener="#{eventoMB.onEventSelect}" update=""
-							oncomplete="" />
-						<p:ajax event="eventMove" listener="#{eventoMB.onEventMove}" update="" />
-						<p:ajax event="eventResize" listener="#{eventoMB.onEventResize}" update="" />
-					</p:schedule>
-				</p:panelGrid>
-			</h:form>
-			<script type="text/javascript">
-							PrimeFaces.locales['tr'] = {
-								closeText : 'kapat',
-								prevText : 'geri',
-								nextText : 'ileri',
-								currentText : 'bugün',
-								monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
-										'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
-										'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
-								monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
-										'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
-										'Kas', 'Ara' ],
-								dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
-										'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
-								dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
-										'Cu', 'Ct' ],
-								dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
-										'Ct' ],
-								weekHeader : 'Hf',
-								firstDay : 1,
-								isRTL : false,
-								showMonthAfterYear : false,
-								yearSuffix : '',
-								month : 'Ay',
-								week : 'Hafta',
-								day : 'Gün',
-								allDayText : 'Tüm Gün'
-							};
-			</script>
-			<style type="text/css">
-							.value {
-								width: 1000px;
-							}
-			</style>
-						
-						
+         <div id="disponiveis" class="tab-pane active">
+            <h3>Eventos Disponíveis</h3>
+            <p:separator style="width:99%;" />
+            <h:form id="formTodosEven">
+            	
+               <div class="row">
+               <c:forEach var="event" items="#{basicTimelineView.gerEvent}" step="1" begin="0">
+                  <div class="col-xd-4 col-md-4 col-sm-6 mt-4">
+                     <div class="card">
+                        <div class="card-header">
+                           #{event.titulo}
+                        </div>
+                        <div class="card-body">
+                           <p class="card-text">Descrição: #{event.descricao}</p>
+                           <p class="card-text">Vagas: #{event.vagas} de #{event.vagas}</p>
+                           
+							<p:commandButton immediate="true" id="cardConsEvent_#{event.id}" value="Inscrever"
+                                  actionListener="#{eventoMB.doConsulta({'evento': event, 'request': 'card'})}" update=":formEvent" 
+                                  process="@this" styleClass="btn btn-primary ui-widget-button-primary-rcf" oncomplete="selAbaEdit('sim')">
+                                  <p:ajaxStatus onstart="PF('status').show()"
+                        			onsuccess="PF('status').hide()" />
+                            </p:commandButton>
+                        </div>
+                        <div class="card-footer text-muted">
+                           2 dias atrás
+                        </div>
+                     </div>
+                  </div>
+                  </c:forEach>
+               </div>
+               
+            </h:form>
          </div>
       </div>
    </ui:define>

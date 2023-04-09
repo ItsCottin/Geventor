@@ -30,15 +30,21 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.CidadeSB;
 import br.com.pluri.eventor.business.EstadoSB;
 import br.com.pluri.eventor.business.EventoSB;
+import br.com.pluri.eventor.business.UsuarioAtividadeSB;
+import br.com.pluri.eventor.business.UsuarioSB;
+import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.Usuario;
+import br.com.pluri.eventor.model.UsuarioAtividade;
 
 /**
- * Adicionado método "retTitleEven(Evento even)" para retornar o titulo do evento
+ * Adicionado mï¿½todo "retTitleEven(Evento even)" para retornar o titulo do evento
  * 
  * <pre>
  * Last Modified  $Date: 2023/04/04 12:27:45 $
@@ -59,11 +65,21 @@ public class EventoMB extends BaseMB {
 	private EventoSB eventoSB;
 	
 	@Autowired
+	private UsuarioSB usuarioSB;
+	
+	@Autowired
 	private CidadeSB cidadeSB;
 	
 	@Autowired
 	private EstadoSB estadoSB;
 	
+	@Autowired
+	private AtividadeSB atividadeSB;
+	
+	@Autowired
+	private UsuarioAtividadeSB inscritosSB;
+	
+	private List<Atividade> resultadoAtividadeByEvento;
 	private List<Evento> resultadoEvento;
 	private Evento editEvento = new Evento();
 	private Map<String,Map<String,String>> data = new HashMap<String, Map<String,String>>();
@@ -120,6 +136,7 @@ public class EventoMB extends BaseMB {
 	public void doPrepareSave(){
 		editEvento = new Evento();
 		this.modoConsulta = false;
+		this.resultadoAtividadeByEvento = null;
 	}
 	
 	private boolean validarDatasEvento() {
@@ -149,26 +166,33 @@ public class EventoMB extends BaseMB {
 	
 	public void doEdit(Evento edit){	
 		//TODO Linha com NullPointerException - ajustar linha para funcionamento correto
+		onPrepareEditOuConsulta(edit, false);
+	}
+	
+	public void doConsulta(Map<String, Object> params) {
+		Evento edit = (Evento) params.get("evento");
+		String request = (String) params.get("request");
+		onPrepareEditOuConsulta(edit, true);
+		if (request.equals("card")){
+			this.resultadoAtividadeByEvento = atividadeSB.findByEventos(edit.getId());
+		} else {
+			this.resultadoAtividadeByEvento = null;
+		}
+	}
+	
+	public void doIncrever(Atividade ativ) {
+		Usuario usuario = new Usuario();
+		usuario = usuarioSB.findById(getCurrentUserId());
+		// TODO Ajustar o preenchimento do objeto 'inscrito'
+		UsuarioAtividade inscrito = new UsuarioAtividade();
+		inscritosSB.insert(inscrito);
+	}
+	
+	public void onPrepareEditOuConsulta(Evento edit, Boolean consulta) {
 		doPrepareSave();
-		this.modoConsulta = false;
+		this.modoConsulta = consulta;
 		this.editEvento = eventoSB.findById(edit.getId());
 		onEstadoChange();
-	}
-	
-	public void doConsulta(Evento edit) {
-		doPrepareSave();
-		this.modoConsulta = true;
-		this.editEvento = eventoSB.findById(edit.getId());
-		editEvento.setSiteProprio(true);
-	}
-	
-	public String retTitleEven(Evento even) {
-		try {
-			return eventoSB.findById(even.getId()).getTitulo();
-		} catch (NullPointerException e){
-			return "Nao deu certo";
-		}
-		
 	}
 	
 	public void doPrepareInsert(){

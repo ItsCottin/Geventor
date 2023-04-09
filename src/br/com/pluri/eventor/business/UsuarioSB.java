@@ -13,6 +13,7 @@ import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
 import br.com.pluri.eventor.dao.UsuarioDAO;
+import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.validator.ValidaCPF;
 
@@ -79,5 +80,10 @@ public class UsuarioSB extends BaseSB {
 		} else {
 			return false;
 		}
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<Usuario> findIncritosByAtividade(Atividade ativ) {
+		return usuarioDAO.findIncritosNaAtividade(ativ.getId());
 	}
 }

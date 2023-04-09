@@ -44,11 +44,33 @@ body {
 	padding: 0!important;
 }
 
+.ui-widget-button-primary-rcf {
+	font-family: inherit!important;
+	background: #007bff!important;
+	border-color: #007bff!important;
+	padding: 0!important;
+}
+
+.ui-widget-button-primary-rcf:hover {
+	color:#fff;
+	background-color:#0069d9;
+	border-color:#0062cc
+}
+
 .ui-widget-button-success-rcf:hover {
 	color: #fff!important;
 	background-color: #218838!important;
 	border-color: #1e7e34!important;
 	box-shadow: 0 0 0 .2rem rgba(72, 180, 97, .5)!important;
+}
+
+.ui-widget-button-secundary-rcf {
+	color: #6c757d!important;
+	border: 1px solid #dddddd!important;
+}
+
+.ui-widget-button-secundary-rcf:hover {
+	color: #fff!important;
 }
 
 .btn-group>.btn-group:not(:first-child)>.btn, .btn-group>.btn:not(:first-child) {
@@ -74,11 +96,52 @@ body {
 	width: 1.4em!important;
 }
 
+.ui-display-block-rcf {
+	display: block!important;
+}
+
 .ui-state-disabled {
 	background-color: #e9ecef!important;
 	opacity: 1!important;
 	width: 100%;
-	font-size: 1rem!important;
+}
+
+@media (min-width: 200px){
+	.ui-trucate-text-rcf {
+		max-width: 58%;	
+	}
+}
+
+@media (max-width: 400px){
+	.ui-padding-right-0-media-400-rcf {
+		padding-right: 0!important;	
+	}
+	.ui-padding-left-0-media-400-rcf {
+		padding-left: 0!important;
+	}
+	.ui-margin-right--95px-media-400-rcf {
+		margin-right: -95px!important;
+	}
+}
+
+.ui-vertical-align--webkit-baseline-middle-rcf {
+	vertical-align:-webkit-baseline-middle!important; 
+}
+
+.ui-vertical-align-inherit-rcf {
+	vertical-align:inherit!important; 
+}
+
+.ui-padding-right-0-rcf {
+	padding-right: 0!important;
+}
+
+.ui-padding-left-0-rcf {
+	padding-left: 0!important;
+}
+
+.ui-margin-right--95px-rcf {
+	margin-right: -95px!important;
 }
 
 @media (min-width: 200px){
@@ -89,6 +152,10 @@ body {
 	.col-sm-7-no-100-width {
 		flex: 0 0 auto!important;
 		width: 58.33333333%!important;
+	}
+	.ui-padding-0-rcf {
+		padding-right:0!important;
+		padding-left:0!important;
 	}
 }
 
@@ -102,6 +169,10 @@ body {
 	border-radius: 0.25rem!important;
 	border: 1px solid #dee2e6!important;
 	padding: 1rem;
+}
+
+.margem-bottom-0-rcf {
+	margin-bottom: 0!important;
 }
 
 .jumbotron {

@@ -8,29 +8,30 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import br.com.etechoracio.common.model.BaseORM;
 import lombok.Getter;
 import lombok.Setter;
-import br.com.etechoracio.common.model.BaseORM;
 
-@Getter
 @Setter
+@Getter
 @Entity
-@Table(name="TBL_EVENTO_VISITANTE")
-public class EventoVisitante extends BaseORM {
+@Table(name="TBL_USUARIO_ATIVIDADE")
+public class UsuarioAtividade extends BaseORM {
+	
 	
 	@Id
 	@GeneratedValue
-	@Column(name="ID_EVEN_VISIT")
+	@Column(name="ID_USUA_ATIV")
 	private Long id;
 	
-	@Column(name="PRESENCA_COLAB")
-	private String presenca;
+	@Column(name="STATUS")
+	private String status;
 	
 	@ManyToOne
-	@JoinColumn(name="ID_EVEN", referencedColumnName="ID_EVEN")
-	private Evento evento;
+	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
+	private Usuario usuario;
 	
 	@ManyToOne
-	@JoinColumn(name="ID_VISIT", referencedColumnName="ID_VISIT")
-	private Visitante visitante;
+	@JoinColumn(name="ID_ATIVI", referencedColumnName="ID_ATIVI")
+	private Atividade atividade;
 }

@@ -33,14 +33,13 @@
 		
    <h:form id="menuForm" >		
     <nav class="navbar navbar-expand-lg fixed-top shadow navbar-dark navbar-offcanvas" style="background-color: #47235e;">
-    			<div class="mr-3">
-        			<a class="navbar-brand mr-auto">PLURI LTDA</a>
-        		</div>
-
-        		<button class="navbar-toggler d-block me-3" type="button" id="navToggle">
+    	<div class="mr-3">
+        	<a class="navbar-brand mr-auto">PLURI LTDA</a>
+        </div>
+		<button class="navbar-toggler d-block me-3" type="button" id="navToggle">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        
         <div class="navbar-collapse offcanvas-collapse">
             <ul class="navbar-nav mr-auto my-2">
                 <li class="nav-item">
@@ -50,22 +49,16 @@
                 	<h:link styleClass="nav-link" value="Cadastre seu Usuario" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="registrarV2.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="indexV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/indexV2.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="eventoV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/eventoV2.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="atividadesV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/atividadesV2.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Participantes" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="participantesV2.xhtml" />
-                </li>
-                <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="inscricoesV2.xhtml" />
-                </li>
-                <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Usuario" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="edit-userV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inscritos.xhtml" />
                 </li>
                 <li class="nav-item">
                     <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"  />
@@ -75,6 +68,9 @@
 						<h:outputText value="Sair" />
 					</h:outputLink>
                 	
+                </li>
+                <li class="nav-item">
+                    <h:link styleClass="nav-link" value="v0.2.5" outcome="/changeset.xhtml"  />
                 </li>
             </ul>
 

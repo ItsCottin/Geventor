@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+	<ui:define name="contentV3">
+		<script type="text/javascript">
+		function openModalConsAtividade() {
+            $('#modalConsAtividade').modal('show');
+        }  
+	          
+	    </script>
+		<ul class="nav nav-tabs">
+	         <li class="active">
+	            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#inscritos">Instritos</a>
+	         </li>
+	         <li>
+	            <a data-toggle="pill" class="nav-link" href="#minhasinscricoes">Minhas Inscrições</a>
+	         </li>
+      	</ul>
+		<div class="tab-content py-4">
+	        <div id="inscritos" class="tab-pane active">
+	         	<h:form id="formtblinsc">
+     	 			<div class="row">
+     	 				<div class="col-sm-8 col-sx-6">
+     	 		  			<h1 class="">Inscritos</h1>
+     	 		 		</div>
+     	 		 		<div class="col-sm-4 col-sx-6">
+     	 		 	
+	     	 		  
+						</div>
+					</div>
+                  	<p:separator style="width:99%;" />
+                  <table class="table" id="tblInscritos">
+                     <thead>
+                        <tr>
+                           <th scope="col">Atividade</th>
+                           <th scope="col">Inscrito</th>
+                           <th scope="col" class="ui-padding-right-0-media-400-rcf ui-padding-left-0-media-400-rcf">Status</th>
+                           <th scope="col" class="ui-margin-right--95px-rcf ui-padding-left-0-media-400-rcf ui-margin-right--95px-rcf">Gerenciar</th>
+                        </tr>			   
+                     </thead>
+                     <c:forEach var="insc" items="#{usuarioAtividadeMB.usuAtiv}" step="1" begin="0">
+                        <tr class="">
+                           <th class="p-3 mb-2 bg-light text-dark ui-vertical-align--webkit-baseline-middle-rcf" scope="col" >
+                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
+	                           	<p:commandButton immediate="true"
+									icon="ui-icon-search" title="Consultar"
+									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":modalAtiv"
+									process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf mx-2">
+								</p:commandButton>
+								<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
+	                           		<p class="text-truncate ui-trucate-text-rcf">#{insc.atividade.nome}</p>
+	                           	</div>
+							</div>
+                           </th>
+                           <th class="text-dark font-weight-normal ui-padding-right-0-rcf ui-vertical-align--webkit-baseline-middle-rcf" scope="col">
+                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
+                           		<p:commandButton immediate="true"
+									icon="ui-icon-search" title="Consultar"
+									actionListener="#{atividadeMB.doConsulta(ativ)}" update=""
+									process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf mx-2">
+								</p:commandButton>
+								<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
+                           			<p class="text-truncate ui-trucate-text-rcf">#{insc.usuario.nome}</p>
+                           		</div>                           		
+							</div>
+                           </th>
+                           <th class="text-dark font-weight-normal ui-vertical-align-inherit-rcf ui-margin-right--95px-rcf ui-padding-right-0-media-400-rcf" scope="col">
+	                           <p class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}
+	                           		 text-truncate ui-trucate-text-rcf">#{insc.status}</p>
+                           </th>
+                           <th scope="col" class="ui-padding-left-0-media-400-rcf ui-vertical-align--webkit-baseline-middle-rcf">
+                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
+                           		<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
+	                           	<p:commandButton immediate="true"
+									icon="ui-icon-check" title="Aprovar" disabled="#{insc.status eq 'Aprovado' ? 'true' : 'false'}"
+									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Aprovado'})}" update=":formtblinsc"
+									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+								</p:commandButton>
+	                           	<p:commandButton immediate="true"
+									icon="ui-icon-closethick" title="Reprovar" disabled="#{insc.status eq 'Aprovado' ? 'false' : 'true'}"
+									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Reprovado'})}" update=":formtblinsc"
+									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+								</p:commandButton>
+								</div>
+							</div>
+                           </th>
+                        </tr>
+                     </c:forEach>
+                  </table>
+                  </h:form>
+                  <h:form id="modalAtiv">
+                  	<h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
+                  </h:form>
+	         
+	        </div>
+         	<div id="minhasinscricoes" class="tab-pane">
+	         
+	         
+	        </div>
+	        <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="ajaxloader.gif" library="images" />
+                     </p:dialog>
+                     <p:ajaxStatus onstart="PF('status').show()"
+                        onsuccess="PF('status').hide()" />
+	    </div>
+	</ui:define>
+</ui:composition>
