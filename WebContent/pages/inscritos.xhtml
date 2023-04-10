@@ -77,12 +77,12 @@
                            	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
                            		<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
 	                           	<p:commandButton immediate="true"
-									icon="ui-icon-check" title="Aprovar" disabled="#{insc.status eq 'Aprovado' ? 'true' : 'false'}"
+									icon="ui-icon-check" title="Aprovar" disabled="#{insc.status eq 'Aprovado' ? 'true' : (insc.status eq 'Pendente' ? 'false' : 'false')}"
 									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Aprovado'})}" update=":formtblinsc"
 									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
 								</p:commandButton>
 	                           	<p:commandButton immediate="true"
-									icon="ui-icon-closethick" title="Reprovar" disabled="#{insc.status eq 'Aprovado' ? 'false' : 'true'}"
+									icon="ui-icon-closethick" title="Reprovar" disabled="#{insc.status eq 'Aprovado' ? 'false' : (insc.status eq 'Pendente' ? 'false' : 'true')}"
 									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Reprovado'})}" update=":formtblinsc"
 									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
 								</p:commandButton>
@@ -99,7 +99,64 @@
 	         
 	        </div>
          	<div id="minhasinscricoes" class="tab-pane">
+	         <div id="minhasinscricoes" class="tab-pane">
+	         	<h:form id="formtblmyinsc">
+     	 			<div class="row">
+     	 				<div class="col-sm-8 col-sx-6">
+     	 		  			<h1 class="">Minhas Inscrições</h1>
+     	 		 		</div>
+     	 		 		<div class="col-sm-4 col-sx-6">
+     	 		 	
+	     	 		  
+						</div>
+					</div>
+                  	<p:separator style="width:99%;" />
+                  <table class="table" id="tblmyinscritos">
+                     <thead>
+                        <tr>
+                           <th scope="col">Atividade</th>
+                           <th scope="col" class="ui-padding-right-0-media-400-rcf ui-padding-left-0-media-400-rcf">Status</th>
+                           <th scope="col" class="ui-margin-right--95px-rcf ui-padding-left-0-media-400-rcf ui-margin-right--95px-rcf">Gerenciar</th>
+                        </tr>			   
+                     </thead>
+                     <c:forEach var="insc" items="#{usuarioAtividadeMB.myInscricoes}" step="1" begin="0">
+                        <tr class="">
+                           <th class="p-3 mb-2 bg-light text-dark ui-vertical-align--webkit-baseline-middle-rcf" scope="col" >
+                           	<div class="row ui-margin-right--95px-rcf">
+	                           	<p:commandButton immediate="true"
+									icon="ui-icon-search" title="Consultar"
+									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":modalAtivMyInsc"
+									process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf mx-2">
+								</p:commandButton>
+								<div class="col-sm-7 col-sm-7-no-100-width">
+	                           		<p class="text-truncate ui-trucate-text-rcf">#{insc.atividade.nome}</p>
+	                           	</div>
+							</div>
+                           </th>
+                           <th class="text-dark font-weight-normal ui-vertical-align-inherit-rcf ui-margin-right--95px-rcf ui-padding-right-0-media-400-rcf" scope="col">
+	                           <p class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}
+	                           		 text-truncate ui-trucate-text-rcf">#{insc.status}</p>
+                           </th>
+                           <th scope="col" class="ui-vertical-align--webkit-baseline-middle-rcf">
+                           	<div class="row">
+                           		<div class="col-sm-7 col-sm-7-no-100-width">
+		                           	<p:commandButton immediate="true"
+										icon="ui-icon-closethick" title="Desistir"
+										actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
+										process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+									</p:commandButton>
+								</div>
+							</div>
+                           </th>
+                        </tr>
+                     </c:forEach>
+                  </table>
+                  </h:form>
+                  <h:form id="modalAtivMyInsc">
+                  	<h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
+                  </h:form>
 	         
+	        </div>
 	         
 	        </div>
 	        <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">

@@ -28,5 +28,20 @@ public class UsuarioAtividadeSB extends BaseSB {
 	public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogado(Long idUsuario) {
 		return usuarioAtividadeDAO.findIncritosNoEventoByUsuarioLogado(idUsuario);
 	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public UsuarioAtividade findSeEstaInscritoNaAtividade(Long idAtividade, Long idUsuario) {
+		return usuarioAtividadeDAO.findSeEstaInscritoNaAtividade(idUsuario, idAtividade);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findMyInscricoes(Long idUsuario) {
+		return usuarioAtividadeDAO.findMyInscricoes(idUsuario);
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void delete(UsuarioAtividade usuAtiv) {
+		usuarioAtividadeDAO.delete(usuAtiv);
+	}
 
 }

@@ -81,6 +81,13 @@ public class EventoSB extends BaseSB {
 		return eventoDAO.findAll();
 	}
 	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<Evento> findAllEventoMenosMeus(Long idUsu){
+		return eventoDAO.findAllEventoMenosMeus(idUsu);
+	}
+	
+	
+	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public Evento findByTitulo(String titulo){
 		return eventoDAO.findByTitulo(titulo);

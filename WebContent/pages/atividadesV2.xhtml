@@ -64,7 +64,9 @@
                            <th scope="col" class="p-3 mb-2 bg-light text-dark">#{ativ.evento.titulo}</th>
                            <th class="d-none d-sm-block font-weight-normal" scope="col">#{ativ.detalhes}</th>
                            <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
-                           <th class="d-none d-sm-block font-weight-normal" scope="col">#{ativ.dataInicio}</th>
+                           <th class="d-none d-sm-block font-weight-normal" scope="col">
+                           	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+                           </th>
                            <th scope="col" >
                            	<p:commandButton immediate="true" id="consultar_#{ativ.id}"
 								icon="ui-icon-search" title="Consultar"

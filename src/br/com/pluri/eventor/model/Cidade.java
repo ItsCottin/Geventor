@@ -15,18 +15,21 @@ import br.com.etechoracio.common.model.BaseORM;
 @Setter
 @Getter
 @Entity
-@Table(name="City")
+@Table(name="cities")
 public class Cidade extends BaseORM {
 	
 	@Id
 	@GeneratedValue
-	@Column(name="Id")
+	@Column(name="id")
 	private Long id;
 	
-	@Column(name="Name")
+	@Column(name="name")
 	private String name;
 	
+	@Column(name="slug")
+	private String slug;
+	
 	@ManyToOne
-	@JoinColumn(name="IdState", referencedColumnName="Id")
+	@JoinColumn(name="state_id", referencedColumnName="id")
 	private Estado estado;
 }

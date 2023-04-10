@@ -31,15 +31,21 @@ public class UsuarioAtividadeMB extends BaseMB {
 	private UsuarioSB usuSB;
 	
 	private List<Usuario> inscritos;
-	private List<UsuarioAtividade> usuAtiv;	
+	private List<UsuarioAtividade> usuAtiv;
+	private List<UsuarioAtividade> myInscricoes;	
 	
 	@PostConstruct
 	public void postConstruct(){
 		findInscritosMyEventos();
+		findMyInscricoes();
 	}
 	
 	public void findInscritosMyEventos(){
 		this.usuAtiv = usuAtivSB.findIncritosNoEventoByUsuarioLogado(getCurrentUserId());
+	}
+	
+	public void findMyInscricoes(){
+		this.myInscricoes = usuAtivSB.findMyInscricoes(getCurrentUserId());
 	}
 	
 	public void getInscritosByAtividade(Atividade ativ){
@@ -51,6 +57,11 @@ public class UsuarioAtividadeMB extends BaseMB {
 		UsuarioAtividade usuAtiv = (UsuarioAtividade) params.get("usuAtiv");
 		usuAtiv.setStatus(status);
 		usuAtivSB.insert(usuAtiv);
+	}
+	
+	public void doDelete(UsuarioAtividade usuAtiv){
+		usuAtivSB.delete(usuAtiv);
+		findMyInscricoes();
 	}
 	
 	

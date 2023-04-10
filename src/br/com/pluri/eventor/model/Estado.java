@@ -16,18 +16,18 @@ import br.com.etechoracio.common.model.BaseORM;
 @Getter
 @Setter
 @Entity
-@Table(name="State")
+@Table(name="states")
 public class Estado extends BaseORM {
 	
 	@Id
 	@GeneratedValue
-	@Column(name="Id")
+	@Column(name="id")
 	private Long id;
 	
-	@Column(name="Name")
+	@Column(name="name")
 	private String name;
 	
-	@Column(name="Acronym")
+	@Column(name="initials")
 	private String uf;
 	
 	@OneToMany(mappedBy="estado")

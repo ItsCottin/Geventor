@@ -60,13 +60,9 @@ public class Atividade extends BaseORM {
 	@Transient
 	private Date horaFim;
 	
-	// relação de atividade para demanda (muitos pra muitos)
-	/*@ManyToMany
-	@JoinTable(
-			name="TBL_DEMANDA_ATIVIDADE_USUARIO",
-			joinColumns=@JoinColumn(name="ID_ATIVI", referencedColumnName="ID_ATIVI"),
-			inverseJoinColumns=@JoinColumn(name="ID_DEMAN", referencedColumnName="ID_DEMAN"))
-	private List<Demanda> demandas;*/
+	@Transient
+	private boolean estaInscrito;
+	
 	@ManyToOne
 	@JoinColumn(name="ID_EVEN", referencedColumnName="ID_EVEN")
 	public Evento evento;

@@ -9,7 +9,10 @@
    <ui:define name="contentV3">
       <script type="text/javascript">
          var voltarCard;
-         function selAbaTbl() {
+         function selAbaTbl(voltar) {
+        	 if (voltar == 'nao') {
+        		voltarCard = voltar
+        	 }
         	 if (voltarCard == 'nao') {
           		 $('.nav-tabs a[href="#visualizar"]').tab('show');
         	 } else {
@@ -80,7 +83,9 @@
                         <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
                            <tr>
                               <th scope="col" class="p-3 mb-2 bg-light text-dark">#{even.titulo}</th>
-                              <th class="d-none d-lg-block font-weight-normal" scope="col">#{even.dataInicio}</th>
+                              <th class="d-none d-lg-block font-weight-normal" scope="col">
+                              	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
+                              </th>
                               <th scope="col" class="font-weight-normal">#{even.cidade}</th>
                               <th class="d-none d-sm-block font-weight-normal" scope="col">#{even.estado}</th>
                               <th scope="col" class="font-weight-normal">#{even.vagas}</th>
@@ -290,7 +295,7 @@
                                        value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
                                        id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
                                        actionListener="#{eventoMB.doSave}" update=":formtbl :formEvent"
-                                       oncomplete="selAbaTbl();" >
+                                       oncomplete="selAbaTbl('nao');" >
                                        <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
                                        <f:ajax render="tblEven" />
                                     </p:commandButton>
@@ -327,9 +332,9 @@
                         						onsuccess="PF('status').hide()" />
 	                                       </p:commandButton> <!-- adicionar condição pra deixar de se inscrever e mudar o 'icon' para 'ui-icon-minusthick' ou 'ui-icon-minus'  -->
 	                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
-	                                          icon="ui-icon-plus" title="Consultar" value="Increver" 
-	                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formHtmlModal"
-	                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="btn btn-secondary ui-widget-button-secundary-rcf">
+	                                          icon="ui-icon-plus" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : 'Inscrever'}" value="Increver" disabled="#{ativ.estaInscrito}"
+	                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
+	                                          process="@this" oncomplete="" styleClass="btn btn-secondary ui-widget-button-secundary-rcf">
 	                                          <p:ajaxStatus onstart="PF('status').show()"
                         						onsuccess="PF('status').hide()" />
 	                                       </p:commandButton>
@@ -449,7 +454,7 @@
             <h:form id="formTodosEven">
             	
                <div class="row">
-               <c:forEach var="event" items="#{basicTimelineView.gerEvent}" step="1" begin="0">
+               <c:forEach var="event" items="#{eventoMB.allEvenMenosMeus}" step="1" begin="0">
                   <div class="col-xd-4 col-md-4 col-sm-6 mt-4">
                      <div class="card">
                         <div class="card-header">

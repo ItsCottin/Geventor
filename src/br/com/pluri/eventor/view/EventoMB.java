@@ -2,9 +2,12 @@ package br.com.pluri.eventor.view;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -87,6 +90,7 @@ public class EventoMB extends BaseMB {
 	private List<Estado> estados;
 	private int indexTab = 0;
 	private List<Evento> resultEven;
+	private List<Evento> allEvenMenosMeus;
 	private static final long serialVersionUID = 1L;
 	private ScheduleModel eventModel;
     private ScheduleModel lazyEventModel;
@@ -101,6 +105,11 @@ public class EventoMB extends BaseMB {
 		estados = estadoSB.findAll();
 		this.modoConsulta = false;
 		this.evenSel = new Evento();
+		findAllEventoMenosMeus();
+	}
+	
+	public void findAllEventoMenosMeus(){
+		this.allEvenMenosMeus = eventoSB.findAllEventoMenosMeus(getCurrentUserId());
 	}
 	
 	public void onTabChange(TabChangeEvent event) {
@@ -174,18 +183,41 @@ public class EventoMB extends BaseMB {
 		String request = (String) params.get("request");
 		onPrepareEditOuConsulta(edit, true);
 		if (request.equals("card")){
-			this.resultadoAtividadeByEvento = atividadeSB.findByEventos(edit.getId());
+			setAtividadeSeEstaInscrito(atividadeSB.findByEventos(edit.getId()));
 		} else {
 			this.resultadoAtividadeByEvento = null;
 		}
 	}
 	
+	public boolean findSeEstaInscritoNaAtividade(Long idAtiv){
+		UsuarioAtividade usuAtiv = new UsuarioAtividade();
+		usuAtiv = inscritosSB.findSeEstaInscritoNaAtividade(idAtiv, getCurrentUserId());
+		if(usuAtiv == null){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public void setAtividadeSeEstaInscrito(List<Atividade> ativ) {
+		this.resultadoAtividadeByEvento = null;
+		this.resultadoAtividadeByEvento = new ArrayList<Atividade>();
+		for (Atividade ati : ativ) {
+			ati.setEstaInscrito(findSeEstaInscritoNaAtividade(ati.getId()));
+			this.resultadoAtividadeByEvento.add(ati);
+		}
+	}
+	
 	public void doIncrever(Atividade ativ) {
+		UsuarioAtividade inscrito = new UsuarioAtividade();
 		Usuario usuario = new Usuario();
 		usuario = usuarioSB.findById(getCurrentUserId());
-		// TODO Ajustar o preenchimento do objeto 'inscrito'
-		UsuarioAtividade inscrito = new UsuarioAtividade();
+		inscrito.setStatus("Pendente");
+		inscrito.setUsuario(usuario);
+		inscrito.setAtividade(ativ);
 		inscritosSB.insert(inscrito);
+		setAtividadeSeEstaInscrito(atividadeSB.findByEventos(ativ.evento.getId()));
+		
 	}
 	
 	public void onPrepareEditOuConsulta(Evento edit, Boolean consulta) {
