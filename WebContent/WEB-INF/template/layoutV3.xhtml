@@ -61,7 +61,7 @@
                     <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inscritos.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"  />
+                    <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/conta.xhtml" />
                 </li>
                 <li class="nav-item">
                 	<h:outputLink styleClass="nav-link" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
@@ -70,7 +70,7 @@
                 	
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="v0.2.6" outcome="/changeset.xhtml"  />
+                    <h:link styleClass="nav-link" value="v0.2.7" outcome="/changeset.xhtml"  />
                 </li>
             </ul>
 

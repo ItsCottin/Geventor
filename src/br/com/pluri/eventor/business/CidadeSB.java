@@ -24,4 +24,9 @@ public class CidadeSB extends BaseSB {
 	public List<Cidade> findByEstado(String estado){
 		return cidadeDAO.findByEstado(estado);
 	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public Cidade findById(Long idCidade){
+		return cidadeDAO.findById(idCidade);
+	}
 }

@@ -5,25 +5,28 @@
 -- senha: t@11ta341
 
 -- tabela Usuario
-create database GEVENTOR
  
-USE sql10607033;
+USE TCCRCF;
  
 -- SQLINES LICENSE FOR EVALUATION USE ONLY
 create table TBL_USUARIO(
 ID_USUA bigint(10) primary key auto_increment,
 LOGIN_USUA varchar(50) not null,
-FUNCAO_USUA varchar(25),
-AVALIACAO_USUA float(5) not null default '0.0',
 NOME_USUA varchar(100) not null,
 CPF_CNPJ_USUA varchar(14),
 EMAIL_USUA varchar(50) not null,
 ENDERECO_USUA varchar(150),
 SENHA_USUA varchar(800) not null,
 TP_PESSOA_USUA varchar(8),
-QR_CODE_USUA varchar(200),
 TELEFONE_USUA varchar(15),
-TP_COLAB_USUA varchar(25)
+CELULAR_USUA varchar(15),
+TP_USUA VARCHAR(10) default 'COMUM',
+CEP_USUA VARCHAR(10),
+BAIRRO_USUA VARCHAR(100),
+UF_USUA VARCHAR(10),
+CIDADE_USUA VARCHAR(100),
+NUMERO_CASA_USUA VARCHAR(10),
+DT_ALTER_USUA DateTime
 );
 
 -- Tabela Evento

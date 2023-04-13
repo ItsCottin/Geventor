@@ -16,4 +16,7 @@ public interface CidadeDAO extends BaseDAO<Cidade> {
 			" inner join c.estado e " +
 			" where e.uf = :uf")
 	public List<Cidade> findByEstado(@Param("uf") String estado);
+	
+	public Cidade findById(Long idCidade);
+	
 }

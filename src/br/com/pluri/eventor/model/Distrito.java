@@ -15,11 +15,11 @@ import lombok.Getter;
 import lombok.Setter;
 import br.com.etechoracio.common.model.BaseORM;
 
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name="cities")
-public class Cidade extends BaseORM {
+@Table(name="districts")
+public class Distrito extends BaseORM {
 	
 	@Id
 	@GeneratedValue
@@ -27,18 +27,16 @@ public class Cidade extends BaseORM {
 	private Long id;
 	
 	@Column(name="name")
-	private String name;
+	private String bairro;
 	
 	@Column(name="slug")
 	private String slug;
 	
-	@ManyToOne
-	@JoinColumn(name="state_id", referencedColumnName="id")
-	public Estado estado;
+	//@JoinColumn(name="city_id", referencedColumnName="id")
+	//@ManyToOne
+	//private Cidade cidade;
 	
 	//@OneToMany
-	//public List<Endereco> endereco;
-	
-	//@OneToMany
-	//public List<Distrito> distrito;
+	//private List<Endereco> endereco;
+
 }

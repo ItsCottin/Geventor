@@ -1,6 +1,7 @@
 package br.com.pluri.eventor.model;
 
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -20,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import br.com.etechoracio.common.model.BaseORM;
 import br.com.pluri.eventor.enums.TipoPessoaEnum;
-import br.com.pluri.eventor.enums.TipoColaboradorEnum;
+import br.com.pluri.eventor.enums.TipoUsuarioEnum;
 
 @Getter
 @Setter
@@ -36,12 +37,6 @@ public class Usuario extends BaseORM {
 	@Column(name="LOGIN_USUA")
 	private String login;
 	
-	@Column(name="FUNCAO_USUA")
-	private String funcao;
-	
-	@Column(name="AVALIACAO_USUA")
-	private float avaliacao;
-	
 	@Column(name="NOME_USUA")
 	private String nome;
 	
@@ -53,6 +48,25 @@ public class Usuario extends BaseORM {
 	
 	@Column(name="ENDERECO_USUA")
 	private String endereco;
+	
+	@Column(name="NUMERO_CASA_USUA")
+	private String nrCasa;
+	
+	@Column(name="CIDADE_USUA")
+	private String cidade;
+	
+	@Column(name="UF_USUA")
+	private String estado;
+	
+	@Column(name="BAIRRO_USUA")
+	private String bairro;
+	
+	@Column(name="CEP_USUA")
+	private String cep;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="TP_USUA")
+	private TipoUsuarioEnum tpUsuario;
 	
 	@Column(name="SENHA_USUA")
 	private String senha;
@@ -66,16 +80,15 @@ public class Usuario extends BaseORM {
 	@Enumerated(EnumType.STRING)
 	@Column(name="TP_PESSOA_USUA")
 	private TipoPessoaEnum tipoPessoa;
-	
-	@Column(name="QR_CODE_USUA")
-	private String qrCode;
-	
+
 	@Column(name="TELEFONE_USUA")
 	private String telefone;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name="TP_COLAB_USUA")
-	private TipoColaboradorEnum tipoColaborador;
+	@Column(name="CELULAR_USUA")
+	private String celular;
+	
+	@Column(name="DT_ALTER_USUA")
+	private Date dataAlter;
 	
 	public Usuario(){}
 
