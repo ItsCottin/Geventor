@@ -2,8 +2,10 @@ package br.com.pluri.eventor.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -32,11 +34,11 @@ public class Distrito extends BaseORM {
 	@Column(name="slug")
 	private String slug;
 	
-	//@JoinColumn(name="city_id", referencedColumnName="id")
-	//@ManyToOne
-	//private Cidade cidade;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="city_id", referencedColumnName="id", nullable=false, insertable=false, updatable=false)
+	private Cidade cidade;
 	
-	//@OneToMany
+	//@OneToMany(mappedBy = "distrito")
 	//private List<Endereco> endereco;
 
 }

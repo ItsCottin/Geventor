@@ -1,7 +1,9 @@
 package br.com.pluri.eventor.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -24,11 +26,11 @@ public class Endereco extends BaseORM {
 	@Column(name="id")
 	private Long id;
 	
-	@Column(name="city_id")
-	private Long idCidade;
-	
 	@Column(name="district_id")
-	private Long idBairro;
+	private Long idDistrict;
+	
+	@Column(name="city_id")
+	private Long idCity;
 		
 	@Column(name="address")
 	private String endereco;
@@ -46,13 +48,12 @@ public class Endereco extends BaseORM {
 	private int ddd;
 	
 	
-	
-	//@JoinColumn(name="district_id", referencedColumnName="id")
-	//@ManyToOne
+	//@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	//@JoinColumn(name="district_id", referencedColumnName="id", nullable=false, insertable=false, updatable=false)
 	//public Distrito distrito;
 	
-	//@JoinColumn(name="city_id", referencedColumnName="id")
-	//@ManyToOne
-	//public Cidade cidade;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="city_id", referencedColumnName="id", nullable=false, insertable=false, updatable=false)
+	public Cidade cidade;
 	
 }

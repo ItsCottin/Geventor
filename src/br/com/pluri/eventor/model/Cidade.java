@@ -2,8 +2,10 @@ package br.com.pluri.eventor.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -36,9 +38,9 @@ public class Cidade extends BaseORM {
 	@JoinColumn(name="state_id", referencedColumnName="id")
 	public Estado estado;
 	
-	//@OneToMany
-	//public List<Endereco> endereco;
+	@OneToMany(mappedBy = "cidade")
+	public List<Endereco> endereco;
 	
-	//@OneToMany
-	//public List<Distrito> distrito;
+	@OneToMany(mappedBy = "cidade")
+	public List<Distrito> distrito;
 }
