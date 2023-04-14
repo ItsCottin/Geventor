@@ -25,4 +25,10 @@ public interface UsuarioDAO extends BaseDAO<Usuario> {
 			" where e.id = :id")
 	public List<Usuario> findIncritosNaAtividade (@Param("id") Long idAtiv);
 	
+	@Query("select u from Usuario u where u.login = :login")
+	public Usuario findByLogin_v2 (@Param("login") String login);
+	
+	@Query("select u from Usuario u where u.id = :id and u.senha = :senha")
+	public Usuario findByIdAndSenha (@Param("id") Long id, @Param("senha") String senha);
+	
 }

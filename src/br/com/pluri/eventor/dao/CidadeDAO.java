@@ -17,6 +17,10 @@ public interface CidadeDAO extends BaseDAO<Cidade> {
 			" where e.uf = :uf")
 	public List<Cidade> findByEstado(@Param("uf") String estado);
 	
+	@Query("select c from Cidade c " +
+			" where c.name = :cidade")
+	public Cidade findByName(@Param("cidade") String cidade);
+	
 	public Cidade findById(Long idCidade);
 	
 }
