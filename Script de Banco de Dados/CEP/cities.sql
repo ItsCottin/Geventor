@@ -6,11 +6,12 @@
 --
 
 CREATE TABLE `cities` (
-  `id` bigint(10) UNSIGNED NOT NULL,
-  `state_id` bigint(10) UNSIGNED NOT NULL,
+  `id` bigint(10) primary key auto_increment,
+  `state_id` bigint(10),
   `name` varchar(95) NOT NULL,
-  `slug` varchar(95) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `slug` varchar(95) NOT NULL,
+  foreign key (state_id) references states(id)
+) DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `cities`

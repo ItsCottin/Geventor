@@ -6,10 +6,10 @@
 --
 
 CREATE TABLE `states` (
-  `id` bigint(10) UNSIGNED NOT NULL,
+  `id` bigint(10) primary key auto_increment,
   `name` varchar(95) NOT NULL,
   `initials` varchar(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `states`
