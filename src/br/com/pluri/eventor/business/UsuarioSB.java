@@ -1,5 +1,8 @@
 package br.com.pluri.eventor.business;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -40,28 +43,31 @@ public class UsuarioSB extends BaseSB {
 			usuario.setSenha(senhaCriptografada);
 			usuarioDAO.save(usuario);
 		} else {
-			throw new LoginJaCadastradoException("Login já cadastrado");
+			throw new LoginJaCadastradoException("Login jï¿½ cadastrado");
 		}
 	}
 
-	// TODO buscar apenas usuarios que não estão relacionados no evento e que
-	// não seja o usuario logado
+	// TODO buscar apenas usuarios que nï¿½o estï¿½o relacionados no evento e que
+	// nï¿½o seja o usuario logado
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public List<Usuario> findAll() {
 		return usuarioDAO.findAll();
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void editeUsuario(Usuario usuario) throws SenhaInvalidaException, CPFNotValidException {
+	public void editeUsuario(Usuario usuario) throws SenhaInvalidaException, LoginJaCadastradoException {
 		usuario.setCpfCnpj(usuario.getCpfCnpj().replace(".", ""));
 		usuario.setCpfCnpj(usuario.getCpfCnpj().replace("-", ""));
-		if (usuario.getOldsenha().equals(usuario.getSenha())) {
-			throw new SenhaInvalidaException("Senha já usada !");
+		usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
+		if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
+			throw new SenhaInvalidaException("Senha jÃ¡ usada !");
 		} else if (validarSenhaOld(usuario)) {
-			if(validaCPF.isCPF(usuario.getCpfCnpj())){
+			if (!usuario.loginVerificado) {
+				throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' nÃ£o foi verificado.");
+			} else {
+				LocalDateTime agora = LocalDateTime.now();
+				usuario.setDataAlter(Date.from(agora.atZone(ZoneId.systemDefault()).toInstant()));
 				usuarioDAO.save(usuario);
-			}else{
-				throw new CPFNotValidException("CPF Inválido");
 			}
 		} else {
 			throw new SenhaInvalidaException("Senha incorreta !");
@@ -74,7 +80,7 @@ public class UsuarioSB extends BaseSB {
 	}
 
 	public boolean validarSenhaOld(Usuario usuario) {
-		resultValidarSenha = usuarioDAO.findByLoginAndSenha(usuario.getLogin(), PasswordUtils.criptografarMD5(usuario.getOldsenha()));
+		resultValidarSenha = usuarioDAO.findByIdAndSenha(usuario.getId(), PasswordUtils.criptografarMD5(usuario.getOldsenha()));
 		if(resultValidarSenha!=null){
 			return true;
 		} else {
@@ -85,5 +91,9 @@ public class UsuarioSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<Usuario> findIncritosByAtividade(Atividade ativ) {
 		return usuarioDAO.findIncritosNaAtividade(ativ.getId());
+	}
+	
+	public Usuario findUsuarioByLogin(String login) {
+		return usuarioDAO.findByLogin_v2(login);
 	}
 }
