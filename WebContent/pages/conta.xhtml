@@ -11,7 +11,7 @@
 <div class="container bootstrap snippet">
     <div class="row">
   		<div class="col-sm-12">
-  			<h1 class="text-center">Seu usuario</h1>
+  			<h1 class="text-center">Seu usuário</h1>
   		</div>
     </div>
     <div class="row">
@@ -39,27 +39,37 @@
                         </div>
                         <div class="col-sm-8 form-group">
                             <h:inputText class="form-control" id="nome" value="#{usuarioMB.editUsuario.nome}" label="nome" required="true"
-                            	disabled="" />
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-4 form-group">
                             <label for="login" class="col-form-label">Nome de Login:</label>
                         </div>
-                        <div class="col-sm-8 form-group">
+                        <div class="col-sm-8 form-group input-group">
                             <h:inputText class="form-control" id="login" value="#{usuarioMB.editUsuario.login}" label="login" required="true"
-                            	disabled="" />
+                            	disabled="#{usuarioMB.modoConsulta}" >
+                            	<p:ajax event="blur" listener="#{usuarioMB.verificaAlterLogin(usuarioMB.editUsuario.login)}" update="formUsuario"/>
+                            </h:inputText>
+                            <div class="input-group-append">
+                            	<h:commandButton value="#{usuarioMB.editUsuario.loginVerificado eq 'false' ? 'Verificar' : 'Verificado'}" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf" actionListener="#{usuarioMB.verificaLoginExiste()}"
+                            		disabled="#{usuarioMB.editUsuario.loginVerificado}" update="formUsuario">
+                            		<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                            	</h:commandButton>
+                            </div>
                         </div>
                     	<div class="col-sm-1 col-md-1 col-lg-2  form-group">
                         	<label for="cpf" class="col-form-label">CPF:</label>
                         </div>
                         <div class="col-sm-4 col-md-4 col-lg-3 form-group">
-                            <p:inputMask value="#{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'}" label="cpf" mask="999.999.999-99"
-								styleClass="form-control" disabled="" /> <!-- #{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'} -->
+                            <p:inputMask value="#{usuarioMB.editUsuario.cpfCnpj}" label="cpf" mask="999.999.999-99"
+								styleClass="form-control" disabled="#{usuarioMB.modoConsulta}" >
+								<p:ajax event="blur" listener="#{usuarioMB.validaCPFTab(usuarioMB.editUsuario.cpfCnpj)}" update="formUsuario"/>
+							</p:inputMask> <!-- #{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'} -->
                         </div>
                         <div class="col-sm-2 form-group">
                             <label for="email" class="col-form-label">E-mail:</label>
                         </div>
                         <div class="col-sm-5 form-group">
-                            <h:inputText styleClass="form-control" disabled=""
+                            <h:inputText styleClass="form-control" disabled="#{usuarioMB.modoConsulta}"
                                     value="#{usuarioMB.editUsuario.email}" id="email"
                                     validatorMessage="formato de email inválido" label="E-mail">
                                 <f:validateRegex
@@ -71,7 +81,7 @@
                         </div>
                         <div class="col-sm-4 col-md-4 col-lg-3 form-group">
                             <p:inputMask value="#{usuarioMB.cepInformado}" label="cep" mask="99999-999"
-								styleClass="form-control" disabled="">
+								styleClass="form-control" disabled="#{usuarioMB.modoConsulta}">
 								<p:ajax event="blur" listener="#{usuarioMB.findEnderecoByCEP()}" update="formUsuario"/>
 							</p:inputMask>
                         </div>
@@ -79,13 +89,13 @@
                             <label for="bairro" class="col-form-label">Bairro:</label>
                         </div>
                         <div class="col-sm-5 form-group">
-                            <h:inputText class="form-control" id="bairro" value="#{usuarioMB.editUsuario.bairro}" label="Bairro" required="true"
-                            	disabled="" />
+                            <h:inputText class="form-control" id="bairro" value="#{usuarioMB.editUsuario.bairro}" label="Bairro"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-6 form-group">
                             <h:selectOneMenu styleClass="form-control" styname="uf"
                                 id="uf" value="#{usuarioMB.editUsuario.estado}"
-                                label="Estado" disabled="" >
+                                label="Estado" disabled="#{usuarioMB.modoConsulta}" >
                                 <f:ajax listener="#{usuarioMB.onEstadoChange}" render="cidades" />
                                 <f:selectItem itemValue="" itemLabel="Selecione um Estado"
                                     noSelectionOption="true" />
@@ -96,7 +106,7 @@
                         <div class="col-sm-6 form-group">
                             <h:selectOneMenu styleClass="form-control"
                                 value="#{usuarioMB.editUsuario.cidade}" label="Cidade"
-                                id="cidades" disabled="" >
+                                id="cidades" disabled="#{usuarioMB.modoConsulta}" >
                                 <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
                                     noSelectionOption="true" />
                                 <f:selectItems value="#{usuarioMB.cidades}" var="cid"
@@ -107,74 +117,74 @@
                         <div class="col-sm-2 form-group">
                             <label for="endereco" class="col-form-label">Endereço:</label>
                         </div>
-                        <div class="col-sm-5 form-group">
-                            <h:inputText class="form-control" id="endereco" value="#{usuarioMB.editUsuario.endereco}" label="Endereço" required="true"
-                            	disabled="" />
-                        </div>
-                        <div class="col-sm-2 form-group">
-                            <label for="numero" class="col-form-label">Número:</label>
-                        </div>
-                        <div class="col-sm-3 form-group">
-                            <h:inputText class="form-control" id="numero" value="#{usuarioMB.editUsuario.nrCasa}" label="Número" required="true"
-                            	disabled="" />
+                        <div class="col-sm-4 form-group">
+                            <h:inputText class="form-control" id="endereco" value="#{usuarioMB.editUsuario.endereco}" label="Endereço"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-2 form-group">
                             <label for="celular" class="col-form-label">Celular:</label>
                         </div>
                         <div class="col-sm-4 form-group">
                             <p:inputMask pt:type="" styleClass="form-control" id="celular"
-                                    label="Celular" mask="(99) 99999-9999" disabled=""
-                                    value="#{usuarioMB.editUsuario.celular}" />
+                                    label="Celular" mask="(99) 99999-9999" disabled="#{usuarioMB.modoConsulta}"
+                                    value="#{usuarioMB.editUsuario.celular}" >
+                                    <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.celular)}" update="formUsuario"/>
+                            </p:inputMask>
+                        </div>
+                        <div class="col-sm-2 form-group">
+                            <label for="numero" class="col-form-label">Número:</label>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <h:inputText class="form-control" id="numero" value="#{usuarioMB.editUsuario.nrCasa}" label="Número"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-2 form-group">
                             <label for="telefone" class="col-form-label">Telefone:</label>
                         </div>
                         <div class="col-sm-4 form-group">
                             <p:inputMask pt:type="" styleClass="form-control" id="telefone"
-                                    label="Telefone" mask="(99) 9999-9999" disabled=""
-                                    value="#{usuarioMB.editUsuario.telefone}" />
+                                    label="Telefone" mask="(99) 9999-9999" disabled="#{usuarioMB.modoConsulta}"
+                                    value="#{usuarioMB.editUsuario.telefone}" >
+                                    <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.telefone)}" update="formUsuario"/>
+                             </p:inputMask>
                         </div>
                         <div class="col-sm-5 col-lg-3 form-group">
                             <label for="senhaatual" class="col-form-label">Senha Atual:</label>
                         </div>
                         <div class="col-sm-7 col-lg-3 form-group">
-                            <h:inputText class="form-control" id="senhaatual" value="#{usuarioMB.editUsuario.oldsenha}" label="Senha Atual" required="true"
-                            	disabled="" />
+                            <h:inputText class="form-control" id="senhaatual" value="#{usuarioMB.editUsuario.oldsenha}" label="Senha Atual"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-5 col-lg-3 form-group">
                             <label for="senha" class="col-form-label">Nova Senha:</label>
                         </div>
                         <div class="col-sm-7 col-lg-3 form-group">
-                            <p:password class="form-control" id="senha" value="#{usuarioMB.editUsuario.senha}" label="Nova Senha" required="true"
-                            	disabled="" />
+                            <p:password class="form-control" id="senha" value="#{usuarioMB.editUsuario.senha}" label="Nova Senha"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         <div class="col-sm-5 col-lg-4 col-xl-3 form-group">
                             <label for="senha2" class="col-form-label">Confirmar nova senha:</label>
                         </div>
                         <div class="col-sm-7 col-lg-4 col-xl-3 form-group">
-                            <p:password class="form-control" id="senha2" value="#{usuarioMB.editUsuario.confirmSenha}" label="Confirmar nova senha" required="true"
-                            	disabled="" />
+                            <p:password class="form-control" id="senha2" value="#{usuarioMB.editUsuario.confirmSenha}" label="Confirmar nova senha"
+                            	disabled="#{usuarioMB.modoConsulta}" />
                         </div>
                         
                     </div>
                     <div class="row border-rcf">   
                         <div class="col-12">
                             <div class="btn-group" role="group" aria-label="Basic example">
-                                    <p:commandButton rendered="true"
-                                       value="Salvar"
+                                    <p:commandButton rendered="#{usuarioMB.modoConsulta eq true ? 'false' : 'true'}"
+                                       value="Salvar" actionListener="#{usuarioMB.doEdit()}"
                                        id="btnSalva" styleClass="btn btn-success ui-widget-button-success-rcf"
-                                       update=""
-                                       oncomplete="selAbaTbl('nao');" >
+                                       update=":msgs, :formUsuario" >
                                        <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-                                       <f:ajax render="tblEven" />
                                     </p:commandButton>
                                     <p:commandButton rendered="true"
-                                       value="Editar"
-                                       id="btnCan" styleClass="btn btn-secundary ui-widget-button-secundary-rcf"
-                                       update=""
-                                       oncomplete="selAbaTbl();"  >
+                                       value="#{usuarioMB.modoConsulta eq true ? 'Editar' : 'Cancelar'}" actionListener="#{usuarioMB.preEdit()}"
+                                       id="btnCan" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf"
+                                       update="formUsuario" >
                                        <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-                                       <f:ajax render="tblEven" />
                                     </p:commandButton>
                                  </div>
                         </div>
