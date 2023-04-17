@@ -35,12 +35,17 @@ import org.springframework.stereotype.Controller;
 import br.com.etechoracio.common.view.BaseMB;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.CidadeSB;
+import br.com.pluri.eventor.business.DistritoSB;
+import br.com.pluri.eventor.business.EnderecoSB;
 import br.com.pluri.eventor.business.EstadoSB;
 import br.com.pluri.eventor.business.EventoSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
+import br.com.pluri.eventor.business.exception.CEPInvalidoException;
+import br.com.pluri.eventor.business.exception.DDDInvalidoException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
+import br.com.pluri.eventor.model.Endereco;
 import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
 import br.com.pluri.eventor.model.Usuario;
@@ -63,6 +68,12 @@ import br.com.pluri.eventor.model.UsuarioAtividade;
 @Scope("view")
 @Controller
 public class EventoMB extends BaseMB {
+	
+	@Autowired
+	private DistritoSB distritoSB;
+	
+	@Autowired
+	private EnderecoSB enderecoSB;
 	
 	@Autowired
 	private EventoSB eventoSB;
@@ -98,6 +109,8 @@ public class EventoMB extends BaseMB {
 	private boolean confirmaExclui = false;
 	public boolean modoConsulta;
 	public Evento evenSel;
+	private Endereco enderecoDoCEP;
+	private String cepInformado;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -131,11 +144,10 @@ public class EventoMB extends BaseMB {
 		if (!validarDatasEvento()) {
 			return;
 		}
+		eventoSB.insert(editEvento, getCurrentUserId());
 		if (editEvento.getId() == null) {
-			eventoSB.insert(editEvento, getCurrentUserId());
 			showInfoMessage("Evento inserido com sucesso");
 		} else {
-			eventoSB.editeEvento(editEvento);
 			showInfoMessage("Evento Atualizado com sucesso");
 		}
 		onEventos();
@@ -151,11 +163,11 @@ public class EventoMB extends BaseMB {
 	private boolean validarDatasEvento() {
 		if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
 			if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-				showErrorMessage("Data Início está depois da data final do evento");
+				showErrorMessage("Data Inï¿½cio estï¿½ depois da data final do evento");
 				return false;
 			}
 		} else if (editEvento.getDataInicio() != null || editEvento.getDataFim() != null) {
-			showErrorMessage("Data Início está depois da data final do evento");
+			showErrorMessage("Data Inï¿½cio estï¿½ depois da data final do evento");
 			return false;
 		}
 		return true;
@@ -166,15 +178,12 @@ public class EventoMB extends BaseMB {
 	}
 	
 	public void doRemove(Evento exclui){
-		
-		//TODO Linha com erro "The entity must not be null!" - ajustar linha para funcionamento correto
 		eventoSB.delete(exclui);
-		showInfoMessage("Evento excluído com sucesso");
+		showInfoMessage("Evento excluï¿½do com sucesso");
 		onEventos();
 	}
 	
-	public void doEdit(Evento edit){	
-		//TODO Linha com NullPointerException - ajustar linha para funcionamento correto
+	public void doEdit(Evento edit){
 		onPrepareEditOuConsulta(edit, false);
 	}
 	
@@ -229,6 +238,82 @@ public class EventoMB extends BaseMB {
 	
 	public void doPrepareInsert(){
 		this.editEvento = new Evento();
+	}
+	
+	public void findEnderecoByCEP() {
+		try {
+			if (!cepInformado.equals("_____-___")) {
+				this.enderecoDoCEP = new Endereco();
+				this.enderecoDoCEP = enderecoSB.findCidadeAndEstadoByCEP(cepInformado);
+				if (enderecoDoCEP != null) {
+					this.editEvento.setCep(enderecoDoCEP.getCep());
+					this.editEvento.setEstado(enderecoDoCEP.cidade.estado.getUf());
+					onEstadoChange();
+					this.editEvento.setCidade(enderecoDoCEP.cidade.getName());
+					this.editEvento.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
+					this.editEvento.setEndereco(enderecoDoCEP.getEndereco());
+				} else {
+					throw new CEPInvalidoException("CEP '" + cepInformado + "' nï¿½o encontrado no Banco de Dados.\n"
+							+ "Informe seu endereï¿½o manualmente.");
+				}
+			}
+		} catch (CEPInvalidoException e) {
+			showErrorMessage(e.getMessage());
+		}
+	}
+	
+	public void validaDDDAfterSelCidade(){
+		if(editEvento.getTelefone() != null) {
+			validaDDD(editEvento.getTelefone());
+		}
+	}
+	
+	public void validaDDD(String numero) {
+		try {
+			if (!numero.contains("_")) {
+				if(!numero.equals("")){
+					if (numero.length() == 15) {
+						validaPrimeiroDigCelular(numero);
+					}
+					if (!editEvento.getCidade().equals("")){
+						if(editEvento.getCep() == null){
+							boolean naoContem = true;
+							List<Cidade> cidlist = new ArrayList<Cidade>();
+							cidlist = cidadeSB.findByName(editEvento.getCidade());
+							List<Integer> listddd;
+							for (Cidade cid : cidlist) {
+								listddd = enderecoSB.findDDDInnerJoinCity(cid.getId());
+								for (Integer ddd : listddd){
+									if (ddd == Integer.parseInt(numero.substring(1, 3))){
+										naoContem = false;
+									}
+								}
+							}
+							if(naoContem) {
+								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+							}
+						} else {
+							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editEvento.getCep()).getDdd()){
+								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+							}
+						}
+					}
+				}
+			}
+		} catch (DDDInvalidoException e) {
+			showInfoMessage(e.getMessage());
+		}
+	}
+	
+	public void validaPrimeiroDigCelular(String numero) {
+		try {
+			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
+				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do nï¿½mero '" + numero + "' ï¿½ invï¿½lido");
+			}
+		} catch (DDDInvalidoException e) {
+			showErrorMessage(e.getMessage());
+			editEvento.setTelefone("");
+		}
 	}
 	
         @PostConstruct
