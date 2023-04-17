@@ -30,8 +30,8 @@ public class Evento extends BaseORM {
 	@Column(name="ID_EVEN")
 	private Long id;
 	
-	@Column(name="LOCAL_EVEN")
-	private String local;
+	@Column(name="ENDERECO_EVEN")
+	private String endereco;
 	
 	@Column(name="DATAINICIO_EVEN")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -47,12 +47,6 @@ public class Evento extends BaseORM {
 	@Column(name="DESCRICAO_EVEN")
 	private String descricao;
 	
-	@Column(name="TWITTER_EVEN")
-	private String twitter;
-	
-	@Column(name="FACEBOOK_EVEN")
-	private String facebook;
-	
 	@Column(name="SITE_EVEN")
 	private String site;
 	
@@ -64,9 +58,6 @@ public class Evento extends BaseORM {
 	
 	@Column(name="VAGAS")
 	private int vagas;
-	
-	@Column(name="RESPONSAVEL_EVEN")
-	private String responsavel;
 
 	@Column(name="EMAIL_EVEN")
 	private String email;
@@ -76,6 +67,18 @@ public class Evento extends BaseORM {
 	
 	@Column(name="TELEFONE_EVEN")
 	private String telefone;
+	
+	@Column(name="CEP_EVEN")
+	private String cep;
+	
+	@Column(name="BAIRRO_EVEN")
+	private String bairro;
+	
+	@Column(name="NUMERO_LUGAR_EVEN")
+	private String numeroLugar;
+	
+	@Column(name="DT_ALTER_EVEN")
+	private Date dataAlter;
 	
 	@Column(name="SITE_PROPRIO")
 	private boolean siteProprio;
