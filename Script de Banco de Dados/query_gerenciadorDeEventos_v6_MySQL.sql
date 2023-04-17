@@ -34,7 +34,7 @@ AVATAR_DIR varchar(100) default 'default.png'
 create table TBL_EVENTO(
 ID_EVEN bigint(10) primary key auto_increment,
 ID_USUA bigint(10),
-LOCAL_EVEN varchar(300) not null,
+ENDERECO_EVEN varchar(100) not null,
 CIDADE_EVEN varchar(100) not null,
 ESTADO_EVEN varchar(20) not null,
 DATAINICIO_EVEN DateTime not null,
@@ -42,14 +42,15 @@ DATAFIM_EVEN DateTime not null,
 TITULO_EVEN varchar(100) not null,
 DESCRICAO_EVEN varchar(500) not null,
 VAGAS int not null,
-RESPONSAVEL_EVEN varchar(50) null,
-TWITTER_EVEN varchar(200),
-FACEBOOK_EVEN varchar(200),
 SITE_EVEN varchar(50),
 EMAIL_EVEN varchar(50) not null,
 TELEFONE_EVEN varchar(15) not null,
 PRECO_EVEN varchar(100) not null,
 SITE_PROPRIO bool default true,
+CEP_EVEN VARCHAR(10) not null, 				-- new
+BAIRRO_EVEN VARCHAR(100) not null,  		-- new
+NUMERO_LUGAR_EVEN VARCHAR(10) not null,		-- new
+DT_ALTER_EVEN DateTime,						-- new
 foreign key (ID_USUA) references TBL_USUARIO(ID_USUA)
 );
 
@@ -135,8 +136,16 @@ SELECT * FROM TBL_USUARIO
 
 -- alterações: 16/04/2023
 -- 
--- select table tbl_usuario add column AVATAR_DIR varchar(100) default 'default.png'
+-- alter table tbl_usuario add column AVATAR_DIR varchar(100) default 'default.png'
 -- 
 -- update tbl_usuario
 -- set AVATAR_DIR = 'default.png'
 -- where ID_USUA in ('1','2','3')
+
+-- alterações: 17/04/2023 for version 0.2.9
+-- alter table TBL_EVENTO add column CEP_EVEN VARCHAR(10) not null;
+-- alter table TBL_EVENTO add column BAIRRO_EVEN VARCHAR(100) not null;
+-- ALTER TABLE TBL_EVENTO DROP column LOCAL_EVEN;
+-- alter table TBL_EVENTO add column ENDERECO_EVEN varchar(100) not null;
+-- alter table TBL_EVENTO add column NUMERO_LUGAR_EVEN VARCHAR(10) not null;
+-- alter table TBL_EVENTO add column DT_ALTER_EVEN DateTime;
