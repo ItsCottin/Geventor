@@ -31,7 +31,7 @@ public class CidadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public Cidade findByName(String nomeCid){
+	public List<Cidade> findByName(String nomeCid){
 		return cidadeDAO.findByName(nomeCid);
 	}
 }

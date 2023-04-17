@@ -88,8 +88,31 @@ body {
 .ui-widget-button-danger-rcf:hover {
 	color: #fff!important;
 	background-color: #c82333!important;
+	background: #6c757d!important;
 	border-color: #bd2130!important;
 	box-shadow: 0 0 0 .2rem rgba(72, 180, 97, .5)!important;
+}
+
+.ui-widget-button-outline-secondary-rcf {
+	color:#6c757d!important;
+	border-color:#dddddd!important;
+	font-family: inherit!important;
+	padding: 0!important;
+}
+
+.ui-widget-button-outline-secondary-rcf:hover {
+	color:#fff!important;
+	background-color:#6c757d!important;
+	border-color:#6c757d!important;
+	background: #6c757d!important;
+	box-shadow:0 0 0 .2rem rgba(108,117,125,.5)!important;
+}
+
+
+.ui-widget-button-outline-secondary-rcf.focus,.ui-widget-button-outline-secondary-rcf:focus{
+	box-shadow:0 0 0 .2rem rgba(108,117,125,.5)!important;
+	background: #6c757d!important;
+	color: #fff!important;
 }
 
 .ui-icon-button-rcf {
@@ -101,7 +124,6 @@ body {
 }
 
 .ui-state-disabled {
-	background-color: #e9ecef!important;
 	opacity: 1!important;
 	width: 100%;
 }

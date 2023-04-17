@@ -30,8 +30,8 @@ public interface EnderecoDAO extends BaseDAO<Endereco> {
 	@Query(value = "select * from address_searchs where city_id = :idCid", nativeQuery = true)
 	public List<Endereco> findEnderecoByIdCid (@Param("idCid") Long idCid);
 	
-	@Query(value = "select distinct (a.ddd), c.name, c.id from address_searchs a "
+	@Query(value = "select distinct (a.ddd) from address_searchs a "
 			+ "inner join cities c on a.city_id = c.id where c.id = :idCid", nativeQuery = true)
-	public Object[] findDDDInnerJoinCity (@Param("idCid") Long idCid);
+	public List<Integer> findDDDInnerJoinCity (@Param("idCid") Long idCid);
 	
 }

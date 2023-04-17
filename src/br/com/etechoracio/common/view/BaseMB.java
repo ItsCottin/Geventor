@@ -3,9 +3,11 @@ package br.com.etechoracio.common.view;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -400,4 +402,14 @@ public abstract class BaseMB {
 				getFacesContext().getApplication().getNavigationHandler();
 		navigateHandler.performNavigation(outcome + "?faces-redirect=true");
 	}
+	
+	protected String formatarData(Date data, String formato) {
+		if(data != null){
+	        SimpleDateFormat sdf = new SimpleDateFormat(formato);
+	        String dataFormatada = sdf.format(data);
+	        return dataFormatada;
+		} else {
+			return "";
+		}
+    }
 }

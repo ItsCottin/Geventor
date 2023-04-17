@@ -1,7 +1,9 @@
 package br.com.pluri.eventor.view;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -22,6 +24,8 @@ import br.com.pluri.eventor.business.CidadeSB;
 import br.com.pluri.eventor.business.DistritoSB;
 import br.com.pluri.eventor.business.EnderecoSB;
 import br.com.pluri.eventor.business.EstadoSB;
+import br.com.pluri.eventor.business.EventoSB;
+import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.CPFNotValidException;
@@ -44,6 +48,9 @@ public class UsuarioMB extends BaseMB {
 	private UsuarioSB usuarioSB;
 	
 	@Autowired
+	private UsuarioAtividadeSB usuarioAtividadeSB;
+	
+	@Autowired
 	private CidadeSB cidadeSB;
 	
 	@Autowired
@@ -54,6 +61,9 @@ public class UsuarioMB extends BaseMB {
 
 	@Autowired
 	private DistritoSB distritoSB;
+	
+	@Autowired
+	private EventoSB eventoSB;
 	
 	private ValidaCPF validaCPF = new ValidaCPF();
 	
@@ -66,6 +76,11 @@ public class UsuarioMB extends BaseMB {
 	private Usuario editUsuario = new Usuario();
 	private Usuario usuarioLogado = new Usuario();
 	private boolean modoConsulta;
+	private boolean edicaoIndisponivel;
+	private int myeventos;
+	private int inscritospen;
+	private int myinscricoes;
+	private String proxevent;
 	
 	public void doSave(){
 		try{
@@ -89,8 +104,30 @@ public class UsuarioMB extends BaseMB {
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.usuarioLogado = usuarioSB.findById(getCurrentUserId());
 			editUsuario.setLoginVerificado(true);
-			this.modoConsulta = true; 
+			this.modoConsulta = true;
+			this.edicaoIndisponivel = false;
+			this.editUsuario.setAtualizaSenha("N");
+			findMyInscricoes();
+			findInscritosPenMyEventos();
+			getDataProxEventoDoUsuLogado();
+			findMyEvento();
 		}
+	}
+	
+	public void findMyEvento(){
+		this.myeventos = eventoSB.findEventosByUsuario(getCurrentUserId()).size();
+	}
+	
+	public void findMyInscricoes(){
+		this.myinscricoes = usuarioAtividadeSB.findMyInscricoes(getCurrentUserId()).size();
+	}
+	
+	public void findInscritosPenMyEventos(){
+		this.inscritospen = usuarioAtividadeSB.findIncritosNoEventoByUsuarioLogadoByStatus(getCurrentUserId(), "Pendente").size();
+	}
+	
+	public void getDataProxEventoDoUsuLogado(){
+		this.proxevent = formatarData(eventoSB.getDataProxEventoDoUsuLogado(getCurrentUserId()), "dd/MM");
 	}
 	
 	public void preEdit() {
@@ -99,7 +136,15 @@ public class UsuarioMB extends BaseMB {
 		} else {
 			this.modoConsulta = true;
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
+			this.editUsuario.setAtualizaSenha("N");
+			this.editUsuario.loginVerificado = true;
+			this.cepInformado = null;
 		}
+	}
+	
+	public void setAvatarEdit(String avatar) throws SenhaInvalidaException{
+		this.editUsuario.setAvatar(avatar);
+		doEdit();
 	}
 	
 	public void onEstadoChange(){
@@ -121,12 +166,33 @@ public class UsuarioMB extends BaseMB {
 	public void validaDDD(String numero) {
 		try {
 			if (!numero.contains("_")) {
-				if (numero.length() == 15) {
-					validaPrimeiroDigCelular(numero);
-				}
-				if (editUsuario.getCidade() != null &&
-						Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findDDDInnerJoinCity(cidadeSB.findByName(editUsuario.getCidade()).getId())) {
-					throw new DDDInvalidoException("DDD do n√∫mero '" + numero + "' n√£o pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+				if(!numero.equals("")){
+					if (numero.length() == 15) {
+						validaPrimeiroDigCelular(numero);
+					}
+					if (!editUsuario.getCidade().equals("")){
+						if(editUsuario.getCep() == null){
+							boolean naoContem = true;
+							List<Cidade> cidlist = new ArrayList<Cidade>();
+							cidlist = cidadeSB.findByName(editUsuario.getCidade());
+							List<Integer> listddd;
+							for (Cidade cid : cidlist) {
+								listddd = enderecoSB.findDDDInnerJoinCity(cid.getId());
+								for (Integer ddd : listddd){
+									if (ddd == Integer.parseInt(numero.substring(1, 3))){
+										naoContem = false;
+									}
+								}
+							}
+							if(naoContem) {
+								throw new DDDInvalidoException("DDD do n˙mero '" + numero + "' n„o pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+							}
+						} else {
+							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editUsuario.getCep()).getDdd()){
+								throw new DDDInvalidoException("DDD do n˙mero '" + numero + "' n„o pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+							}
+						}
+					}
 				}
 			}
 		} catch (DDDInvalidoException e) {
@@ -134,10 +200,17 @@ public class UsuarioMB extends BaseMB {
 		}
 	}
 	
+	public void validaDDDAfterSelCidade(){
+		if(editUsuario.getCelular() != null) {
+			validaDDD(editUsuario.getCelular());
+			validaDDD(editUsuario.getTelefone());
+		}
+	}
+	
 	public void validaPrimeiroDigCelular(String numero) {
 		try {
 			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
-				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do n√∫mero '" + numero + "' √© inv√°lido");
+				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do n˙mero '" + numero + "' È inv·lido");
 			}
 		} catch (DDDInvalidoException e) {
 			showErrorMessage(e.getMessage());
@@ -158,8 +231,8 @@ public class UsuarioMB extends BaseMB {
 					this.editUsuario.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
 					this.editUsuario.setEndereco(enderecoDoCEP.getEndereco());
 				} else {
-					throw new CEPInvalidoException("CEP '" + cepInformado + "' n√£o encontrado no Banco de Dados.\n"
-							+ "Informe seu endere√ßo manualmente.");
+					throw new CEPInvalidoException("CEP '" + cepInformado + "' n„o encontrado no Banco de Dados.\n"
+							+ "Informe seu endereÁo manualmente.");
 				}
 			}
 		} catch (CEPInvalidoException e) {
@@ -170,11 +243,10 @@ public class UsuarioMB extends BaseMB {
 	@SuppressWarnings("static-access")
 	public void validaCPFTab(String cpf) {
 		try {
-			if (!cpf.contains("_")) {
-				if(!validaCPF.isCPF(cpf.replace(".", "").replace("-", ""))) {
-					throw new CPFNotValidException("O CPF '" + cpf + "' √© inv√°lido");
-				}
+			if(!cpf.contains("_") && !validaCPF.isCPF(cpf.replace(".", "").replace("-", ""))) {
+				throw new CPFNotValidException("O CPF '" + cpf + "' È inv·lido");
 			}
+			
 		} catch (Exception e) {
 			showErrorMessage(e.getMessage());
 			editUsuario.setCpfCnpj("");
@@ -186,14 +258,11 @@ public class UsuarioMB extends BaseMB {
 			Usuario usuarioLogin = new Usuario();
 			usuarioLogin = usuarioSB.findUsuarioByLogin(editUsuario.getLogin());
 			
-			if (!usuarioLogado.getLogin().equals(editUsuario.getLogin())) {
-				if(usuarioLogin != null) {
-					throw new LoginJaCadastradoException("O nome de Login '" + editUsuario.getLogin() + "' j√° est√° cadastrado.");
-				} else {
-					editUsuario.setLoginVerificado(true);
-				}
+			if (!usuarioLogado.getLogin().equals(editUsuario.getLogin()) && usuarioLogin != null) {
+				this.editUsuario.setLoginVerificado(false);
+				throw new LoginJaCadastradoException("O nome de Login '" + editUsuario.getLogin() + "' j· est· cadastrado.");
 			} else {
-				editUsuario.setLoginVerificado(true);
+				this.editUsuario.setLoginVerificado(true);
 			}
 		} catch (LoginJaCadastradoException e) {
 			showErrorMessage(e.getMessage());
@@ -203,22 +272,36 @@ public class UsuarioMB extends BaseMB {
 	
 	public void verificaAlterLogin(String login) {
 		if(!login.equals(usuarioLogado.getLogin())) {
-			editUsuario.setLoginVerificado(false);
+			this.editUsuario.setLoginVerificado(false);
+		} else {
+			this.editUsuario.setLoginVerificado(true);
 		}
 	}
 	
 	public void doEdit() throws SenhaInvalidaException {
 		try {
+			if (editUsuario.getAtualizaSenha().equals("N")){
+				this.editUsuario.setSenha(usuarioSB.findById(getCurrentUserId()).getSenha());
+			}
 			usuarioSB.editeUsuario(editUsuario);	
-			showInfoMessage("Seu usu√°rio foi atualizado com sucesso.");
+			showInfoMessage("Seu usu·rio foi atualizado com sucesso.");
+			this.editUsuario = new Usuario();
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.modoConsulta = true;
+			this.editUsuario.setAtualizaSenha("N");
+			verificaAlterLogin(editUsuario.getLogin());
 		} catch (SenhaInvalidaException es) {
 			showErrorMessage(es.getMessage());
 		} catch (LoginJaCadastradoException e) {
 			showErrorMessage(e.getMessage());
 		}
 	}
+	
+	public String formatarDataFromTela(Map<String, Object> params) {
+		Date data = (Date) params.get("data");
+		String formato = (String) params.get("formato");
+        return formatarData(data, formato);
+    }
 	
 	
 	

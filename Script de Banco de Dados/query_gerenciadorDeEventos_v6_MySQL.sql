@@ -26,7 +26,8 @@ BAIRRO_USUA VARCHAR(100),
 UF_USUA VARCHAR(10),
 CIDADE_USUA VARCHAR(100),
 NUMERO_CASA_USUA VARCHAR(10),
-DT_ALTER_USUA DateTime
+DT_ALTER_USUA DateTime,
+AVATAR_DIR varchar(100) default 'default.png'
 );
 
 -- Tabela Evento
@@ -132,3 +133,10 @@ INSERT INTO TBL_USUARIO(LOGIN_USUA,
 SELECT * FROM TBL_USUARIO
 
 
+-- alterações: 16/04/2023
+-- 
+-- select table tbl_usuario add column AVATAR_DIR varchar(100) default 'default.png'
+-- 
+-- update tbl_usuario
+-- set AVATAR_DIR = 'default.png'
+-- where ID_USUA in ('1','2','3')

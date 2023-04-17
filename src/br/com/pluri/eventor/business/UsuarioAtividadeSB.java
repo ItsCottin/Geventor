@@ -30,6 +30,11 @@ public class UsuarioAtividadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogadoByStatus(Long idUsuario, String status) {
+		return usuarioAtividadeDAO.findIncritosNoEventoByUsuarioLogadoByStatus(idUsuario, status);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public UsuarioAtividade findSeEstaInscritoNaAtividade(Long idAtividade, Long idUsuario) {
 		return usuarioAtividadeDAO.findSeEstaInscritoNaAtividade(idUsuario, idAtividade);
 	}

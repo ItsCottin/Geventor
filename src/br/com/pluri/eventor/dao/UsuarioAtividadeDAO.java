@@ -19,6 +19,12 @@ public interface UsuarioAtividadeDAO extends BaseDAO<UsuarioAtividade> {
 		public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogado (@Param("id") Long idUsu);
 		
 		@Query("select u from UsuarioAtividade u " +
+				   " inner join u.atividade a " +
+				   " inner join a.evento e " +
+				   " where e.usuario.id = :id and u.status = :status")
+		public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogadoByStatus (@Param("id") Long idUsu, @Param("status") String status);
+		
+		@Query("select u from UsuarioAtividade u " +
 			   " where u.usuario.id = :idUsu and u.atividade.id = :idAtiv")
 		public UsuarioAtividade findSeEstaInscritoNaAtividade(@Param("idUsu") Long idUsu, @Param("idAtiv") Long idAtiv);
 		

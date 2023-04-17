@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.business;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -86,11 +87,12 @@ public class EventoSB extends BaseSB {
 		return eventoDAO.findAllEventoMenosMeus(idUsu);
 	}
 	
-	
-	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public Evento findByTitulo(String titulo){
 		return eventoDAO.findByTitulo(titulo);
 	}
 	
+	public Date getDataProxEventoDoUsuLogado(Long idUsu){
+		return eventoDAO.getDataProxEventoDoUsuLogado(idUsu);
+	} 
 }

@@ -64,6 +64,9 @@ public class Usuario extends BaseORM {
 	@Column(name="CEP_USUA")
 	private String cep;
 	
+	@Column(name="AVATAR_DIR")
+	private String avatar;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name="TP_USUA")
 	private TipoUsuarioEnum tpUsuario;
@@ -76,6 +79,12 @@ public class Usuario extends BaseORM {
 	
 	@Transient
 	private String oldsenha;
+	
+	@Transient
+	public boolean loginVerificado;
+	
+	@Transient
+	public String atualizaSenha;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="TP_PESSOA_USUA")

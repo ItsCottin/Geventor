@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -20,5 +21,9 @@ public interface EventoDAO extends BaseDAO<Evento> {
 	@Query("select e from Evento e " +
 		   " where e.usuario.id != :idUsu")
 	public List<Evento> findAllEventoMenosMeus(@Param("idUsu") Long idUsu);
+	
+	@Query(value = "select MIN(datainicio_even) as proximoevento from tbl_evento where datainicio_even >= CURDATE() and id_usua = :idUsu",
+			nativeQuery = true)
+	public Timestamp getDataProxEventoDoUsuLogado(@Param("idUsu") Long idUsu);
 	
 }

@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.business;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -46,9 +47,19 @@ public class EnderecoSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public int findDDDInnerJoinCity(Long idCid){
-		Object[] obj = enderecoDAO.findDDDInnerJoinCity(idCid);
-		return (Integer) obj[0];
+	public List<Integer> findDDDInnerJoinCity(Long idCid){
+		//List<Object[]> obj = enderecoDAO.findDDDInnerJoinCity(idCid);
+		//List<Integer> dddList = new ArrayList<Integer>();
+		//for (Object[] o : obj) {
+	    //    Integer ddd = (Integer) o[0];
+	    //    dddList.add(ddd);
+	    //}
+		return enderecoDAO.findDDDInnerJoinCity(idCid);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public Endereco findEnderecoByCEP(String cep){
+		return enderecoDAO.findEnderecoByCEP(cep);
 	}
 	
 }

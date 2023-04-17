@@ -133,18 +133,10 @@ public class AtividadeMB extends BaseMB {
 		setModalConsultaAtiv();
 	}
 	
-	public String formatarData(Date data, String formato) {
-        SimpleDateFormat sdf = new SimpleDateFormat(formato);
-        String dataFormatada = sdf.format(data);
-        return dataFormatada;
-    }
-	
 	public String formatarDataFromTela(Map<String, Object> params) {
 		Date data = (Date) params.get("data");
 		String formato = (String) params.get("formato");
-        SimpleDateFormat sdf = new SimpleDateFormat(formato);
-        String dataFormatada = sdf.format(data);
-        return dataFormatada;
+        return formatarData(data, formato);
     }
 	
 	public void setModalConsultaAtiv() {

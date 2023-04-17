@@ -15,8 +15,10 @@ import br.com.pluri.eventor.business.exception.CPFNotValidException;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
+import br.com.pluri.eventor.dao.EnderecoDAO;
 import br.com.pluri.eventor.dao.UsuarioDAO;
 import br.com.pluri.eventor.model.Atividade;
+import br.com.pluri.eventor.model.Endereco;
 import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.validator.ValidaCPF;
 
@@ -43,7 +45,7 @@ public class UsuarioSB extends BaseSB {
 			usuario.setSenha(senhaCriptografada);
 			usuarioDAO.save(usuario);
 		} else {
-			throw new LoginJaCadastradoException("Login jï¿½ cadastrado");
+			throw new LoginJaCadastradoException("Login já cadastrado");
 		}
 	}
 
@@ -56,21 +58,25 @@ public class UsuarioSB extends BaseSB {
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void editeUsuario(Usuario usuario) throws SenhaInvalidaException, LoginJaCadastradoException {
-		usuario.setCpfCnpj(usuario.getCpfCnpj().replace(".", ""));
-		usuario.setCpfCnpj(usuario.getCpfCnpj().replace("-", ""));
-		usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
-		if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
-			throw new SenhaInvalidaException("Senha jÃ¡ usada !");
-		} else if (validarSenhaOld(usuario)) {
-			if (!usuario.loginVerificado) {
-				throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' nÃ£o foi verificado.");
-			} else {
-				LocalDateTime agora = LocalDateTime.now();
-				usuario.setDataAlter(Date.from(agora.atZone(ZoneId.systemDefault()).toInstant()));
-				usuarioDAO.save(usuario);
-			}
+		if(usuario.getCpfCnpj().contains("_")){
+			usuario.setCpfCnpj("");
 		} else {
-			throw new SenhaInvalidaException("Senha incorreta !");
+			usuario.setCpfCnpj(usuario.getCpfCnpj().replace(".", "").replace("-", ""));
+		}
+		if(usuario.atualizaSenha.equals("S")){
+			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
+			if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
+				throw new SenhaInvalidaException("Senha jé usada !");
+			}
+			if (!validarSenhaOld(usuario)){
+				throw new SenhaInvalidaException("Senha incorreta !");
+			}
+		}
+		if (!usuario.loginVerificado) {
+			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' não foi verificado.");
+		} else {
+			usuario.setDataAlter(getDateAlter());
+			usuarioDAO.save(usuario);
 		}
 	}
 
@@ -81,7 +87,7 @@ public class UsuarioSB extends BaseSB {
 
 	public boolean validarSenhaOld(Usuario usuario) {
 		resultValidarSenha = usuarioDAO.findByIdAndSenha(usuario.getId(), PasswordUtils.criptografarMD5(usuario.getOldsenha()));
-		if(resultValidarSenha!=null){
+		if(resultValidarSenha!=null && usuario.getSenha().equals(PasswordUtils.criptografarMD5(usuario.getConfirmSenha()))){
 			return true;
 		} else {
 			return false;

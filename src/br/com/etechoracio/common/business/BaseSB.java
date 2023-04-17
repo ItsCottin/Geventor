@@ -1,6 +1,9 @@
 package br.com.etechoracio.common.business;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +13,17 @@ import javax.persistence.PersistenceContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
+/**
+ * Criado o método 'getDateAlter()' para retornar a data do sistema para utilizar em métodos de alteração e inclusão de registro.
+ * 
+ * <pre>
+ * Last Modified  $Date: 2023/04/15 $
+ * Last Modified by $Author: Rodrigo Cotting $
+ * </pre>
+ * 
+ * @author Rogério de Morais
+ * @version $Revision: 1.1 $
+ */
 public abstract class BaseSB {
 	
 	@PersistenceContext
@@ -62,6 +76,11 @@ public abstract class BaseSB {
 		if (em != null) {
 			em.flush();
 		}
+	}
+	
+	protected Date getDateAlter(){
+		LocalDateTime agora = LocalDateTime.now();
+		return Date.from(agora.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 }
