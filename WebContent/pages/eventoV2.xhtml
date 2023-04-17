@@ -141,16 +141,23 @@
                         <p:separator style="width:99%;" />
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
-                              <label for="titulo" class="col-sm-3 col-form-label">Título:</label>
-                              <div class="col-sm-9">
+                           	<div class="col-sm-2 col-small-4-rcf form-group text-right text-truncate">
+                              	<label for="titulo" class="col-form-label">Título:</label>
+                             </div>
+                              <div class="col-sm-4 col-small-8-rcf form-group">
                                  <p:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="titulo" value="#{eventoMB.editEvento.titulo}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta}" />
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-3">
+                              <div class="col-md-4 col-sm-3 col-small-7-rcf form-group text-right text-truncate">
+                                 <label for="vagas" class="col-form-label">Vagas pro Evento:</label>
+                              </div>
+                              <div class="col-md-2 col-sm-3 col-small-5-rcf form-group">
+                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="vagas" disabled="#{eventoMB.modoConsulta}"
+                                    value="#{eventoMB.editEvento.vagas}" label="Vagas" />
+                              </div>
+                              <div class="col-md-3 col-sm-4 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="from" class="col-form-label">Começa:</label>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-8 col-small-8-rcf form-group">
                                  <p:inputText pt:type="date" label="Data inicio"
                                     styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataInicio}" required="true"
@@ -158,20 +165,18 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd" />
                                  </p:inputText>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-4 col-small-6-rcf form-group text-right text-truncate">
                                  <label for="horafrom" class="col-form-label">Hora Começo:</label>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-8 col-small-6-rcf form-group">
                                  <p:calendar pattern="HH:mm" timeOnly="true" styleClass="#{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
                                     value="#{eventoMB.editEvento.horaInicio}" required="true"
                                     label="Hora inicio" id="horafrom" disabled="#{eventoMB.modoConsulta}" />
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-4 form-group col-small-4-rcf text-right text-truncate">
                                  <label for="datafim" class="col-form-label">Termina:</label>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-8 form-group col-small-8-rcf">
                                  <p:inputText pt:type="date" label="Data inicio"
                                     styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataFim}" required="true"
@@ -179,17 +184,94 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd" />
                                  </p:inputText>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-4 col-small-6-rcf form-group text-right text-truncate">
                                  <label for="horafim" class="col-form-label">Hora Termino:</label>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-md-3 col-sm-8 col-small-6-rcf form-group">
                                  <p:calendar pattern="HH:mm" timeOnly="true" styleClass="#{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
                                     value="#{eventoMB.editEvento.horaFim}" required="true"
                                     label="Hora inicio" id="horafim" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
-                              <div class="col-sm-6 input-group">
+                              
+                              <div class="col-sm-1 col-md-1 col-lg-2 col-small-4-rcf form-group text-right">
+		                          <label for="cep" class="col-form-label">CEP:</label>
+		                      </div>
+		                      <div class="col-sm-4 col-md-4 col-lg-3 col-small-8-rcf form-group">
+		                          <p:inputMask value="#{eventoMB.cepInformado}" label="cep" mask="99999-999"
+										styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'border border-info bg-white'}" 
+										disabled="#{eventoMB.modoConsulta}">
+										<p:ajax event="blur" listener="#{eventoMB.findEnderecoByCEP()}" update="formEvent"/>
+								</p:inputMask>
+		                      </div>
+		                      <div class="col-sm-2 col-small-4-rcf form-group text-right">
+	                            <label for="bairro" class="col-form-label">Bairro:</label>
+	                        </div>
+	                        <div class="col-sm-5 col-small-8-rcf form-group">
+	                            <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="bairro" 
+	                            	value="#{eventoMB.editEvento.bairro}" label="Bairro" disabled="#{eventoMB.modoConsulta}" />
+	                        </div>
+                              <div class="col-sm-6 form-group">
+                                 <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" styname="uf"
+                                    id="uf" required="true" value="#{eventoMB.editEvento.estado}"
+                                    label="Estado" disabled="#{eventoMB.modoConsulta}" >
+                                    <f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
+                                    <f:selectItem itemValue="" itemLabel="Selecione um Estado"
+                                       noSelectionOption="true" />
+                                    <f:selectItems value="#{eventoMB.estados}" var="est"
+                                       itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+                                 </h:selectOneMenu>
+                              </div>
+                              <div class="col-sm-6 form-group">
+                                 <h:selectOneMenu required="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+                                    value="#{eventoMB.editEvento.cidade}" label="Cidade"
+                                    id="cidades" disabled="#{eventoMB.modoConsulta}" >
+                                    <p:ajax update="formEvent" listener="#{eventoMB.validaDDDAfterSelCidade}" />
+                                    <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
+                                       noSelectionOption="true" />
+                                    <f:selectItems value="#{eventoMB.cidades}" var="cid"
+                                       itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+                                 </h:selectOneMenu>
+                              </div>
+                              <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                                 <label for="endereco" class="col-form-label">Endereço:</label>
+                              </div>
+                              <div class="col-sm-4 col-small-8-rcf form-group">
+                                 <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="local" value="#{eventoMB.editEvento.endereco}" label="endereco" required="true"
+                                    disabled="#{eventoMB.modoConsulta}" />
+                              </div>
+                              <div class="col-sm-2 col-small-4-rcf form-group text-right">
+		                            <label for="numero" class="col-form-label">Número:</label>
+		                        </div>
+		                        <div class="col-sm-4 col-small-8-rcf form-group">
+		                            <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="numero" value="#{eventoMB.editEvento.numeroLugar}" label="Número"
+		                            	disabled="#{eventoMB.modoConsulta}" />
+		                        </div>
+                              <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                            	<label for="celular" class="col-form-label">Celular:</label>
+		                        </div>
+		                        <div class="col-sm-4 col-small-8-rcf form-group">
+		                            <p:inputMask pt:type="" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="celular"
+		                                    label="Celular" mask="(99) 99999-9999" disabled="#{eventoMB.modoConsulta}"
+		                                    value="#{eventoMB.editEvento.telefone}" >
+		                                    <p:ajax event="blur" listener="#{eventoMB.validaDDD(eventoMB.editEvento.telefone)}" update="formEvent"/>
+		                            </p:inputMask>
+		                        </div>
+                              <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                                 <label for="email" class="col-form-label">E-mail:</label>
+                              </div>
+                              <div class="col-sm-4 col-small-8-rcf form-group">
+                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}"
+                                    value="#{eventoMB.editEvento.email}" id="email"
+                                    validatorMessage="formato de email inválido" label="E-mail">
+                                    <f:validateRegex
+                                       pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                 </h:inputText>
+                              </div>
+                           </div>
+                           <div class="row mb-3 border-rcf">
+                           	<div class="col-md-6 col-sm-12 form-group input-group">
                                  <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" placeholder="Site proprio do Evento"
                                     value="#{eventoMB.editEvento.site}" 
                                     disabled="#{eventoMB.editEvento.siteProprio or eventoMB.modoConsulta}"
@@ -198,7 +280,7 @@
                                     <span class="input-group-text" id="basic-addon3">.eventor.com.br</span>
                                  </div>
                               </div>
-                              <div class="col-sm-6 input-group mt-3-rcf">
+                              <div class="col-md-6 col-sm-12 form-group input-group">
                                  <div class="input-group-prepend">
                                     <div class="input-group-text">
                                        <h:selectBooleanCheckbox styleClass="#{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
@@ -210,78 +292,17 @@
                                  <input type="text" class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" aria-label="Text input with checkbox" 
                                     value="utilizar site fornecido pelo geventor." disabled="true" />
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-6">
-                                 <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" styname="uf"
-                                    id="uf" required="true" value="#{eventoMB.editEvento.estado}"
-                                    label="Estado" disabled="#{eventoMB.modoConsulta}" >
-                                    <f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
-                                    <f:selectItem itemValue="" itemLabel="Selecione um Estado"
-                                       noSelectionOption="true" />
-                                    <f:selectItems value="#{eventoMB.estados}" var="est"
-                                       itemLabel="#{est.uf}" itemValue="#{est.uf}" />
-                                 </h:selectOneMenu>
-                              </div>
-                              <div class="col-sm-6 mt-3-rcf">
-                                 <h:selectOneMenu required="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
-                                    value="#{eventoMB.editEvento.cidade}" label="Cidade"
-                                    id="cidades" disabled="#{eventoMB.modoConsulta}" >
-                                    <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
-                                       noSelectionOption="true" />
-                                    <f:selectItems value="#{eventoMB.cidades}" var="cid"
-                                       itemLabel="#{cid.name}" itemValue="#{cid.name}" />
-                                 </h:selectOneMenu>
-                              </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-2">
-                                 <label for="local" class="col-form-label">Local:</label>
-                              </div>
-                              <div class="col-sm-4">
-                                 <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="local" value="#{eventoMB.editEvento.local}" label="Local" required="true"
-                                    disabled="#{eventoMB.modoConsulta}" />
-                              </div>
-                              <div class="col-sm-2">
-                                 <label for="email" class="col-form-label">E-mail:</label>
-                              </div>
-                              <div class="col-sm-4">
-                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}"
-                                    value="#{eventoMB.editEvento.email}" id="email"
-                                    validatorMessage="formato de email inválido" label="E-mail">
-                                    <f:validateRegex
-                                       pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                 </h:inputText>
-                              </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-2">
-                                 <label for="telefone" class="col-form-label">Telefone:</label>
-                              </div>
-                              <div class="col-sm-4">
-                                 <p:inputMask pt:type="" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="telefone"
-                                    label="Telefone" mask="(99) 99999-9999" disabled="#{eventoMB.modoConsulta}"
-                                    value="#{eventoMB.editEvento.telefone}" />
-                              </div>
-                              <div class="col-sm-2">
+                              <div class="col-sm-2 col-small-4-rcf form-group text-right">
                                  <label for="preco" class="col-form-label">Preço:</label>
                               </div>
-                              <div class="col-sm-4">
+                              <div class="col-sm-4 col-small-8-rcf form-group">
                                  <p:inputMask pt:type="" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" label="Preço" id="preco"
                                     mask="R$ 99,99" value="#{eventoMB.editEvento.preco}" disabled="#{eventoMB.modoConsulta}" />
                               </div>
+                              
                            </div>
                            <div class="row mb-3 border-rcf">
-                              <div class="col-sm-2">
-                                 <label for="vagas" class="col-form-label">Vagas pro Evento:</label>
-                              </div>
-                              <div class="col-sm-4">
-                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="vagas" disabled="#{eventoMB.modoConsulta}"
-                                    value="#{eventoMB.editEvento.vagas}" label="Vagas" />
-                              </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-12">
+                              <div class="col-sm-12 form-group">
                                  <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
                                     maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{eventoMB.modoConsulta}"
                                     autoResize="false" value="#{eventoMB.editEvento.descricao}"
