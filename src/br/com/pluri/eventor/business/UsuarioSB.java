@@ -43,9 +43,10 @@ public class UsuarioSB extends BaseSB {
 			String senhaCriptografada = PasswordUtils.criptografarMD5(usuario
 					.getSenha());
 			usuario.setSenha(senhaCriptografada);
+			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);
 		} else {
-			throw new LoginJaCadastradoException("Login já cadastrado");
+			throw new LoginJaCadastradoException("Login jï¿½ cadastrado");
 		}
 	}
 
@@ -66,14 +67,14 @@ public class UsuarioSB extends BaseSB {
 		if(usuario.atualizaSenha.equals("S")){
 			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
 			if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
-				throw new SenhaInvalidaException("Senha jé usada !");
+				throw new SenhaInvalidaException("Senha jï¿½ usada !");
 			}
 			if (!validarSenhaOld(usuario)){
 				throw new SenhaInvalidaException("Senha incorreta !");
 			}
 		}
 		if (!usuario.loginVerificado) {
-			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' não foi verificado.");
+			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' nï¿½o foi verificado.");
 		} else {
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);

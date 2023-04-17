@@ -35,6 +35,7 @@ public class EventoSB extends BaseSB {
 		if (evento.isSiteProprio()){
 			evento.setSite("www.evento.pluri.com.br");
 		}
+		evento.setDataAlter(getDateAlter());
 		eventoDAO.save(evento);
 	}
 	
@@ -67,15 +68,15 @@ public class EventoSB extends BaseSB {
 		 return resultado;
 	 }
 	
-	@Transactional(propagation=Propagation.REQUIRED)
-	public void editeEvento (Evento evento){
-		evento.setDataInicio(merge(evento.getDataInicio(), evento.getHoraInicio()));
-		evento.setDataFim(merge(evento.getDataFim(), evento.getHoraFim()));
-		if (evento.isSiteProprio()){
-			evento.setSite("www.evento.pluri.com.br");
-		}
-		eventoDAO.save(evento);
-	}
+	//@Transactional(propagation=Propagation.REQUIRED)
+	//public void editeEvento (Evento evento){
+	//	evento.setDataInicio(merge(evento.getDataInicio(), evento.getHoraInicio()));
+	//	evento.setDataFim(merge(evento.getDataFim(), evento.getHoraFim()));
+	//	if (evento.isSiteProprio()){
+	//		evento.setSite("www.evento.pluri.com.br");
+	//	}
+	//	eventoDAO.save(evento);
+	//}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<Evento> findAll(){
