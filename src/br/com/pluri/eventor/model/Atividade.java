@@ -53,6 +53,12 @@ public class Atividade extends BaseORM {
 	@Column(name="PRECO_ATIVI")
 	private String preco;
 	
+	@Column(name="DT_ALTER_ATIVI")
+	private Date dataAlter;
+	
+	@Column(name="IS_PERIODO_EVEN_ATIVI")
+	private boolean usaPeriodoEven;
+	
 	//Atributos transientes
 	@Transient
 	private Date horaInicio;
@@ -62,6 +68,15 @@ public class Atividade extends BaseORM {
 	
 	@Transient
 	private boolean estaInscrito;
+	
+	@Transient
+	private boolean isgratuito;
+	
+	@Transient
+	private boolean mesmodiainicio;
+	
+	@Transient
+	private boolean mesmodiafim;
 	
 	@ManyToOne
 	@JoinColumn(name="ID_EVEN", referencedColumnName="ID_EVEN")

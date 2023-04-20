@@ -12,8 +12,6 @@ import br.com.etechoracio.common.business.BaseSB;
 import br.com.pluri.eventor.dao.AtividadeDAO;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
-import br.com.pluri.eventor.model.Usuario;
-import br.com.pluri.eventor.utils.DataTimeUtils;
 
 @Service
 public class AtividadeSB extends BaseSB {
@@ -31,6 +29,10 @@ public class AtividadeSB extends BaseSB {
 		atividade.setEvento(new Evento(idEvento));
 		atividade.setDataInicio(merge(atividade.getDataInicio(), atividade.getHoraInicio()));
 		atividade.setDataFim(merge(atividade.getDataFim(), atividade.getHoraFim()));
+		atividade.setDataAlter(getDateAlter());
+		if(atividade.getOrganizacao() == null){
+			atividade.setOrganizacao("Comum");
+		}
 		atividadeDAO.save(atividade);
 	}
 	
@@ -42,10 +44,6 @@ public class AtividadeSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<Atividade> findAllAtividadeByUsuario(Long idUsu){
 		return atividadeDAO.findAllAtividadeByUsuario(idUsu);
-	}
-	
-	private Date merge(Date data, Date hora) {
-		return DataTimeUtils.merge(data, hora);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -65,6 +63,7 @@ public class AtividadeSB extends BaseSB {
 	public void editAtiv (Atividade ativ, Long idEven) {
 		ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
 		ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
+		ativ.setOrganizacao("Comum");
 		atividadeDAO.save(ativ);
 	}
 

@@ -111,6 +111,12 @@ public class UsuarioMB extends BaseMB {
 			this.modoConsulta = true;
 			this.edicaoIndisponivel = false;
 			this.editUsuario.setAtualizaSenha("N");
+			if(editUsuario.getEstado() != null){
+				onEstadoChange();
+			}
+			if(editUsuario.getCep() != null){
+				this.cepInformado = editUsuario.getCep();
+			}
 			findMyInscricoes();
 			findInscritosPenMyEventos();
 			getDataProxEventoDoUsuLogado();
@@ -136,12 +142,16 @@ public class UsuarioMB extends BaseMB {
 	
 	public void preEdit() {
 		if(modoConsulta) {
-			this.modoConsulta = false; 
+			this.modoConsulta = false;
 		} else {
 			this.modoConsulta = true;
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.editUsuario.setAtualizaSenha("N");
 			this.editUsuario.loginVerificado = true;
+		}
+		if(editUsuario.getCep() != null){
+			this.cepInformado = editUsuario.getCep();
+		} else {
 			this.cepInformado = null;
 		}
 	}
@@ -189,11 +199,11 @@ public class UsuarioMB extends BaseMB {
 								}
 							}
 							if(naoContem) {
-								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
 							}
 						} else {
 							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editUsuario.getCep()).getDdd()){
-								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
 							}
 						}
 					}
@@ -214,7 +224,7 @@ public class UsuarioMB extends BaseMB {
 	public void validaPrimeiroDigCelular(String numero) {
 		try {
 			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
-				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do nï¿½mero '" + numero + "' ï¿½ invï¿½lido");
+				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do número '" + numero + "' é inválido");
 			}
 		} catch (DDDInvalidoException e) {
 			showErrorMessage(e.getMessage());
@@ -224,7 +234,7 @@ public class UsuarioMB extends BaseMB {
 	
 	public void findEnderecoByCEP() {
 		try {
-			if (!cepInformado.equals("_____-___")) {
+			if (!cepInformado.contains("_")) {
 				this.enderecoDoCEP = new Endereco();
 				this.enderecoDoCEP = enderecoSB.findCidadeAndEstadoByCEP(cepInformado);
 				if (enderecoDoCEP != null) {
@@ -235,20 +245,33 @@ public class UsuarioMB extends BaseMB {
 					this.editUsuario.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
 					this.editUsuario.setEndereco(enderecoDoCEP.getEndereco());
 				} else {
-					throw new CEPInvalidoException("CEP '" + cepInformado + "' nï¿½o encontrado no Banco de Dados.\n"
-							+ "Informe seu endereï¿½o manualmente.");
+					throw new CEPInvalidoException("CEP '" + cepInformado + "' não encontrado no Banco de Dados.\n"
+							+ "Informe seu endereço manualmente.");
 				}
+			} else {
+				throw new CEPInvalidoException("O CEP informado '" + cepInformado.replace("_", "") + "' é inválido.");
 			}
 		} catch (CEPInvalidoException e) {
 			showErrorMessage(e.getMessage());
+			limpaEndereco();
 		}
+	}
+	
+	public void limpaEndereco(){
+		this.editUsuario.setCep(null);
+		this.cepInformado = null;
+		this.editUsuario.setEstado(null);
+		this.editUsuario.setCidade("");
+		this.editUsuario.setBairro("");
+		this.editUsuario.setEndereco("");
+		onEstadoChange();
 	}
 	
 	@SuppressWarnings("static-access")
 	public void validaCPFTab(String cpf) {
 		try {
 			if(!cpf.contains("_") && !validaCPF.isCPF(cpf.replace(".", "").replace("-", ""))) {
-				throw new CPFNotValidException("O CPF '" + cpf + "' ï¿½ invï¿½lido");
+				throw new CPFNotValidException("O CPF '" + cpf + "' é inválido");
 			}
 			
 		} catch (Exception e) {
@@ -284,11 +307,17 @@ public class UsuarioMB extends BaseMB {
 	
 	public void doEdit() throws SenhaInvalidaException {
 		try {
-			if (editUsuario.getAtualizaSenha().equals("N")){
+			if(editUsuario.getAtualizaSenha().equals("N")){
 				this.editUsuario.setSenha(usuarioSB.findById(getCurrentUserId()).getSenha());
 			}
+			if(editUsuario.getCelular().contains("_")){
+				editUsuario.setCelular(null);
+			}
+			if(editUsuario.getTelefone().contains("_")){
+				editUsuario.setTelefone(null);
+			}
 			usuarioSB.editeUsuario(editUsuario);	
-			showInfoMessage("Seu usuï¿½rio foi atualizado com sucesso.");
+			showInfoMessage("Seu usuário foi atualizado com sucesso.");
 			this.editUsuario = new Usuario();
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.modoConsulta = true;

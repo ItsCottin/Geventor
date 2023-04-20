@@ -110,7 +110,8 @@ public class EventoMB extends BaseMB {
 	public boolean modoConsulta;
 	public Evento evenSel;
 	private Endereco enderecoDoCEP;
-	private String cepInformado;
+	private String usaTelefone;
+	private String maskTelefone;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -119,6 +120,9 @@ public class EventoMB extends BaseMB {
 		this.modoConsulta = false;
 		this.evenSel = new Evento();
 		findAllEventoMenosMeus();
+		this.usaTelefone = "Telefone";
+		this.maskTelefone = "(99) 9999-9999";
+		this.editEvento.setVlr("Pago");
 	}
 	
 	public void findAllEventoMenosMeus(){
@@ -137,6 +141,98 @@ public class EventoMB extends BaseMB {
 			return;
 		}
 		cidades = cidadeSB.findByEstado(editEvento.getEstado());
+	}
+	
+	public void onChangeMyEndereco(){
+		if (editEvento.isUsaMyEndereco()){
+			Usuario usu = new Usuario();
+			usu = usuarioSB.findById(getCurrentUserId());
+			if(usu.getCep() == null || usu.getCep().equals("")){
+				showInfoMessage("Nenhuma informação de 'CEP' encontrado no seu usuário.");
+			} else {
+				editEvento.setCep(usu.getCep());
+			}
+			if(usu.getEstado() == null || usu.getEstado().equals("")){
+				showInfoMessage("Nenhuma informação do 'Estado' encontrado no seu usuário.");
+			} else {
+				editEvento.setEstado(usu.getEstado());
+				onEstadoChange();
+			}
+			if(usu.getCidade() == null || usu.getCidade().equals("")){
+				showInfoMessage("Nenhuma informação da 'Cidade' encontrado no seu usuário.");
+			} else {
+				editEvento.setCidade(usu.getCidade());
+			}
+			if(usu.getBairro() == null || usu.getBairro().equals("")){
+				showInfoMessage("Nenhuma informação do 'Bairro' encontrado no seu usuário.");
+			} else {
+				editEvento.setBairro(usu.getBairro());
+			}
+			if(usu.getEndereco() == null || usu.getEndereco().equals("")){
+				showInfoMessage("Nenhuma informação de 'Endereço' encontrado no seu usuário.");
+			} else {
+				editEvento.setEndereco(usu.getEndereco());
+			}
+			if(usu.getNrCasa() == null || usu.getNrCasa().equals("")){
+				showInfoMessage("Nenhuma informação do 'Numero do Local' encontrado no seu usuário.");
+			} else {
+				editEvento.setNumeroLugar(usu.getNrCasa());
+			}
+		} else {
+			limpaEndereco();
+		}
+	}
+	
+	public void onChangeMyTelefone(){
+		if(editEvento.isUsaMyTelefone()){
+			Usuario usu = new Usuario();
+			usu = usuarioSB.findById(getCurrentUserId());
+			if(usaTelefone.equals("Telefone")){
+				if(usu.getTelefone() != null){
+					setMaskTelefone();
+					editEvento.setTelefone(usu.getTelefone());
+				} else {
+					showInfoMessage("Nenhuma informação do 'Telefone' encontrado no seu usuário.");
+				}
+			}
+			if(usaTelefone.equals("Celular")){
+				if(usu.getCelular() != null){
+					setMaskTelefone();
+					editEvento.setTelefone(usu.getCelular());
+				} else {
+					showInfoMessage("Nenhuma informação do 'Celular' encontrado no seu usuário.");
+				}
+			}
+			if(usu.getEmail() == null || usu.getEmail().equals("")){
+				showInfoMessage("Nenhuma informação de 'E-mail' encontrado no seu usuário.");
+			} else {
+				editEvento.setEmail(usu.getEmail());
+			}
+		} else {
+			editEvento.setTelefone("");
+			editEvento.setEmail("");
+			if(usaTelefone.equals("Telefone")){
+				this.maskTelefone = "(99) 9999-9999";
+			} else {
+				this.maskTelefone = "(99) 99999-9999";
+			}
+		}
+	}
+	
+	public void onChangePrecoEven(){
+		if(editEvento.getVlr().equals("Pago")){
+			editEvento.setVlr("Gratuito");
+		} else {
+			editEvento.setVlr("Pago");
+		}
+	}
+	
+	public void setMaskTelefone(){
+		if(usaTelefone.equals("Telefone")){
+			this.maskTelefone = "(99) 9999-9999";
+		} else {
+			this.maskTelefone = "(99) 99999-9999";
+		}
 	}
 	
 	// M001 - insert do evento
@@ -163,11 +259,11 @@ public class EventoMB extends BaseMB {
 	private boolean validarDatasEvento() {
 		if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
 			if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-				showErrorMessage("Data Inï¿½cio estï¿½ depois da data final do evento");
+				showErrorMessage("Data Início está depois da data final do evento");
 				return false;
 			}
 		} else if (editEvento.getDataInicio() != null || editEvento.getDataFim() != null) {
-			showErrorMessage("Data Inï¿½cio estï¿½ depois da data final do evento");
+			showErrorMessage("Data Início está depois da data final do evento");
 			return false;
 		}
 		return true;
@@ -179,7 +275,7 @@ public class EventoMB extends BaseMB {
 	
 	public void doRemove(Evento exclui){
 		eventoSB.delete(exclui);
-		showInfoMessage("Evento excluï¿½do com sucesso");
+		showInfoMessage("Evento excluído com sucesso");
 		onEventos();
 	}
 	
@@ -233,18 +329,25 @@ public class EventoMB extends BaseMB {
 		doPrepareSave();
 		this.modoConsulta = consulta;
 		this.editEvento = eventoSB.findById(edit.getId());
+		validaTpContato();
 		onEstadoChange();
 	}
 	
 	public void doPrepareInsert(){
 		this.editEvento = new Evento();
+		this.editEvento.setVlr("Pago");
 	}
 	
 	public void findEnderecoByCEP() {
 		try {
-			if (!cepInformado.equals("_____-___")) {
+			if (!editEvento.getCep().contains("_")) {
 				this.enderecoDoCEP = new Endereco();
-				this.enderecoDoCEP = enderecoSB.findCidadeAndEstadoByCEP(cepInformado);
+				this.enderecoDoCEP = enderecoSB.findCidadeAndEstadoByCEP(editEvento.getCep());
+				Usuario usu = new Usuario();
+				usu = usuarioSB.findById(getCurrentUserId());
+				if(!editEvento.getCep().equals(usu.getCep())){
+					this.editEvento.setUsaMyEndereco(false);
+				}
 				if (enderecoDoCEP != null) {
 					this.editEvento.setCep(enderecoDoCEP.getCep());
 					this.editEvento.setEstado(enderecoDoCEP.cidade.estado.getUf());
@@ -253,12 +356,37 @@ public class EventoMB extends BaseMB {
 					this.editEvento.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
 					this.editEvento.setEndereco(enderecoDoCEP.getEndereco());
 				} else {
-					throw new CEPInvalidoException("CEP '" + cepInformado + "' nï¿½o encontrado no Banco de Dados.\n"
-							+ "Informe seu endereï¿½o manualmente.");
+					throw new CEPInvalidoException("CEP '" + editEvento.getCep() + "' não encontrado no Banco de Dados.\n"
+							+ "Informe seu endereço manualmente.");
 				}
+			} else {
+				limpaEndereco();
+				this.editEvento.setUsaMyEndereco(false);
 			}
 		} catch (CEPInvalidoException e) {
 			showErrorMessage(e.getMessage());
+			limpaEndereco();
+			this.editEvento.setUsaMyEndereco(false);
+		}
+	}
+	
+	public void limpaEndereco(){
+		editEvento.setCep("");
+		editEvento.setEstado(null);
+		editEvento.setCidade("");
+		onEstadoChange();
+		editEvento.setBairro("");
+		editEvento.setEndereco("");
+		editEvento.setNumeroLugar("");
+	}
+	
+	public void validaTpContato(){
+		if(editEvento.getTelefone().length() == 15){
+			maskTelefone = "(99) 99999-9999";
+			usaTelefone = "Celular";
+		} else {
+			maskTelefone = "(99) 9999-9999";
+			usaTelefone = "Telefone";
 		}
 	}
 	
@@ -290,11 +418,11 @@ public class EventoMB extends BaseMB {
 								}
 							}
 							if(naoContem) {
-								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
 							}
 						} else {
 							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editEvento.getCep()).getDdd()){
-								throw new DDDInvalidoException("DDD do nï¿½mero '" + numero + "' nï¿½o pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
 							}
 						}
 					}
@@ -316,73 +444,73 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-        @PostConstruct
-        public void init() {
-        	resultEven = eventoSB.findEventosByUsuario(getCurrentUserId());
-            eventModel = new DefaultScheduleModel();
-            for(Evento event : resultEven){
-            	eventModel.addEvent(new DefaultScheduleEvent(event.getTitulo(), event.getDataInicio(), event.getDataFim()));
-            }
-             
-            lazyEventModel = new LazyScheduleModel() {
-                 
-                /**
-    			 * 
-    			 */
-    			private static final long serialVersionUID = 1L;
-    
-    			@Override
-                public void loadEvents(Date start, Date end) {
-                    Date random = getRandomDate(start);
-                    addEvent(new DefaultScheduleEvent("Lazy Event 1", random, random));
-                     
-                    random = getRandomDate(start);
-                    addEvent(new DefaultScheduleEvent("Lazy Event 2", random, random));
-                }   
-            };
-        }
+        //@PostConstruct
+        //public void init() {
+        //	resultEven = eventoSB.findEventosByUsuario(getCurrentUserId());
+        //    eventModel = new DefaultScheduleModel();
+        //    for(Evento event : resultEven){
+        //    	eventModel.addEvent(new DefaultScheduleEvent(event.getTitulo(), event.getDataInicio(), event.getDataFim()));
+        //    }
+        //     
+        //    lazyEventModel = new LazyScheduleModel() {
+        //         
+        //        /**
+    	//		 * 
+    	//		 */
+    	//		private static final long serialVersionUID = 1L;
+    			
+    	//		@Override
+        //        public void loadEvents(Date start, Date end) {
+        //            Date random = getRandomDate(start);
+        //            addEvent(new DefaultScheduleEvent("Lazy Event 1", random, random));
+        //             
+        //            random = getRandomDate(start);
+        //            addEvent(new DefaultScheduleEvent("Lazy Event 2", random, random));
+        //        }   
+        //   };
+        //}
         
         /*public void doPrepareEdit(){
         	this.editEvento = eventoSB.findByTitulo(event.getTitle());
         }*/
          
-        public Date getRandomDate(Date base) {
-            Calendar date = Calendar.getInstance();
-            date.setTime(base);
-            date.add(Calendar.DATE, ((int) (Math.random()*30)) + 1);    //set random day of month
-             
-            return date.getTime();
-        }
+        //public Date getRandomDate(Date base) {
+        //    Calendar date = Calendar.getInstance();
+        //    date.setTime(base);
+        //    date.add(Calendar.DATE, ((int) (Math.random()*30)) + 1);    //set random day of month
+        //     
+        //    return date.getTime();
+        //}
          
-        public Date getInitialDate() {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(calendar.get(Calendar.YEAR), Calendar.FEBRUARY, calendar.get(Calendar.DATE), 0, 0, 0);
-             
-            return calendar.getTime();
-        }
+        //public Date getInitialDate() {
+        //    Calendar calendar = Calendar.getInstance();
+        //    calendar.set(calendar.get(Calendar.YEAR), Calendar.FEBRUARY, calendar.get(Calendar.DATE), 0, 0, 0);
+        //     
+        //    return calendar.getTime();
+        //}
          
-        public void addEvent(ActionEvent actionEvent) {
-            if(event.getId() == null)
-                eventModel.addEvent(event);
-            else
-                eventModel.updateEvent(event);
-             
-            event = new DefaultScheduleEvent();
-        }
+        //public void addEvent(ActionEvent actionEvent) {
+        //    if(event.getId() == null)
+        //        eventModel.addEvent(event);
+        //    else
+        //        eventModel.updateEvent(event);
+        //     
+        //    event = new DefaultScheduleEvent();
+        //}
          
-        public void onEventSelect(SelectEvent selectEvent) {
-            event = (ScheduleEvent) selectEvent.getObject();
-        }
+        //public void onEventSelect(SelectEvent selectEvent) {
+        //    event = (ScheduleEvent) selectEvent.getObject();
+        //}
          
-        public void onDateSelect(SelectEvent selectEvent) {
-            event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
-        }
+        //public void onDateSelect(SelectEvent selectEvent) {
+        //    event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
+        //}
          
-        public void onEventMove(ScheduleEntryMoveEvent event) {
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-        }
+        //public void onEventMove(ScheduleEntryMoveEvent event) {
+        //    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+        //}
          
-        public void onEventResize(ScheduleEntryResizeEvent event) {
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-        }
+        //public void onEventResize(ScheduleEntryResizeEvent event) {
+        //    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+        //}
 }

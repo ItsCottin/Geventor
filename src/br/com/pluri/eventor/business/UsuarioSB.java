@@ -40,13 +40,12 @@ public class UsuarioSB extends BaseSB {
 	public void insert(Usuario usuario) throws LoginJaCadastradoException {
 		List<Usuario> result = usuarioDAO.findByLogin(usuario.getLogin());
 		if (CollectionUtils.isEmpty(result)) {
-			String senhaCriptografada = PasswordUtils.criptografarMD5(usuario
-					.getSenha());
+			String senhaCriptografada = PasswordUtils.criptografarMD5(usuario.getSenha());
 			usuario.setSenha(senhaCriptografada);
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);
 		} else {
-			throw new LoginJaCadastradoException("Login jï¿½ cadastrado");
+			throw new LoginJaCadastradoException("Login já cadastrado");
 		}
 	}
 
@@ -67,14 +66,14 @@ public class UsuarioSB extends BaseSB {
 		if(usuario.atualizaSenha.equals("S")){
 			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
 			if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
-				throw new SenhaInvalidaException("Senha jï¿½ usada !");
+				throw new SenhaInvalidaException("Senha já usada !");
 			}
 			if (!validarSenhaOld(usuario)){
 				throw new SenhaInvalidaException("Senha incorreta !");
 			}
 		}
 		if (!usuario.loginVerificado) {
-			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' nï¿½o foi verificado.");
+			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' não foi verificado.");
 		} else {
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);

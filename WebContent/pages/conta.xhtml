@@ -99,13 +99,13 @@
                             <label for="bairro" class="col-form-label">Bairro:</label>
                         </div>
                         <div class="col-sm-5 col-small-8-rcf form-group">
-                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="bairro" 
-                            	value="#{usuarioMB.editUsuario.bairro}" label="Bairro" disabled="#{usuarioMB.modoConsulta}" />
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" id="bairro" 
+                            	value="#{usuarioMB.editUsuario.bairro}" label="Bairro" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" />
                         </div>
                         <div class="col-sm-6 col-small-12-rcf form-group">
-                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" styname="uf"
+                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" styname="uf"
                                 id="uf" value="#{usuarioMB.editUsuario.estado}"
-                                label="Estado" disabled="#{usuarioMB.modoConsulta}" >
+                                label="Estado" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" >
                                 <p:ajax listener="#{usuarioMB.onEstadoChange}" render="cidades" update="formUsuario" />
                                 <f:selectItem itemValue="" itemLabel="Selecione um Estado"
                                     noSelectionOption="true" />
@@ -114,9 +114,9 @@
                             </h:selectOneMenu>
                         </div>
                         <div class="col-sm-6 col-small-12-rcf form-group">
-                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}"
                                 value="#{usuarioMB.editUsuario.cidade}" label="Cidade"
-                                id="cidades" disabled="#{usuarioMB.modoConsulta}" >
+                                id="cidades" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" >
                                 <p:ajax update="formUsuario" listener="#{usuarioMB.validaDDDAfterSelCidade}" />
                                 <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
                                     noSelectionOption="true" />
@@ -129,8 +129,8 @@
                             <label for="endereco" class="col-form-label">Endereço:</label>
                         </div>
                         <div class="col-sm-4 col-small-8-rcf form-group">
-                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="endereco" 
-                            	value="#{usuarioMB.editUsuario.endereco}" label="Endereço" disabled="#{usuarioMB.modoConsulta}" />
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" id="endereco" 
+                            	value="#{usuarioMB.editUsuario.endereco}" label="Endereço" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" />
                         </div>
                         <div class="col-sm-2 col-small-5-rcf form-group text-right">
                             <label for="celular" class="col-form-label">Celular:</label>

@@ -15,6 +15,8 @@ import javax.persistence.PersistenceContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
+import br.com.pluri.eventor.utils.DataTimeUtils;
+
 /**
  * Criado o m�todo 'getDateAlter()' para retornar a data do sistema para utilizar em m�todos de altera��o e inclus�o de registro.
  * 
@@ -85,6 +87,12 @@ public abstract class BaseSB {
 		ZoneOffset offset = ZoneOffset.of("-03:00");
 		Instant instant = agora.toInstant(offset);
 		return Date.from(instant);
+	}
+	
+
+	
+	protected Date merge(Date data, Date hora) {
+		return DataTimeUtils.merge(data, hora);
 	}
 
 }

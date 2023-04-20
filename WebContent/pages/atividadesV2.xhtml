@@ -118,91 +118,145 @@
                   		<p:separator style="width:99%;" />
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
-                           		<div class="col-sm-3">
+                           		<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
                               		<label for="titulo" class="col-form-label">Nome:</label>
                               	</div>
-                              	<div class="col-sm-3">
-                                 	<p:inputText class="form-control" id="titulo" value="#{atividadeMB.editAtividade.nome}" label="Nome" required="true" disabled="#{atividadeMB.modoConsulta}" />
+                              	<div class="col-lg-6 col-md-4 col-sm-4 col-small-8-rcf form-group">
+                                 	<h:inputText class="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" 
+                                 		id="titulo" value="#{atividadeMB.editAtividade.nome}" label="Nome" required="true" disabled="#{atividadeMB.modoConsulta}" >
+                                 		<p:ajax event="blur" listener="#{atividadeMB.setTituloAtiv}" update="titulo" />
+                                 	</h:inputText>
                               	</div>
-                              	<div class="col-sm-3">
+                              	<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
                               		<label for="eventos" class="col-form-label">Evento:</label>
                               	</div>
-                              	<div class="col-sm-3">
-	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control" label="Evento" required="true"
+                              	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
+	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" label="Evento" required="true"
 											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta}">
-										<f:ajax listener="#{atividadeMB.onEventoChangeV2}"
-											render="tblAtiv" update="" />
+										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update="infoInicioEven, infoFimEven, vagas, vagadisponivel, preco, vlrativ, titulo, :formtblAtiv"/>
 										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
 											noSelectionOption="true" />
 										<f:selectItems value="#{eventoMB.resultadoEvento}" var="event"
 											itemLabel="#{event.titulo}" itemValue="#{event.id}" />
 									</h:selectOneMenu>
 								</div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-3">
+							</div>
+                            <div class="row mb-3 border-rcf">
+                            	<div class="col-lg-6 col-md-6 col-sm-12 col-small-12-rcf form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta}" 
+                                          value="#{atividadeMB.editAtividade.usaPeriodoEven}" id="usaperiodoeven">
+                                          <p:ajax event="change" update="titulo, dataInicio, horafrom, datafim, horafim, usaperiodoeven" listener="#{atividadeMB.onSetDataHoraEvenNaAtiv}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="utilizar periodo do Evento?" disabled="true" />
+                              </div>
+                              <div class="col-lg-6 col-md-6 form-group">
+                              
+                              </div>
+                            	<div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                 	<h:inputText class="form-control bg-light border border-light" id="infoInicioEven" label="Inicio" disabled="true"
+                                 		value="Inicio: #{atividadeMB.infoDataInicioEven}"  />
+                              	</div>
+                              	<div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                 	<h:inputText class="form-control bg-light border border-light" id="infoFimEven" label="Fim" disabled="true"
+                                 			value="Fim: #{atividadeMB.infoDataFimEven}"  />
+                              	</div>
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="from" class="col-form-label">Começa:</label>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
                                  <p:inputText pt:type="date" label="Data inicio"
-                                    styleClass="form-control" disabled="#{atividadeMB.modoConsulta}" 
+                                    styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                    disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataInicio}" required="true"
                                     id="dataInicio" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <p:ajax event="blur" listener="#{atividadeMB.validaDataInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>
                                  </p:inputText>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="horafrom" class="col-form-label">Hora Começo:</label>
                               </div>
-                              <div class="col-sm-3">
-                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
+                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="America/Sao_Paulo"
+                                 	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     value="#{atividadeMB.editAtividade.horaInicio}" required="true"
-                                    label="Hora inicio" id="horafrom" disabled="#{atividadeMB.modoConsulta}" />
+                                    label="Hora inicio" id="horafrom" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}">
+                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <p:ajax event="blur" listener="#{atividadeMB.validaHoraInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>                                 
+                                 </p:inputMask>
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-3">
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="datafim" class="col-form-label">Termina:</label>
                               </div>
-                              <div class="col-sm-3">
-                                 <p:inputText pt:type="date" label="Data inicio"
-                                    styleClass="form-control" disabled="#{atividadeMB.modoConsulta}" 
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
+                                 <p:inputText pt:type="date" label="Data Fim"
+                                    styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                    disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataFim}" required="true"
-                                    id="datafim" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                    id="datafim" placeholder="Data Fim" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <p:ajax event="blur" listener="#{atividadeMB.validaDataFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/> 
                                  </p:inputText>
                               </div>
-                              <div class="col-sm-3">
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="horafim" class="col-form-label">Hora Termino:</label>
                               </div>
-                              <div class="col-sm-3">
-                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass=""
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
+                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="America/Sao_Paulo"
+                                 	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     value="#{atividadeMB.editAtividade.horaFim}" required="true"
-                                    label="Hora inicio" id="horafim" disabled="#{atividadeMB.modoConsulta}" />
+                                    label="Hora Fim" id="horafim" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" >
+                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                 	<p:ajax event="blur" listener="#{atividadeMB.validaHoraFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/>   
+                                 </p:inputMask>
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
-                              <div class="col-sm-3">
-                                 <label for="preco" class="col-form-label">Preço:</label>
-                              </div>
-                              <div class="col-sm-3">
+                              <div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta}" 
+                                          value="#{atividadeMB.editAtividade.isgratuito}">
+                                          <p:ajax event="change" update="preco, vlrativ" listener="#{atividadeMB.onChangeGratuito}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <h:inputText type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="Gratuito ? #{atividadeMB.editAtividade.isgratuito ? 'Sim' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'Sim' : 'Não')}" 
+                                    disabled="true" id="vlrativ" />
                                  <p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
-                                    mask="R$ 99,99" value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta}" />
+                                    mask="#{atividadeMB.editAtividade.isgratuito ? 'Gratuito' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? '' : 'R$ 99,99')}" 
+                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta}" />
                               </div>
-                              <div class="col-sm-3">
-                                 <label for="vagas" class="col-form-label">Vagas para Atividade:</label>
-                              </div>
-                              <div class="col-sm-3">
-                                 <h:inputText styleClass="form-control" id="vagas" disabled="#{atividadeMB.modoConsulta}"
-                                    value="#{atividadeMB.editAtividade.vagas}" label="Vagas" />
-                              </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
-                              <div class="col-sm-12">
+                              	<div class="col-lg-6 col-md-6 col-sm-12 input-group form-group">
+  									<div class="input-group-prepend">
+                                 		<span class="input-group-text">Vagas:</span>
+                                 	</div>
+	                                 <h:inputText styleClass="form-control" id="vagas" disabled="#{atividadeMB.modoConsulta}"
+	                                    value="#{atividadeMB.editAtividade.vagas}" label="Vagas Disponível">
+	                                   	<p:ajax event="blur" listener="#{atividadeMB.validaInputVaga}" update="titulo, vagas, vagadisponivel"/>
+	                                 </h:inputText>
+                                </div>
+                                <div class="col-lg-6 col-md-6 form-group"> 
+                                
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+	                                <h:inputText type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+			                                    value="Disponível: #{atividadeMB.vagasRestant}" 
+			                                    disabled="true" id="vagadisponivel" />
+		                         </div>           
+                              <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                  <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Detalhes da Atividade"
                                     maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{atividadeMB.modoConsulta}"
                                     autoResize="false" value="#{atividadeMB.editAtividade.detalhes}"
-                                    label="Descrição" styleClass="form-control" />
+                                    label="Descrição" styleClass="form-control" id="detalhes" >
+                                    <p:ajax event="blur" update="titulo, dataInicio, datafim, horafrom, horafim, detalhes"/>
+                                 </h:inputTextarea>
                               </div>
                            </div>
                            <div class="row mb-3">
@@ -214,15 +268,15 @@
 	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv"
 	                                    oncomplete="selAbaTbl();" >
 	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-	                                    <f:ajax render="tblAtiv" />
+	                                    <p:ajax render="tblAtiv" update="formAtiv, formtblAtiv" />
 	                                 </p:commandButton>
 	                                 <p:commandButton rendered="#{atividadeMB.editAtividade.id eq null ? 'false' : 'true'}"
 	                                    value="#{atividadeMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
 	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
-	                                    actionListener="#{atividadeMB.doPrepareSave}" update=":formAtiv"
+	                                    actionListener="#{atividadeMB.doPrepareSave}" update=":formtblAtiv :formAtiv"
 	                                    oncomplete="selAbaTbl();"  >
 	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-	                                    <f:ajax render="tblAtiv" />
+	                                    <p:ajax render="tblAtiv" update=":formtblAtiv :formAtiv" />
 	                                 </p:commandButton>
                                  </div>
                               </div>

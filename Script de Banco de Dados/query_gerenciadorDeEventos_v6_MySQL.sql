@@ -47,10 +47,13 @@ EMAIL_EVEN varchar(50) not null,
 TELEFONE_EVEN varchar(15) not null,
 PRECO_EVEN varchar(100) not null,
 SITE_PROPRIO bool default true,
-CEP_EVEN VARCHAR(10) not null, 				-- new
-BAIRRO_EVEN VARCHAR(100) not null,  		-- new
-NUMERO_LUGAR_EVEN VARCHAR(10) not null,		-- new
-DT_ALTER_EVEN DateTime,						-- new
+CEP_EVEN VARCHAR(10) not null, 				-- 0.2.9
+BAIRRO_EVEN VARCHAR(100) not null,  		-- 0.2.9
+NUMERO_LUGAR_EVEN VARCHAR(10) not null,		-- 0.2.9
+DT_ALTER_EVEN DateTime,						-- 0.2.9
+MY_ENDERECO_EVEN bool default false,		-- 0.2.9
+MY_TELEFONE_EVEN bool default false,		-- 0.2.9
+VLR_EVEN varchar(10) default 'Pago',		-- 0.2.9
 foreign key (ID_USUA) references TBL_USUARIO(ID_USUA)
 );
 
@@ -69,6 +72,7 @@ DETALHES_ATIVI varchar(500) not null,
 ORGANIZACAO_ATIVI varchar(100) null,
 VAGAS_ATIVI int not null,
 PRECO_ATIVI varchar(10) not null,
+IS_PERIODO_EVEN_ATIVI bool default false,
 foreign key (ID_EVEN) references  TBL_EVENTO(ID_EVEN)
 );
 
@@ -149,3 +153,16 @@ SELECT * FROM TBL_USUARIO
 -- alter table TBL_EVENTO add column ENDERECO_EVEN varchar(100) not null;
 -- alter table TBL_EVENTO add column NUMERO_LUGAR_EVEN VARCHAR(10) not null;
 -- alter table TBL_EVENTO add column DT_ALTER_EVEN DateTime;
+
+-- alterações: 18/04/2023 for version 0.2.9
+-- alter table TBL_EVENTO add COLUMN MY_ENDERECO_EVEN bool default false;
+-- alter table TBL_EVENTO add COLUMN MY_TELEFONE_EVEN bool default false;
+
+-- alter table TBL_EVENTO drop COLUMN PRECO_EVEN;
+-- alter table TBL_EVENTO add COLUMN EVEN_PAGO varchar(10) default 'Pago'
+
+-- alter table TBL_ATIVIDADE drop COLUMN ORGANIZACAO_ATIVI;
+-- alter table TBL_ATIVIDADE add COLUMN ORGANIZACAO_ATIVI varchar(10) default 'Comum'
+-- alter table TBL_ATIVIDADE add column DT_ALTER_ATIVI DateTime;
+
+-- alter table TBL_ATIVIDADE add COLUMN IS_PERIODO_EVEN_ATIVI bool default false;

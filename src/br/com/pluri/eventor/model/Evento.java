@@ -62,8 +62,8 @@ public class Evento extends BaseORM {
 	@Column(name="EMAIL_EVEN")
 	private String email;
 	
-	@Column(name="PRECO_EVEN")
-	private String preco;
+	@Column(name="VLR_EVEN")
+	private String vlr;
 	
 	@Column(name="TELEFONE_EVEN")
 	private String telefone;
@@ -82,6 +82,15 @@ public class Evento extends BaseORM {
 	
 	@Column(name="SITE_PROPRIO")
 	private boolean siteProprio;
+	
+	@Column(name="MY_ENDERECO_EVEN")
+	private boolean usaMyEndereco;
+	
+	@Column(name="MY_TELEFONE_EVEN")
+	private boolean usaMyTelefone;
+	
+	@Transient
+	private String telefonecelular;
 	
 	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
 	@ManyToOne

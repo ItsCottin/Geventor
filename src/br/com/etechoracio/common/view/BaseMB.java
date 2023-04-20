@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import br.com.etechoracio.common.model.BaseORM;
 import br.com.pluri.eventor.security.business.model.UsuarioAutenticado;
+import br.com.pluri.eventor.utils.DataTimeUtils;
 /**
  * Base para todos os ManagedBeans(MBs) da Aplicação.
  * 
@@ -412,4 +414,15 @@ public abstract class BaseMB {
 			return "";
 		}
     }
+	
+	protected Date merge(Date data, Date hora) {
+		return DataTimeUtils.merge(data, hora);
+	}
+	
+	protected Date fixOneDay(Date data){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(data);
+		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		return calendar.getTime();
+	}
 }
