@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.view;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import lombok.Getter;
@@ -32,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import com.sun.javafx.geom.Edge;
+
 import br.com.etechoracio.common.view.BaseMB;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.CidadeSB;
@@ -43,6 +47,9 @@ import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.DDDInvalidoException;
+import br.com.pluri.eventor.business.exception.DataInvalidaException;
+import br.com.pluri.eventor.business.exception.NRCasaUsuarioException;
+import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.Endereco;
@@ -95,7 +102,7 @@ public class EventoMB extends BaseMB {
 	
 	private List<Atividade> resultadoAtividadeByEvento;
 	private List<Evento> resultadoEvento;
-	private Evento editEvento = new Evento();
+	private Evento editEvento;
 	private Map<String,Map<String,String>> data = new HashMap<String, Map<String,String>>();
 	private List<Cidade> cidades;
 	private List<Estado> estados;
@@ -112,6 +119,8 @@ public class EventoMB extends BaseMB {
 	private Endereco enderecoDoCEP;
 	private String usaTelefone;
 	private String maskTelefone;
+	public boolean dataValidada;
+	public boolean cepvalidoinformado;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -119,10 +128,13 @@ public class EventoMB extends BaseMB {
 		estados = estadoSB.findAll();
 		this.modoConsulta = false;
 		this.evenSel = new Evento();
+		this.editEvento = new Evento();
 		findAllEventoMenosMeus();
 		this.usaTelefone = "Telefone";
 		this.maskTelefone = "(99) 9999-9999";
 		this.editEvento.setVlr("Pago");
+		this.dataValidada = false;
+		this.cepvalidoinformado = false;
 	}
 	
 	public void findAllEventoMenosMeus(){
@@ -144,42 +156,35 @@ public class EventoMB extends BaseMB {
 	}
 	
 	public void onChangeMyEndereco(){
-		if (editEvento.isUsaMyEndereco()){
-			Usuario usu = new Usuario();
-			usu = usuarioSB.findById(getCurrentUserId());
-			if(usu.getCep() == null || usu.getCep().equals("")){
-				showInfoMessage("Nenhuma informação de 'CEP' encontrado no seu usuário.");
+		try{
+			if (editEvento.isUsaMyEndereco()){
+				Usuario usu = new Usuario();
+				usu = usuarioSB.findById(getCurrentUserId());
+				if(usu.getCep() == null || usu.getCep().equals("")){
+					throw new CEPInvalidoException("Nenhuma informação de Endereço encontrado no seu usuário.");
+				} else {
+					editEvento.setCep(usu.getCep());
+					editEvento.setEstado(usu.getEstado());
+					onEstadoChange();
+					editEvento.setCidade(usu.getCidade());
+					editEvento.setBairro(usu.getBairro());
+					editEvento.setEndereco(usu.getEndereco());
+					this.cepvalidoinformado = true;
+					if(usu.getNrCasa() == null || usu.getNrCasa().equals("")){
+						throw new NRCasaUsuarioException("Numero do local não encontrado no seu usuário");
+					} else {
+						editEvento.setNumeroLugar(usu.getNrCasa());
+					}
+				}
 			} else {
-				editEvento.setCep(usu.getCep());
+				limpaEndereco();
 			}
-			if(usu.getEstado() == null || usu.getEstado().equals("")){
-				showInfoMessage("Nenhuma informação do 'Estado' encontrado no seu usuário.");
-			} else {
-				editEvento.setEstado(usu.getEstado());
-				onEstadoChange();
-			}
-			if(usu.getCidade() == null || usu.getCidade().equals("")){
-				showInfoMessage("Nenhuma informação da 'Cidade' encontrado no seu usuário.");
-			} else {
-				editEvento.setCidade(usu.getCidade());
-			}
-			if(usu.getBairro() == null || usu.getBairro().equals("")){
-				showInfoMessage("Nenhuma informação do 'Bairro' encontrado no seu usuário.");
-			} else {
-				editEvento.setBairro(usu.getBairro());
-			}
-			if(usu.getEndereco() == null || usu.getEndereco().equals("")){
-				showInfoMessage("Nenhuma informação de 'Endereço' encontrado no seu usuário.");
-			} else {
-				editEvento.setEndereco(usu.getEndereco());
-			}
-			if(usu.getNrCasa() == null || usu.getNrCasa().equals("")){
-				showInfoMessage("Nenhuma informação do 'Numero do Local' encontrado no seu usuário.");
-			} else {
-				editEvento.setNumeroLugar(usu.getNrCasa());
-			}
-		} else {
+		} catch (CEPInvalidoException e) {
+			showErrorMessage(e.getMessage());
+			this.editEvento.setUsaMyEndereco(false);
 			limpaEndereco();
+		} catch (NRCasaUsuarioException ex) {
+			showInfoMessage(ex.getMessage());			
 		}
 	}
 	
@@ -237,9 +242,6 @@ public class EventoMB extends BaseMB {
 	
 	// M001 - insert do evento
 	public void doSave(){
-		if (!validarDatasEvento()) {
-			return;
-		}
 		eventoSB.insert(editEvento, getCurrentUserId());
 		if (editEvento.getId() == null) {
 			showInfoMessage("Evento inserido com sucesso");
@@ -256,17 +258,65 @@ public class EventoMB extends BaseMB {
 		this.resultadoAtividadeByEvento = null;
 	}
 	
-	private boolean validarDatasEvento() {
-		if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
-			if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-				showErrorMessage("Data Início está depois da data final do evento");
-				return false;
+	public void validaHoraIniEvenHoraFimEven(){
+		try {
+			if(editEvento.getDataFim() != null && editEvento.getDataInicio() != null) {
+				if(editEvento.getHoraFim() != null && editEvento.getHoraInicio() != null && editEvento.getDataFim().equals(editEvento.getDataInicio())) {
+					Calendar calEvenIni = Calendar.getInstance();
+					Calendar calEvenFim = Calendar.getInstance();
+					
+					calEvenIni.setTime(editEvento.getHoraInicio());
+					calEvenFim.setTime(editEvento.getHoraFim());
+					
+					int horaInicAtiv = calEvenIni.get(Calendar.HOUR_OF_DAY);
+					int minutoInicAtiv = calEvenIni.get(Calendar.MINUTE);
+					
+					int horaFimAtiv = calEvenFim.get(Calendar.HOUR_OF_DAY);
+					int minutoFimAtiv = calEvenFim.get(Calendar.MINUTE);
+					
+					if(horaInicAtiv > horaFimAtiv || horaInicAtiv == horaFimAtiv && minutoInicAtiv > minutoFimAtiv){
+						throw new PeriodoDataInvalidaException("O horário de início informado '" + formatarData(editEvento.getHoraInicio(),"HH:mm") + "' é "
+								+ "maior que o horario de fim informado '" + formatarData(editEvento.getHoraFim(),"HH:mm"));
+					}
+				}
 			}
-		} else if (editEvento.getDataInicio() != null || editEvento.getDataFim() != null) {
-			showErrorMessage("Data Início está depois da data final do evento");
-			return false;
+		} catch (PeriodoDataInvalidaException e){
+			showErrorMessage(e.getMessage());
+			this.editEvento.setHoraInicio(null);
+			this.editEvento.setHoraFim(null);
 		}
-		return true;
+	}
+	
+	public void validarDatasEvento(){
+		try {
+			if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
+				this.dataValidada = false;
+				Date dataAtual = getDateNow();
+				int result = editEvento.getDataInicio().compareTo(dataAtual);
+				if(result < 0){
+					throw new PeriodoDataInvalidaException("A data informada '" + formatarData(editEvento.getDataInicio(),"dd/MM/yyyy") + "' não pode ser menor que a data atual '" 
+								+ formatarData(dataAtual,"dd/MM/yyyy"));
+				}
+				if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
+					throw new DataInvalidaException("Data Início está depois da data final do evento");
+				}
+				if(editEvento.getDataInicio().equals(editEvento.getDataFim())){
+					this.editEvento.setMesmoDia(true);
+				}
+				this.dataValidada = true;
+				validaHoraIniEvenHoraFimEven();
+			} else {
+				this.dataValidada = true;
+			}
+		} catch (PeriodoDataInvalidaException e){
+			showErrorMessage(e.getMessage());
+			this.editEvento.setDataInicio(null);
+			this.editEvento.setDataFim(null);
+		} catch (DataInvalidaException ex){
+			showErrorMessage(ex.getMessage());
+			this.editEvento.setDataInicio(null);
+			this.editEvento.setDataFim(null);
+		}
 	}
 
 	public void onEventos(){
@@ -279,11 +329,11 @@ public class EventoMB extends BaseMB {
 		onEventos();
 	}
 	
-	public void doEdit(Evento edit){
+	public void doEdit(Evento edit) throws SQLException {
 		onPrepareEditOuConsulta(edit, false);
 	}
 	
-	public void doConsulta(Map<String, Object> params) {
+	public void doConsulta(Map<String, Object> params) throws SQLException {
 		Evento edit = (Evento) params.get("evento");
 		String request = (String) params.get("request");
 		onPrepareEditOuConsulta(edit, true);
@@ -304,7 +354,7 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-	public void setAtividadeSeEstaInscrito(List<Atividade> ativ) {
+	public void setAtividadeSeEstaInscrito(List<Atividade> ativ){
 		this.resultadoAtividadeByEvento = null;
 		this.resultadoAtividadeByEvento = new ArrayList<Atividade>();
 		for (Atividade ati : ativ) {
@@ -313,7 +363,7 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-	public void doIncrever(Atividade ativ) {
+	public void doIncrever(Atividade ativ){
 		UsuarioAtividade inscrito = new UsuarioAtividade();
 		Usuario usuario = new Usuario();
 		usuario = usuarioSB.findById(getCurrentUserId());
@@ -325,10 +375,16 @@ public class EventoMB extends BaseMB {
 		
 	}
 	
-	public void onPrepareEditOuConsulta(Evento edit, Boolean consulta) {
+	public void onPrepareEditOuConsulta(Evento edit, Boolean consulta) throws SQLException {
 		doPrepareSave();
 		this.modoConsulta = consulta;
 		this.editEvento = eventoSB.findById(edit.getId());
+		this.editEvento.setMesmoDia(false);
+		this.editEvento.setExisteInscrito(false);
+		if(eventoSB.qtdInscritoInEvento(editEvento.getId()) > 0){
+			this.modoConsulta = true;
+			editEvento.setExisteInscrito(true);
+		}
 		validaTpContato();
 		onEstadoChange();
 	}
@@ -338,9 +394,9 @@ public class EventoMB extends BaseMB {
 		this.editEvento.setVlr("Pago");
 	}
 	
-	public void findEnderecoByCEP() {
+	public void findEnderecoByCEP(){
 		try {
-			if (!editEvento.getCep().contains("_")) {
+			if (!editEvento.getCep().contains("_")){
 				this.enderecoDoCEP = new Endereco();
 				this.enderecoDoCEP = enderecoSB.findCidadeAndEstadoByCEP(editEvento.getCep());
 				Usuario usu = new Usuario();
@@ -355,6 +411,7 @@ public class EventoMB extends BaseMB {
 					this.editEvento.setCidade(enderecoDoCEP.cidade.getName());
 					this.editEvento.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
 					this.editEvento.setEndereco(enderecoDoCEP.getEndereco());
+					this.cepvalidoinformado = true;
 				} else {
 					throw new CEPInvalidoException("CEP '" + editEvento.getCep() + "' não encontrado no Banco de Dados.\n"
 							+ "Informe seu endereço manualmente.");
@@ -362,10 +419,12 @@ public class EventoMB extends BaseMB {
 			} else {
 				limpaEndereco();
 				this.editEvento.setUsaMyEndereco(false);
+				this.cepvalidoinformado = false;
 			}
 		} catch (CEPInvalidoException e) {
 			showErrorMessage(e.getMessage());
 			limpaEndereco();
+			this.cepvalidoinformado = false;
 			this.editEvento.setUsaMyEndereco(false);
 		}
 	}
@@ -378,6 +437,7 @@ public class EventoMB extends BaseMB {
 		editEvento.setBairro("");
 		editEvento.setEndereco("");
 		editEvento.setNumeroLugar("");
+		this.cepvalidoinformado = false;
 	}
 	
 	public void validaTpContato(){
@@ -396,11 +456,11 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-	public void validaDDD(String numero) {
+	public void validaDDD(String numero){
 		try {
-			if (!numero.contains("_")) {
+			if (!numero.contains("_")){
 				if(!numero.equals("")){
-					if (numero.length() == 15) {
+					if (numero.length() == 15){
 						validaPrimeiroDigCelular(numero);
 					}
 					if (!editEvento.getCidade().equals("")){
@@ -409,7 +469,7 @@ public class EventoMB extends BaseMB {
 							List<Cidade> cidlist = new ArrayList<Cidade>();
 							cidlist = cidadeSB.findByName(editEvento.getCidade());
 							List<Integer> listddd;
-							for (Cidade cid : cidlist) {
+							for (Cidade cid : cidlist){
 								listddd = enderecoSB.findDDDInnerJoinCity(cid.getId());
 								for (Integer ddd : listddd){
 									if (ddd == Integer.parseInt(numero.substring(1, 3))){
@@ -417,7 +477,7 @@ public class EventoMB extends BaseMB {
 									}
 								}
 							}
-							if(naoContem) {
+							if(naoContem){
 								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
 							}
 						} else {
@@ -428,12 +488,12 @@ public class EventoMB extends BaseMB {
 					}
 				}
 			}
-		} catch (DDDInvalidoException e) {
+		} catch (DDDInvalidoException e){
 			showInfoMessage(e.getMessage());
 		}
 	}
 	
-	public void validaPrimeiroDigCelular(String numero) {
+	public void validaPrimeiroDigCelular(String numero){
 		try {
 			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
 				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do nï¿½mero '" + numero + "' ï¿½ invï¿½lido");
@@ -443,74 +503,4 @@ public class EventoMB extends BaseMB {
 			editEvento.setTelefone("");
 		}
 	}
-	
-        //@PostConstruct
-        //public void init() {
-        //	resultEven = eventoSB.findEventosByUsuario(getCurrentUserId());
-        //    eventModel = new DefaultScheduleModel();
-        //    for(Evento event : resultEven){
-        //    	eventModel.addEvent(new DefaultScheduleEvent(event.getTitulo(), event.getDataInicio(), event.getDataFim()));
-        //    }
-        //     
-        //    lazyEventModel = new LazyScheduleModel() {
-        //         
-        //        /**
-    	//		 * 
-    	//		 */
-    	//		private static final long serialVersionUID = 1L;
-    			
-    	//		@Override
-        //        public void loadEvents(Date start, Date end) {
-        //            Date random = getRandomDate(start);
-        //            addEvent(new DefaultScheduleEvent("Lazy Event 1", random, random));
-        //             
-        //            random = getRandomDate(start);
-        //            addEvent(new DefaultScheduleEvent("Lazy Event 2", random, random));
-        //        }   
-        //   };
-        //}
-        
-        /*public void doPrepareEdit(){
-        	this.editEvento = eventoSB.findByTitulo(event.getTitle());
-        }*/
-         
-        //public Date getRandomDate(Date base) {
-        //    Calendar date = Calendar.getInstance();
-        //    date.setTime(base);
-        //    date.add(Calendar.DATE, ((int) (Math.random()*30)) + 1);    //set random day of month
-        //     
-        //    return date.getTime();
-        //}
-         
-        //public Date getInitialDate() {
-        //    Calendar calendar = Calendar.getInstance();
-        //    calendar.set(calendar.get(Calendar.YEAR), Calendar.FEBRUARY, calendar.get(Calendar.DATE), 0, 0, 0);
-        //     
-        //    return calendar.getTime();
-        //}
-         
-        //public void addEvent(ActionEvent actionEvent) {
-        //    if(event.getId() == null)
-        //        eventModel.addEvent(event);
-        //    else
-        //        eventModel.updateEvent(event);
-        //     
-        //    event = new DefaultScheduleEvent();
-        //}
-         
-        //public void onEventSelect(SelectEvent selectEvent) {
-        //    event = (ScheduleEvent) selectEvent.getObject();
-        //}
-         
-        //public void onDateSelect(SelectEvent selectEvent) {
-        //    event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
-        //}
-         
-        //public void onEventMove(ScheduleEntryMoveEvent event) {
-        //    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-        //}
-         
-        //public void onEventResize(ScheduleEntryResizeEvent event) {
-        //    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-        //}
 }

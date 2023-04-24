@@ -139,13 +139,21 @@
                      <h:form id="formEvent">
                         <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
                         <p:separator style="width:99%;" />
+                        <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Atenção!, Não é possivel realizar alteração nesse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+								</div>
+		                    </div>
+	                    </p:panelGrid>
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
                            	<div class="col-lg-2 col-md-2 col-sm-2 col-small-3-rcf form-group text-right text-truncate">
                               	<label for="titulo" class="col-form-label">Título:</label>
                              </div>
                               <div class="col-lg-6 col-md-6 col-sm-5 col-small-9-rcf form-group">
-                                 <p:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="titulo" value="#{eventoMB.editEvento.titulo}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta}" />
+                                 <p:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="titulo" 
+                                 	value="#{eventoMB.editEvento.titulo}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta}" />
                               </div>
                               <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="vagas" class="col-form-label">Vagas:</label>
@@ -161,36 +169,46 @@
                                  <p:inputText pt:type="date" label="Data inicio"
                                     styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataInicio}" required="true"
-                                    id="dataInicio" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd"  locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    id="dataInicio" placeholder="Data inicio">
+                                    <p:ajax event="blur" listener="#{eventoMB.validarDatasEvento}" update="datafim, dataInicio" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC"/>
                                  </p:inputText>
+                                 <!-- <f:convertDateTime pattern="yyyy-MM-dd"  locale="pt_BR" timeZone="America/Sao_Paulo" /> -->
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-4 col-small-6-rcf form-group text-right text-truncate">
                                  <label for="horafrom" class="col-form-label">Hora Começo:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-8 col-small-6-rcf form-group">
-                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass="#{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
-                                    value="#{eventoMB.editEvento.horaInicio}" required="true" timeZone="America/Sao_Paulo"
-                                    label="Hora inicio" id="horafrom" disabled="#{eventoMB.modoConsulta}" />
+                                 <p:inputMask mask="99:99" timeOnly="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+                                    value="#{eventoMB.editEvento.horaInicio}" required="true" timeZone="UTC"
+                                    label="Hora inicio" id="horafrom" disabled="#{eventoMB.modoConsulta}" >
+                                    <p:ajax event="blur" listener="#{eventoMB.validaHoraIniEvenHoraFimEven}" update="horafim, horafrom" />
+                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
+                                 </p:inputMask>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-4 form-group col-small-4-rcf text-right text-truncate">
                                  <label for="datafim" class="col-form-label">Termina:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-8 form-group col-small-8-rcf">
-                                 <p:inputText pt:type="date" label="Data inicio" 
+                                 <p:inputText pt:type="date" label="Data Fim" 
                                     styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
                                     value="#{eventoMB.editEvento.dataFim}" required="true"
-                                    id="datafim" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd"  locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    id="datafim" placeholder="Data inicio" converter="ConversorDateView" >
+                                    <p:ajax event="blur" listener="#{eventoMB.validarDatasEvento}" update="datafim, dataInicio" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC"/>
                                  </p:inputText>
+                                  <!-- <f:convertDateTime pattern="yyyy-MM-dd"  locale="pt_BR" timeZone="America/Sao_Paulo" /> -->
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-4 col-small-6-rcf form-group text-right text-truncate">
                                  <label for="horafim" class="col-form-label">Hora Termino:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-8 col-small-6-rcf form-group">
-                                 <p:calendar pattern="HH:mm" timeOnly="true" styleClass="#{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
-                                    value="#{eventoMB.editEvento.horaFim}" required="true" timeZone="America/Sao_Paulo"
-                                    label="Hora inicio" id="horafim" disabled="#{eventoMB.modoConsulta}" />
+                                 <p:inputMask mask="99:99" timeOnly="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+                                    value="#{eventoMB.editEvento.horaFim}" required="true" timeZone="UTC"
+                                    label="Hora inicio" id="horafim" disabled="#{eventoMB.modoConsulta}" >
+                                 	<p:ajax event="blur" listener="#{eventoMB.validaHoraIniEvenHoraFimEven}" update="horafim, horafrom" />
+                                 	<f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
+                                 </p:inputMask>
                               </div>
                            </div>
                            <div class="row mb-3 border-rcf">
@@ -199,7 +217,7 @@
                                     <div class="input-group-text">
                                        <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
                                           value="#{eventoMB.editEvento.usaMyEndereco}" id="usaMyEndereco">
-                                          <p:ajax event="change" update="cep, uf, cidades, numero, local, bairro" listener="#{eventoMB.onChangeMyEndereco}" />
+                                          <p:ajax event="change" update="cep, uf, cidades, numero, local, bairro, usaMyEndereco" listener="#{eventoMB.onChangeMyEndereco}" />
                                        </h:selectBooleanCheckbox>
                                     </div>
                                  </div>
@@ -212,15 +230,15 @@
 		                      </div>
 		                      <div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
 		                          <p:inputMask value="#{eventoMB.editEvento.cep}" label="cep" mask="99999-999"
-										styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'border border-info bg-white'}" 
-										disabled="#{eventoMB.modoConsulta}" id="cep">
+										styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'border border-info bg-white')}" 
+										disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" id="cep">
 										<p:ajax event="blur" listener="#{eventoMB.findEnderecoByCEP()}" update="uf, cidades, numero, local, bairro, usaMyEndereco"/>
 								</p:inputMask>
 		                      </div>
                               <div class="col-lg-4 col-md-6 col-sm-6 col-small-12-rcf form-group">
-                                 <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.cep eq '' ? 'bg-white' : 'bg-light border border-light')}" styname="uf"
+                                 <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" styname="uf"
                                     id="uf" required="true" value="#{eventoMB.editEvento.estado}"
-                                    label="Estado" disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.cep eq '' ? 'false' : 'true')}" >
+                                    label="Estado" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" >
                                     <f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
                                     <f:selectItem itemValue="" itemLabel="Selecione um Estado"
                                        noSelectionOption="true" />
@@ -229,10 +247,10 @@
                                  </h:selectOneMenu>
                               </div>
                               <div class="col-lg-4 col-md-6 col-sm-6 col-small-12-rcf form-group">
-                                 <h:selectOneMenu required="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.cep eq '' ? 'bg-white' : 'bg-light border border-light')}"
+                                 <h:selectOneMenu required="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}"
                                     value="#{eventoMB.editEvento.cidade}" label="Cidade"
-                                    id="cidades" disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.cep eq '' ? 'false' : 'true')}" >
-                                    <p:ajax update="formEvent" listener="#{eventoMB.validaDDDAfterSelCidade}" />
+                                    id="cidades" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" >
+                                    <p:ajax update="cidades" listener="#{eventoMB.validaDDDAfterSelCidade}" />
                                     <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
                                        noSelectionOption="true" />
                                     <f:selectItems value="#{eventoMB.cidades}" var="cid"
@@ -250,16 +268,16 @@
                                  <label for="endereco" class="col-form-label">Endereço:</label>
                               </div>
                               <div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
-                                 <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.cep eq '' ? 'bg-white' : 'bg-light border border-light')}" id="local" value="#{eventoMB.editEvento.endereco}" label="endereco" required="true"
-                                    disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.cep eq '' ? 'false' : 'true')}" />
+                                 <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" id="local" value="#{eventoMB.editEvento.endereco}" label="endereco" required="true"
+                                    disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" />
                               </div>
                               
 		                        <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right">
 	                            	<label for="bairro" class="col-form-label">Bairro:</label>
 	                        	</div>
 	                        	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
-	                            	<h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.cep eq '' ? 'bg-white' : 'bg-light border border-light')}" id="bairro" 
-	                            	value="#{eventoMB.editEvento.bairro}" label="Bairro" disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.cep eq '' ? 'false' : 'true')}" />
+	                            	<h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" id="bairro" 
+	                            	value="#{eventoMB.editEvento.bairro}" label="Bairro" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" />
 	                        	</div>
 		                    </div>
                            <div class="row mb-3 border-rcf">
@@ -307,7 +325,7 @@
 		                            <p:inputMask pt:type="" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.usaMyTelefone eq false ? 'bg-white' : 'bg-light border border-light')}" id="celular"
 		                                    label="Celular" mask="#{eventoMB.maskTelefone}" disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.usaMyTelefone eq false ? 'false' : 'true')}"
 		                                    value="#{eventoMB.editEvento.telefone}" >
-		                                    <p:ajax event="blur" listener="#{eventoMB.validaDDD(eventoMB.editEvento.telefone)}" update="formEvent"/>
+		                                <p:ajax event="blur" listener="#{eventoMB.validaDDD(eventoMB.editEvento.telefone)}" update="celular"/>
 		                            </p:inputMask>
 		                        </div>
                               

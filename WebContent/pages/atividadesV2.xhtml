@@ -116,6 +116,20 @@
                      <h:form id="formAtiv">
                      <h3 class="">#{atividadeMB.editAtividade.id eq null ? 'Adicionar Atividade' : (atividadeMB.modoConsulta ? 'Consultando a Atividade' : 'Editar Atividade')}</h3>
                   		<p:separator style="width:99%;" />
+                  		<p:panelGrid rendered="#{atividadeMB.editAtividade.eventonaovigente}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Atenção!, Não é possível editar essa Atividade pois o Evento dessa Atividade não está mais vigente.
+								</div>
+		                    </div>
+	                    </p:panelGrid>
+	                    <p:panelGrid rendered="#{atividadeMB.editAtividade.existeInscrito}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Atenção!, Não é possível editar essa Atividade pois existem Inscritos 'Aprovados' ou 'Pendentes' nessa Atividade.
+								</div>
+		                    </div>
+	                    </p:panelGrid>
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 border-rcf">
                            		<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
@@ -136,7 +150,7 @@
 										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update="infoInicioEven, infoFimEven, vagas, vagadisponivel, preco, vlrativ, titulo, :formtblAtiv"/>
 										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
 											noSelectionOption="true" />
-										<f:selectItems value="#{eventoMB.resultadoEvento}" var="event"
+										<f:selectItems value="#{atividadeMB.resultadoEvento}" var="event"
 											itemLabel="#{event.titulo}" itemValue="#{event.id}" />
 									</h:selectOneMenu>
 								</div>
@@ -174,7 +188,7 @@
                                     disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataInicio}" required="true"
                                     id="dataInicio" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC"/>
                                     <p:ajax event="blur" listener="#{atividadeMB.validaDataInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>
                                  </p:inputText>
                               </div>
@@ -182,11 +196,11 @@
                                  <label for="horafrom" class="col-form-label">Hora Começo:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="America/Sao_Paulo"
+                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="UTC"
                                  	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     value="#{atividadeMB.editAtividade.horaInicio}" required="true"
                                     label="Hora inicio" id="horafrom" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}">
-                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
                                     <p:ajax event="blur" listener="#{atividadeMB.validaHoraInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>                                 
                                  </p:inputMask>
                               </div>
@@ -199,7 +213,7 @@
                                     disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataFim}" required="true"
                                     id="datafim" placeholder="Data Fim" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC" />
                                     <p:ajax event="blur" listener="#{atividadeMB.validaDataFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/> 
                                  </p:inputText>
                               </div>
@@ -207,11 +221,11 @@
                                  <label for="horafim" class="col-form-label">Hora Termino:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="America/Sao_Paulo"
+                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="UTC"
                                  	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     value="#{atividadeMB.editAtividade.horaFim}" required="true"
                                     label="Hora Fim" id="horafim" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" >
-                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="America/Sao_Paulo" />
+                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
                                  	<p:ajax event="blur" listener="#{atividadeMB.validaHoraFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/>   
                                  </p:inputMask>
                               </div>
@@ -230,8 +244,8 @@
                                     value="Gratuito ? #{atividadeMB.editAtividade.isgratuito ? 'Sim' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'Sim' : 'Não')}" 
                                     disabled="true" id="vlrativ" />
                                  <p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
-                                    mask="#{atividadeMB.editAtividade.isgratuito ? 'Gratuito' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? '' : 'R$ 99,99')}" 
-                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta}" />
+                                    mask="#{atividadeMB.editAtividade.isgratuito ? '' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? '' : 'R$ 99,99')}" 
+                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.isgratuito ? 'true' : 'false')}" />
                               </div>
                               	<div class="col-lg-6 col-md-6 col-sm-12 input-group form-group">
   									<div class="input-group-prepend">

@@ -76,6 +76,12 @@ public class Atividade extends BaseORM {
 	private boolean mesmodiainicio;
 	
 	@Transient
+	private boolean existeInscrito;
+	
+	@Transient
+	private boolean eventonaovigente;
+	
+	@Transient
 	private boolean mesmodiafim;
 	
 	@ManyToOne

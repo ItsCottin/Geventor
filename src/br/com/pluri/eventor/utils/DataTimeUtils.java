@@ -1,6 +1,5 @@
 package br.com.pluri.eventor.utils;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -15,10 +14,8 @@ public class DataTimeUtils {
 		
 		Calendar aTime = Calendar.getInstance();
 		aTime.setTime(time);
-		aDate.set(Calendar.HOUR_OF_DAY, aTime.get(Calendar.HOUR));
+		aDate.set(Calendar.HOUR_OF_DAY, aTime.get(Calendar.HOUR_OF_DAY));
 		aDate.set(Calendar.MINUTE, aTime.get(Calendar.MINUTE));
 		return aDate.getTime();
 	}	
-	
-	
 }

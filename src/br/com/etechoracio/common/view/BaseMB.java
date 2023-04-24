@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -419,10 +422,19 @@ public abstract class BaseMB {
 		return DataTimeUtils.merge(data, hora);
 	}
 	
-	protected Date fixOneDay(Date data){
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(data);
-		calendar.add(Calendar.DAY_OF_MONTH, 1);
-		return calendar.getTime();
+	protected Date getDateNow(){
+		LocalDateTime agora = LocalDateTime.now();
+	    ZoneId zoneId = ZoneId.of("UTC");
+	    ZonedDateTime zdt = agora.atZone(zoneId);
+	    return Date.from(zdt.toInstant());
+	}
+	
+	public boolean isVigente(Date data){
+		int result = data.compareTo(getDateNow());
+		if(result > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

@@ -10,6 +10,16 @@
 		<el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
 	</application>
 	
+	<converter>
+	    <converter-id>ConversorDateView</converter-id>
+	    <converter-class>br.com.pluri.eventor.utils.ConversorDateView</converter-class>
+	</converter>
+	
+	<converter>
+	    <converter-id>ConversorHoraView</converter-id>
+	    <converter-class>br.com.pluri.eventor.utils.ConversorHoraView</converter-class>
+	</converter>
+	
 	<application>
 		<locale-config>
 			<default-locale>pt_BR</default-locale>

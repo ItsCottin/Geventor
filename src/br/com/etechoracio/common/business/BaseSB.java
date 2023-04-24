@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -82,11 +84,18 @@ public abstract class BaseSB {
 		}
 	}
 	
-	protected Date getDateAlter(){
+	protected Date getDateAlterOld(){
 		LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 		ZoneOffset offset = ZoneOffset.of("-03:00");
 		Instant instant = agora.toInstant(offset);
 		return Date.from(instant);
+	}
+	
+	protected Date getDateAlter(){
+		LocalDateTime agora = LocalDateTime.now();
+	    ZoneId zoneId = ZoneId.of("UTC");
+	    ZonedDateTime zdt = agora.atZone(zoneId);
+	    return Date.from(zdt.toInstant());
 	}
 	
 

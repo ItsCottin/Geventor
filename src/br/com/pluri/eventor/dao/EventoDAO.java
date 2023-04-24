@@ -1,7 +1,15 @@
 package br.com.pluri.eventor.dao;
 
+import java.math.BigInteger;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,5 +33,13 @@ public interface EventoDAO extends BaseDAO<Evento> {
 	@Query(value = "select MIN(datainicio_even) as proximoevento from tbl_evento where datainicio_even >= CURDATE() and id_usua = :idUsu",
 			nativeQuery = true)
 	public Timestamp getDataProxEventoDoUsuLogado(@Param("idUsu") Long idUsu);
+	
+	@Query(value = "select * from TBL_evento where ID_USUA = :idUsu and DATAINICIO_EVEN > now()", nativeQuery = true)
+	public List<Evento> findRecenEventosByUsuario (@Param("idUsu") Long idUsu);
+	
+	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS IN ('Pendente', 'Aprovado') AND ID_ATIVI IN " + 
+    "(SELECT ID_ATIVI FROM TBL_ATIVIDADE WHERE ID_EVEN IN " +
+    "(SELECT ID_EVEN FROM TBL_EVENTO WHERE ID_EVEN = :idEven))", nativeQuery = true)
+	public BigInteger qtdInscritoInEvento (@Param("idEven") Long idEven);
 	
 }

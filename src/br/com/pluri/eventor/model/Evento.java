@@ -103,6 +103,12 @@ public class Evento extends BaseORM {
 	@Transient
 	private Date horaFim;
 	
+	@Transient
+	private boolean existeInscrito;
+	
+	@Transient
+	private boolean mesmoDia;
+	
 	
 	@OneToMany(mappedBy="evento")
 	private List<Atividade> atividades;

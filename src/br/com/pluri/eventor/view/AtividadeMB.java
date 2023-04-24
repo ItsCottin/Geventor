@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.view;
 
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -321,7 +322,7 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void onEventos(){
-		resultadoEvento = eventoSB.findEventosByUsuario(getCurrentUserId());
+		resultadoEvento = eventoSB.findRecenEventosByUsuario(getCurrentUserId());
 	}
 	
 	public void doRemove(Atividade exclui){
@@ -339,10 +340,19 @@ public class AtividadeMB extends BaseMB {
 		this.editAtividade.evento.setVlr("Gratuito");
 	}
 	
-	public void doEdit(Atividade edit){
+	public void doEdit(Atividade edit) throws SQLException{
 		doPrepareSave();
-		this.modoConsulta = false;
 		prepareEditOuConsulta(edit);
+		if(edit.evento != null){
+			if (isVigente(edit.evento.getDataInicio())){
+				this.modoConsulta = false;
+			} else {
+				this.modoConsulta = true;
+				editAtividade.setEventonaovigente(true);
+			}
+		} else {
+			this.modoConsulta = true;
+		}
 	}
 	
 	public void doPrepareSave(){
@@ -354,15 +364,21 @@ public class AtividadeMB extends BaseMB {
 		onAllAtividade();
 	}
 	
-	public void doConsulta(Atividade edit) {
+	public void doConsulta(Atividade edit) throws SQLException {
 		doPrepareSave();
-		this.modoConsulta = true;
 		prepareEditOuConsulta(edit);
+		this.modoConsulta = true;
 	}
 	
-	public void prepareEditOuConsulta(Atividade edit){
+	public void prepareEditOuConsulta(Atividade edit) throws SQLException{
 		this.editAtividade = atividadeSB.findById(edit.getId());
 		this.idEvento = editAtividade.evento.getId();
+		this.editAtividade.setEventonaovigente(false);
+		this.editAtividade.setExisteInscrito(false);
+		if(atividadeSB.qtdInscritoInAtividade(editAtividade.getId()) > 0){
+			this.modoConsulta = true;
+			editAtividade.setExisteInscrito(true);
+		}
 		setModalConsultaAtiv();
 		setQtdVagasRest();
 		getInfoDataEven();

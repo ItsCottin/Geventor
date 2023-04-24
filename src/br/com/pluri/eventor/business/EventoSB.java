@@ -1,5 +1,7 @@
 package br.com.pluri.eventor.business;
 
+import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
 import br.com.pluri.eventor.dao.EventoDAO;
+import br.com.pluri.eventor.dao.EventoDAOImpl;
 import br.com.pluri.eventor.model.Evento;
 import br.com.pluri.eventor.model.Usuario;
 
@@ -17,9 +20,12 @@ public class EventoSB extends BaseSB {
 	
 	private EventoDAO eventoDAO;
 	
+	private EventoDAOImpl eventoDAOimpl;
+	
 	@Override
 	protected void postConstructImpl() {
 		eventoDAO = getDAO(EventoDAO.class);
+		eventoDAOimpl = new EventoDAOImpl();
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -38,6 +44,17 @@ public class EventoSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<Evento> findEventosByUsuario(Long  idUsuarioLogado){
 		return eventoDAO.findByUsuario(new Usuario(idUsuarioLogado));
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<Evento> findRecenEventosByUsuario(Long  idUsuarioLogado){
+		return eventoDAO.findRecenEventosByUsuario(idUsuarioLogado);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public int qtdInscritoInEvento(Long  idEven) throws SQLException{
+		BigInteger bigInt = eventoDAO.qtdInscritoInEvento(idEven);
+		return bigInt.intValue();
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
