@@ -429,7 +429,7 @@ public abstract class BaseMB {
 	    return Date.from(zdt.toInstant());
 	}
 	
-	public boolean isVigente(Date data){
+	protected boolean isVigente(Date data){
 		int result = data.compareTo(getDateNow());
 		if(result > 0) {
 			return true;

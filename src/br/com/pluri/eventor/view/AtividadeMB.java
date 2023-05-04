@@ -1,8 +1,12 @@
 package br.com.pluri.eventor.view;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -87,11 +91,23 @@ public class AtividadeMB extends BaseMB {
 		setQtdVagasRest();
 		if(editAtividade.evento.getVlr().equals("Gratuito")){
 			editAtividade.setIsgratuito(true);
+			editAtividade.setPreco("Gratuito");
 		} else {
 			editAtividade.setIsgratuito(false);
+			editAtividade.setPreco(null);
 		}
 		onAllAtividade();
 		getInfoDataEven();
+	}
+	
+	public void onChangeCheckGratuito(){
+		if(editAtividade.getNome() != null) {
+			if (editAtividade.getPreco().equals("Gratuito")) {
+				editAtividade.setIsgratuito(true);
+			} else {
+				editAtividade.setIsgratuito(false);
+			}
+		}
 	}
 	
 	public void getInfoDataEven(){
@@ -131,6 +147,10 @@ public class AtividadeMB extends BaseMB {
 	
 	public void setTituloAtiv(){
 		this.editAtividade.setNome(editAtividade.getNome());
+	}
+	
+	public void setPrecoAtiv(){
+		this.editAtividade.setPreco(editAtividade.getPreco());
 	}
 	
 	public Date formatDateForValidacao(Date data){
@@ -241,6 +261,8 @@ public class AtividadeMB extends BaseMB {
 		}
 	}
 	
+	
+	
 	public void validaHoraInicio(){
 		try{
 			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null && editAtividade.getHoraInicio() != null) {
@@ -309,7 +331,11 @@ public class AtividadeMB extends BaseMB {
 		if(editAtividade.isIsgratuito()){
 			editAtividade.setPreco("Gratuito");
 		} else {
-			editAtividade.setPreco("");
+			if (editAtividade.getId() != null) {
+				editAtividade.setPreco(atividadeSB.findById(editAtividade.getId()).getPreco());
+			} else {
+				editAtividade.setPreco("");
+			}
 		}
 	}
 	
@@ -321,8 +347,37 @@ public class AtividadeMB extends BaseMB {
 		resultadoAtividadeByEvento = atividadeSB.findAllAtividadeByUsuario(getCurrentUserId());
 	}
 	
+	public boolean isVigenteAtiv(Date data){
+		int result = data.compareTo(getDateNowAtiv());
+		if(result > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Date getDateNowAtiv(){
+		LocalDateTime agora = LocalDateTime.now();
+	    ZoneId zoneId = ZoneId.of("UTC");
+	    ZonedDateTime zdt = agora.atZone(zoneId);
+	    return Date.from(zdt.toInstant());
+	}
+	
 	public void onEventos(){
-		resultadoEvento = eventoSB.findRecenEventosByUsuario(getCurrentUserId());
+		resultadoEvento = eventoSB.findEventosByUsuario(getCurrentUserId());
+		Iterator<Evento> it = resultadoEvento.iterator();
+	    while (it.hasNext()) {
+	        Evento even = it.next();
+	        if (!isVigenteAtiv(even.getDataInicio())) {
+	            if (editAtividade.getNome() != null) {
+	                if (editAtividade.evento.getId() != even.getId()) {
+	                    it.remove();
+	                }
+	            } else {
+	                it.remove();
+	            }
+	        }
+	    }
 	}
 	
 	public void doRemove(Atividade exclui){
@@ -356,8 +411,8 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void doPrepareSave(){
-		onEventos();
 		this.editAtividade = new Atividade();
+		onEventos();
 		this.vagasRestant = 0; 
 		this.idEvento = null;
 		this.modoConsulta = false;
@@ -382,13 +437,22 @@ public class AtividadeMB extends BaseMB {
 		setModalConsultaAtiv();
 		setQtdVagasRest();
 		getInfoDataEven();
+		onEventos();
+		onChangeCheckGratuito();
+		validaInputVaga();
 	}
 	
 	public void setQtdVagasRest(){
 		onEventoChange();
 		this.vagasRestant = 0;
 		for (Atividade ativ : resultadoAtividadeByEvento){
-			this.vagasRestant = vagasRestant + ativ.getVagas();
+			if(editAtividade.getNome() != null) {
+				if (!editAtividade.getId().equals(ativ.getId())){
+					this.vagasRestant = vagasRestant + ativ.getVagas();
+				}
+			} else {
+				this.vagasRestant = vagasRestant + ativ.getVagas();
+			}
 		}
 		this.vagasRestant = eventoSB.findById(idEvento).getVagas() - vagasRestant;
 	}

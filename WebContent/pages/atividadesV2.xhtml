@@ -145,9 +145,9 @@
                               		<label for="eventos" class="col-form-label">Evento:</label>
                               	</div>
                               	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
-	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" label="Evento" required="true"
+	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" label="Evento" required="true"
 											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta}">
-										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update="infoInicioEven, infoFimEven, vagas, vagadisponivel, preco, vlrativ, titulo, :formtblAtiv"/>
+										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update="cbxIsGratuito, infoInicioEven, infoFimEven, vagas, vagadisponivel, preco, vlrativ, titulo, :formtblAtiv"/>
 										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
 											noSelectionOption="true" />
 										<f:selectItems value="#{atividadeMB.resultadoEvento}" var="event"
@@ -234,8 +234,8 @@
                               <div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
                                  <div class="input-group-prepend bg-light border border-light">
                                     <div class="input-group-text">
-                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta}" 
-                                          value="#{atividadeMB.editAtividade.isgratuito}">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'true' : 'false')}" 
+                                          value="#{atividadeMB.editAtividade.isgratuito}" id="cbxIsGratuito">
                                           <p:ajax event="change" update="preco, vlrativ" listener="#{atividadeMB.onChangeGratuito}" />
                                        </h:selectBooleanCheckbox>
                                     </div>
@@ -243,15 +243,18 @@
                                  <h:inputText type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
                                     value="Gratuito ? #{atividadeMB.editAtividade.isgratuito ? 'Sim' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'Sim' : 'Não')}" 
                                     disabled="true" id="vlrativ" />
-                                 <p:inputMask pt:type="" styleClass="form-control" label="Preço" id="preco"
+                                 <p:inputMask pt:type="" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.isgratuito ? 'bg-light border border-light' : 'bg-white')}" 
+                                 	label="Preço" id="preco"
                                     mask="#{atividadeMB.editAtividade.isgratuito ? '' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? '' : 'R$ 99,99')}" 
-                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.isgratuito ? 'true' : 'false')}" />
+                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.isgratuito ? 'true' : 'false')}" >
+                                    <p:ajax event="blur" listener="#{atividadeMB.setPrecoAtiv}" update="preco" />
+                                 </p:inputMask>
                               </div>
                               	<div class="col-lg-6 col-md-6 col-sm-12 input-group form-group">
   									<div class="input-group-prepend">
                                  		<span class="input-group-text">Vagas:</span>
                                  	</div>
-	                                 <h:inputText styleClass="form-control" id="vagas" disabled="#{atividadeMB.modoConsulta}"
+	                                 <h:inputText styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="vagas" disabled="#{atividadeMB.modoConsulta}"
 	                                    value="#{atividadeMB.editAtividade.vagas}" label="Vagas Disponível">
 	                                   	<p:ajax event="blur" listener="#{atividadeMB.validaInputVaga}" update="titulo, vagas, vagadisponivel"/>
 	                                 </h:inputText>
