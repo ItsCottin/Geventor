@@ -6,20 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 
 import lombok.Getter;
 import lombok.Setter;
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.CidadeSB;
 import br.com.pluri.eventor.business.DistritoSB;
 import br.com.pluri.eventor.business.EnderecoSB;
@@ -29,6 +24,7 @@ import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.CPFNotValidException;
+import br.com.pluri.eventor.business.exception.CampoObrigatÃ³rioException;
 import br.com.pluri.eventor.business.exception.DDDInvalidoException;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
@@ -42,7 +38,7 @@ import br.com.pluri.eventor.validator.ValidaCPF;
 @Setter
 @Controller
 @Scope("view")
-public class UsuarioMB extends BaseMB {
+public class UsuarioMB extends BaseMB  {
 
 	@Autowired
 	private UsuarioSB usuarioSB;
@@ -87,14 +83,40 @@ public class UsuarioMB extends BaseMB {
 	private String proxevent;
 	
 	public void doSave(){
-		try{
+		try {
+			if(getCurrentUser() == null) {
+			String campos = validaCampoObrigatorioParaInsert();
+				if(!campos.isEmpty()) {
+					throw new CampoObrigatÃ³rioException(MessageBundleLoader.getMessage("crÃ­tica.camposobrigatorios", new Object[] {campos}));
+				}
+			}
 			usuarioSB.insert(editUsuario);
-			showInfoMessage("Usuario cadastrado com sucesso");
+			showInfoMessage(MessageBundleLoader.getMessage("usu.insert_sucess"));
 			navigate("PAGE_LOGIN");
-		}catch (LoginJaCadastradoException e2){
+		} catch (LoginJaCadastradoException e2){
 			showErrorMessage(e2.getMessage());
 			validationFailed();
+		} catch (CampoObrigatÃ³rioException e) {
+			showErrorMessage(e.getMessage());
+		} catch (SenhaInvalidaException e) {
+			showErrorMessage(e.getMessage());
+			editUsuario.setSenha(null);
+			editUsuario.setConfirmSenha(null);
 		}
+	}
+	
+	public String validaCampoObrigatorioParaInsert() {
+		StringBuilder campos = new StringBuilder();
+		if(editUsuario.getNome() == null) {
+			campos.append("'Nome', ");
+		}
+		if(editUsuario.getEmail() == null) {
+			campos.append("'E-mail', ");
+		}
+		if(editUsuario.getLogin() == null) {
+			campos.append("'Login', ");
+		}
+		return campos.toString();
 	}
 	
 	public void findAll(){
@@ -199,11 +221,13 @@ public class UsuarioMB extends BaseMB {
 								}
 							}
 							if(naoContem) {
-								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+								throw new DDDInvalidoException(
+										MessageBundleLoader.getMessage("critica.dddnaopertencecidade", new Object[] {numero, editUsuario.getCidade()}));
 							}
 						} else {
 							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editUsuario.getCep()).getDdd()){
-								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editUsuario.getCidade() +  "'.");
+								throw new DDDInvalidoException(
+										MessageBundleLoader.getMessage("critica.dddnaopertencecidade", new Object[] {numero, editUsuario.getCidade()}));
 							}
 						}
 					}
@@ -224,7 +248,7 @@ public class UsuarioMB extends BaseMB {
 	public void validaPrimeiroDigCelular(String numero) {
 		try {
 			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
-				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do número '" + numero + "' é inválido");
+				throw new DDDInvalidoException(MessageBundleLoader.getMessage("critica.digcelularinvalido", new Object[] {numero.substring(5, 6), numero}));
 			}
 		} catch (DDDInvalidoException e) {
 			showErrorMessage(e.getMessage());
@@ -245,11 +269,10 @@ public class UsuarioMB extends BaseMB {
 					this.editUsuario.setBairro(distritoSB.findById(enderecoDoCEP.getIdDistrict()).getBairro());
 					this.editUsuario.setEndereco(enderecoDoCEP.getEndereco());
 				} else {
-					throw new CEPInvalidoException("CEP '" + cepInformado + "' não encontrado no Banco de Dados.\n"
-							+ "Informe seu endereço manualmente.");
+					throw new CEPInvalidoException(MessageBundleLoader.getMessage("critica.cepnotfound", new Object[] {cepInformado}));
 				}
 			} else {
-				throw new CEPInvalidoException("O CEP informado '" + cepInformado.replace("_", "") + "' é inválido.");
+				throw new CEPInvalidoException(MessageBundleLoader.getMessage("critica.cepinvalido", new Object[] {cepInformado.replace("_", "")}));
 			}
 		} catch (CEPInvalidoException e) {
 			showErrorMessage(e.getMessage());
@@ -271,7 +294,7 @@ public class UsuarioMB extends BaseMB {
 	public void validaCPFTab(String cpf) {
 		try {
 			if(!cpf.contains("_") && !validaCPF.isCPF(cpf.replace(".", "").replace("-", ""))) {
-				throw new CPFNotValidException("O CPF '" + cpf + "' é inválido");
+				throw new CPFNotValidException(MessageBundleLoader.getMessage("critica.cpfinvalido", new Object[] {cpf}));
 			}
 			
 		} catch (Exception e) {
@@ -284,24 +307,37 @@ public class UsuarioMB extends BaseMB {
 		try {
 			Usuario usuarioLogin = new Usuario();
 			usuarioLogin = usuarioSB.findUsuarioByLogin(editUsuario.getLogin());
-			
-			if (!usuarioLogado.getLogin().equals(editUsuario.getLogin()) && usuarioLogin != null) {
+			if(getCurrentUser() != null){
+				if (!usuarioLogado.getLogin().equals(editUsuario.getLogin()) && usuarioLogin != null) {
+					this.editUsuario.setLoginVerificado(false);
+					throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginjacadastrado", new Object[] {editUsuario.getLogin()}));
+				} else {
+					this.editUsuario.setLoginVerificado(true);
+				}
+			} else if (usuarioLogin != null){
 				this.editUsuario.setLoginVerificado(false);
-				throw new LoginJaCadastradoException("O nome de Login '" + editUsuario.getLogin() + "' jï¿½ estï¿½ cadastrado.");
-			} else {
-				this.editUsuario.setLoginVerificado(true);
+				throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginjacadastrado", new Object[] {editUsuario.getLogin()}));
 			}
+			this.editUsuario.setLoginVerificado(true);
 		} catch (LoginJaCadastradoException e) {
 			showErrorMessage(e.getMessage());
-			editUsuario.setLogin(usuarioLogado.getLogin());
+			if(getCurrentUser() != null){
+				editUsuario.setLogin(usuarioLogado.getLogin());
+			} else {
+				editUsuario.setLogin(null);
+			}
 		}
 	}
 	
 	public void verificaAlterLogin(String login) {
-		if(!login.equals(usuarioLogado.getLogin())) {
-			this.editUsuario.setLoginVerificado(false);
+		if(getCurrentUser() != null){
+			if(!login.equals(usuarioLogado.getLogin())) {
+				this.editUsuario.setLoginVerificado(false);
+			} else {
+				this.editUsuario.setLoginVerificado(true);
+			}
 		} else {
-			this.editUsuario.setLoginVerificado(true);
+			this.editUsuario.setLoginVerificado(false);
 		}
 	}
 	
@@ -317,7 +353,7 @@ public class UsuarioMB extends BaseMB {
 				editUsuario.setTelefone(null);
 			}
 			usuarioSB.editeUsuario(editUsuario);	
-			showInfoMessage("Seu usuário foi atualizado com sucesso.");
+			showInfoMessage(MessageBundleLoader.getMessage("usu.update_sucess"));
 			this.editUsuario = new Usuario();
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.modoConsulta = true;

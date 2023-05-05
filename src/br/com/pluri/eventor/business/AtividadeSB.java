@@ -3,7 +3,6 @@ package br.com.pluri.eventor.business;
 
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;

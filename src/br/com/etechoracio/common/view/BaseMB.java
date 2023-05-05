@@ -8,10 +8,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -29,25 +27,25 @@ import br.com.etechoracio.common.model.BaseORM;
 import br.com.pluri.eventor.security.business.model.UsuarioAutenticado;
 import br.com.pluri.eventor.utils.DataTimeUtils;
 /**
- * Base para todos os ManagedBeans(MBs) da Aplicação.
+ * Base para todos os ManagedBeans(MBs) da Aplicaï¿½ï¿½o.
  * 
  * <pre>
  * Last Modified  $Date: 2015/10/28 19:22:45 $
- * Last Modified by $Author: Rogério de Morais $
+ * Last Modified by $Author: Rogï¿½rio de Morais $
  * </pre>
  * 
- * @author Rogério de Morais
+ * @author Rogï¿½rio de Morais
  * @version $Revision: 1.1 $
  */
 public abstract class BaseMB {
 	protected static final String RECORD_INSERT_SUCCESS = "Registro inserido com sucesso.";
 	protected static final String RECORD_UPDATE_SUCCESS = "Registro alterado com sucesso.";
-	protected static final String RECORD_REMOVE_SUCCESS = "Exclusão realizada com sucesso.";
+	protected static final String RECORD_REMOVE_SUCCESS = "Exclusï¿½o realizada com sucesso.";
 	protected static final String SK_USER_CTX = "user_context";
 
 	protected static final String CONTEXT_PAGES = "/pages";
-	public static final String PAGE_HOME = CONTEXT_PAGES + "/indexV2.xhtml";
-	public static final String PAGE_LOGIN = "/loginV2.xhtml";
+	public static final String PAGE_HOME = CONTEXT_PAGES + "/inicio.xhtml";
+	public static final String PAGE_LOGIN = "/index.xhtml";
 
 	@PostConstruct
 	final void postConstructCaller() {
@@ -55,7 +53,7 @@ public abstract class BaseMB {
 	}
 
 	/**
-	 * Metodo chamado após o Contrutor da Classe.
+	 * Metodo chamado apï¿½s o Contrutor da Classe.
 	 */
 	protected void postConstruct() {
 	}
@@ -208,9 +206,9 @@ public abstract class BaseMB {
 	 * </p>
 	 * 
 	 * @param name
-	 *            - nome do parâmetro.
+	 *            - nome do parï¿½metro.
 	 * @param value
-	 *            - valor do parâmetro.
+	 *            - valor do parï¿½metro.
 	 */
 	protected void addCallbackParam(String name, Object value) {
 		RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -235,10 +233,10 @@ public abstract class BaseMB {
 	}
 
 	/**
-	 * Verifica se um dos parâmetros foi preenchido.
+	 * Verifica se um dos parï¿½metros foi preenchido.
 	 * 
 	 * @param parameters
-	 *            Lista de parâmetros
+	 *            Lista de parï¿½metros
 	 * @return
 	 */
 	protected boolean isSelectOne(Object... parameters) {
@@ -288,8 +286,7 @@ public abstract class BaseMB {
 	protected <B extends BaseORM> List<Long> extrairIds(B[] tipo) {
 		List<Long> ids = new ArrayList<Long>();
 		if (tipo.length == 0) {
-			throw new RuntimeException(
-					"Não há registros selecionados para a solicitação.");
+			throw new RuntimeException(MessageBundleLoader.getMessage("critica.noregistro"));
 		}
 		for (int x = 0; x < tipo.length; x++) {
 			ids.add((Long) tipo[x].getId());
@@ -309,8 +306,7 @@ public abstract class BaseMB {
 	protected <B extends BaseORM> List<Long> extrairIds(List<B> list) {
 		List<Long> ids = new ArrayList<Long>();
 		if (list == null || list.isEmpty()) {
-			throw new RuntimeException(
-					"Não há registros selecionados para a solicitação.");
+			throw new RuntimeException(MessageBundleLoader.getMessage("critica.noregistro"));
 		}
 		for (B b : list) {
 			ids.add((Long) b.getId());
@@ -319,7 +315,7 @@ public abstract class BaseMB {
 	}
 
 	/**
-	 * Obtém um componente do Primefaces através do seu id.
+	 * Obtï¿½m um componente do Primefaces atravï¿½s do seu id.
 	 * 
 	 * @param idComponent
 	 * @return
@@ -330,7 +326,7 @@ public abstract class BaseMB {
 	}
 
 	/**
-	 * Redefine a paginação de um {@link DataTable}.
+	 * Redefine a paginaï¿½ï¿½o de um {@link DataTable}.
 	 * 
 	 * @param idDataTable
 	 *            - Identificador do {@link DataTable}
@@ -341,7 +337,7 @@ public abstract class BaseMB {
 	}
 
 	/**
-	 * Define a aba que será exibida no componente.
+	 * Define a aba que serï¿½ exibida no componente.
 	 * 
 	 * @param index
 	 */
@@ -360,9 +356,9 @@ public abstract class BaseMB {
 	 * </p>
 	 * 
 	 * @param name
-	 *            - nome do parâmetro.
+	 *            - nome do parï¿½metro.
 	 * @param value
-	 *            - valor do parâmetro.
+	 *            - valor do parï¿½metro.
 	 */
 	protected void addCallBackParam(String name, Object value) {
 		RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -380,7 +376,7 @@ public abstract class BaseMB {
 		try {
 			FacesContext.getCurrentInstance().getExternalContext().redirect(url);
 		} catch (IOException e) {
-			showErrorMessage("Falha no redirecionamento de página.");
+			showErrorMessage(MessageBundleLoader.getMessage("critica.redirecionamentopagina"));
 			validationFailed();
 		}
 	}

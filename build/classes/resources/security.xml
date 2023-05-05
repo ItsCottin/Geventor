@@ -14,8 +14,8 @@
 
 	<http use-expressions="true" access-denied-page="/pages/erros/acesso-negado.xhtml"
 		authentication-manager-ref="authenticationManager">
-		<form-login login-page="/loginV2.xhtml" />
-		<logout logout-success-url="/loginV2.xhtml" invalidate-session="true" logout-url="/j_spring_security_logout" />
+		<form-login login-page="/index.xhtml" />
+		<logout logout-success-url="/index.xhtml" invalidate-session="true" logout-url="/j_spring_security_logout" />
 		<!-- colocar role de administrador -->
 		<intercept-url pattern="/pages/**" access="isAuthenticated()" />
 		<intercept-url pattern="/v2/pages/**" access="isAuthenticated()" />

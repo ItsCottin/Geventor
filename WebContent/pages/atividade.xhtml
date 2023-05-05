@@ -138,7 +138,7 @@
                               	<div class="col-lg-6 col-md-4 col-sm-4 col-small-8-rcf form-group">
                                  	<h:inputText class="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" 
                                  		id="titulo" value="#{atividadeMB.editAtividade.nome}" label="Nome" required="true" disabled="#{atividadeMB.modoConsulta}" >
-                                 		<p:ajax event="blur" listener="#{atividadeMB.setTituloAtiv}" update="titulo" />
+                                 		<p:ajax event="blur" listener="#{atividadeMB.setTituloAtiv}" update="titulo, infoInicioEven, infoFimEven" />
                                  	</h:inputText>
                               	</div>
                               	<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">

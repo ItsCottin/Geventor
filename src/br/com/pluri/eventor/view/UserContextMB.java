@@ -1,13 +1,9 @@
 package br.com.pluri.eventor.view;
 
-import java.io.IOException;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,6 +52,7 @@ public class UserContextMB extends BaseMB {
 			SecurityContextHolder.getContext().setAuthentication
 				(authenticationManager.authenticate(authentication));
 			afterAuthentication();
+			//showInfoMessage(context.getMessage("cpferror.invalid_format", null, Locale.getDefault()));
 			navigate(PAGE_HOME);
 		}catch(AuthenticationException e){
 			showErrorMessage(e.getMessage());

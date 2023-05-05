@@ -3,40 +3,28 @@ package br.com.pluri.eventor.view;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.primefaces.component.tabview.TabView;
-import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultScheduleEvent;
-import org.primefaces.model.DefaultScheduleModel;
-import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.sun.javafx.geom.Edge;
-
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.CidadeSB;
 import br.com.pluri.eventor.business.DistritoSB;
@@ -161,7 +149,7 @@ public class EventoMB extends BaseMB {
 				Usuario usu = new Usuario();
 				usu = usuarioSB.findById(getCurrentUserId());
 				if(usu.getCep() == null || usu.getCep().equals("")){
-					throw new CEPInvalidoException("Nenhuma informação de Endereço encontrado no seu usuário.");
+					throw new CEPInvalidoException(MessageBundleLoader.getMessage("critica.endereconotfoundinusu"));
 				} else {
 					editEvento.setCep(usu.getCep());
 					editEvento.setEstado(usu.getEstado());
@@ -171,7 +159,7 @@ public class EventoMB extends BaseMB {
 					editEvento.setEndereco(usu.getEndereco());
 					this.cepvalidoinformado = true;
 					if(usu.getNrCasa() == null || usu.getNrCasa().equals("")){
-						throw new NRCasaUsuarioException("Numero do local não encontrado no seu usuário");
+						throw new NRCasaUsuarioException(MessageBundleLoader.getMessage("info.numeronotfoundinusu"));
 					} else {
 						editEvento.setNumeroLugar(usu.getNrCasa());
 					}
@@ -197,7 +185,7 @@ public class EventoMB extends BaseMB {
 					setMaskTelefone();
 					editEvento.setTelefone(usu.getTelefone());
 				} else {
-					showInfoMessage("Nenhuma informação do 'Telefone' encontrado no seu usuário.");
+					showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"Telefone"}));
 				}
 			}
 			if(usaTelefone.equals("Celular")){
@@ -205,11 +193,11 @@ public class EventoMB extends BaseMB {
 					setMaskTelefone();
 					editEvento.setTelefone(usu.getCelular());
 				} else {
-					showInfoMessage("Nenhuma informação do 'Celular' encontrado no seu usuário.");
+					showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"Celular"}));
 				}
 			}
 			if(usu.getEmail() == null || usu.getEmail().equals("")){
-				showInfoMessage("Nenhuma informação de 'E-mail' encontrado no seu usuário.");
+				showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"E-mail"}));
 			} else {
 				editEvento.setEmail(usu.getEmail());
 			}
@@ -244,9 +232,9 @@ public class EventoMB extends BaseMB {
 	public void doSave(){
 		eventoSB.insert(editEvento, getCurrentUserId());
 		if (editEvento.getId() == null) {
-			showInfoMessage("Evento inserido com sucesso");
+			showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess"));
 		} else {
-			showInfoMessage("Evento Atualizado com sucesso");
+			showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess"));
 		}
 		onEventos();
 		doPrepareSave(); 
@@ -275,8 +263,11 @@ public class EventoMB extends BaseMB {
 					int minutoFimAtiv = calEvenFim.get(Calendar.MINUTE);
 					
 					if(horaInicAtiv > horaFimAtiv || horaInicAtiv == horaFimAtiv && minutoInicAtiv > minutoFimAtiv){
-						throw new PeriodoDataInvalidaException("O horário de início informado '" + formatarData(editEvento.getHoraInicio(),"HH:mm") + "' é "
-								+ "maior que o horario de fim informado '" + formatarData(editEvento.getHoraFim(),"HH:mm"));
+						throw new PeriodoDataInvalidaException(
+								MessageBundleLoader.getMessage("hora.iniciomaiorfim", 
+										new Object[] {formatarData(editEvento.getHoraInicio(),"HH:mm"), 
+												formatarData(editEvento.getHoraFim(),"HH:mm")}, 
+										Locale.getDefault()));
 					}
 				}
 			}
@@ -294,11 +285,18 @@ public class EventoMB extends BaseMB {
 				Date dataAtual = getDateNow();
 				int result = editEvento.getDataInicio().compareTo(dataAtual);
 				if(result < 0){
-					throw new PeriodoDataInvalidaException("A data informada '" + formatarData(editEvento.getDataInicio(),"dd/MM/yyyy") + "' não pode ser menor que a data atual '" 
-								+ formatarData(dataAtual,"dd/MM/yyyy"));
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("date.iniciomenoratual", 
+									new Object[] {formatarData(editEvento.getDataInicio(),"dd/MM/yyyy"), 
+											formatarData(dataAtual,"dd/MM/yyyy")}, 
+									Locale.getDefault()));
 				}
 				if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-					throw new DataInvalidaException("Data Início está depois da data final do evento");
+					throw new DataInvalidaException(
+							MessageBundleLoader.getMessage("date.iniciomaiorfim", 
+									new Object[] {formatarData(editEvento.getDataInicio(), "dd/MM/yyyy"), 
+											 formatarData(editEvento.getDataFim(), "dd/MM/yyyy")}, 
+									Locale.getDefault()));
 				}
 				if(editEvento.getDataInicio().equals(editEvento.getDataFim())){
 					this.editEvento.setMesmoDia(true);
@@ -325,7 +323,7 @@ public class EventoMB extends BaseMB {
 	
 	public void doRemove(Evento exclui){
 		eventoSB.delete(exclui);
-		showInfoMessage("Evento excluído com sucesso");
+		showInfoMessage(MessageBundleLoader.getMessage("even.delete_sucess"));
 		onEventos();
 	}
 	
@@ -413,8 +411,7 @@ public class EventoMB extends BaseMB {
 					this.editEvento.setEndereco(enderecoDoCEP.getEndereco());
 					this.cepvalidoinformado = true;
 				} else {
-					throw new CEPInvalidoException("CEP '" + editEvento.getCep() + "' não encontrado no Banco de Dados.\n"
-							+ "Informe seu endereço manualmente.");
+					throw new CEPInvalidoException(MessageBundleLoader.getMessage("critica.cepnotfound", new Object[] {editEvento.getCep()}));
 				}
 			} else {
 				limpaEndereco();
@@ -478,11 +475,13 @@ public class EventoMB extends BaseMB {
 								}
 							}
 							if(naoContem){
-								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+								throw new DDDInvalidoException(
+										MessageBundleLoader.getMessage("critica.dddnaopertencecidade", new Object[] {numero, editEvento.getCidade()}));
 							}
 						} else {
 							if(Integer.parseInt(numero.substring(1, 3)) != enderecoSB.findEnderecoByCEP(editEvento.getCep()).getDdd()){
-								throw new DDDInvalidoException("DDD do número '" + numero + "' não pertence a cidade selecionada: '" + editEvento.getCidade() +  "'.");
+								throw new DDDInvalidoException(
+										MessageBundleLoader.getMessage("critica.dddnaopertencecidade", new Object[] {numero, editEvento.getCidade()}));
 							}
 						}
 					}
@@ -496,7 +495,7 @@ public class EventoMB extends BaseMB {
 	public void validaPrimeiroDigCelular(String numero){
 		try {
 			if (Integer.parseInt(numero.substring(5, 6)) != 9) {
-				throw new DDDInvalidoException("Primeiro digito '" + numero.substring(5, 6) + "' do nï¿½mero '" + numero + "' ï¿½ invï¿½lido");
+				throw new DDDInvalidoException(MessageBundleLoader.getMessage("critica.digcelularinvalido", new Object[] {numero.substring(5, 6), numero}));
 			}
 		} catch (DDDInvalidoException e) {
 			showErrorMessage(e.getMessage());

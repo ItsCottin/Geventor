@@ -1,13 +1,14 @@
 package br.com.pluri.eventor.business;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
+import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.dao.EnderecoDAO;
 import br.com.pluri.eventor.model.Endereco;
@@ -27,7 +28,7 @@ public class EnderecoSB extends BaseSB {
 		if (validaCEP(cep)) {
 			return enderecoDAO.findEnderecoByCEP(cep);
 		} else  {
-			throw new CEPInvalidoException("O CEP informado '" + cep.replace("-", "").replace("_", "") + "' é inválido.");
+			throw new CEPInvalidoException(MessageBundleLoader.getMessage("critica.cpfinvalido", new Object[] {cep.replace("-", "").replace("_", "")}));
 		}
 	}
 	

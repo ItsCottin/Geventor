@@ -43,22 +43,16 @@
         <div class="navbar-collapse offcanvas-collapse">
             <ul class="navbar-nav mr-auto my-2">
                 <li class="nav-item">
-                	<h:link styleClass="nav-link" value="Realizar Login" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="loginV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/incio.xhtml" />
                 </li>
                 <li class="nav-item">
-                	<h:link styleClass="nav-link" value="Cadastre seu Usuario" rendered="#{userContextMB.noLogado eq false ? 'false' : 'true'}" outcome="registrarV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/evento.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/indexV2.xhtml" />
+                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/atividade.xhtml" />
                 </li>
                 <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/eventoV2.xhtml" />
-                </li>
-                <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/atividadesV2.xhtml" />
-                </li>
-                <li class="nav-item">
-                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inscritos.xhtml" />
+                    <h:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inscrito.xhtml" />
                 </li>
                 <li class="nav-item">
                     <h:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/conta.xhtml" />

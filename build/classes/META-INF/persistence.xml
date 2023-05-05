@@ -13,9 +13,9 @@
 			<property name="hibernate.format_sql" value="false"/>
 
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://mysqlserverrcf.mysql.database.azure.com/TCCRCF"/>
-			<property name="javax.persistence.jdbc.user" value="masterrcf"/>
-			<property name="javax.persistence.jdbc.password" value="i1BREUu558"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/sql10607033?characterEncoding=utf8"/>
+			<property name="javax.persistence.jdbc.user" value="root"/>
+			<property name="javax.persistence.jdbc.password" value="i1BREUu533"/>
 			
 		</properties>
 

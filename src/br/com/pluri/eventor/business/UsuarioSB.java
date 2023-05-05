@@ -1,8 +1,5 @@
 package br.com.pluri.eventor.business;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -11,21 +8,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
-import br.com.pluri.eventor.business.exception.CPFNotValidException;
+import br.com.etechoracio.common.view.MessageBundleLoader;
+import br.com.pluri.eventor.business.exception.CampoObrigatórioException;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
-import br.com.pluri.eventor.dao.EnderecoDAO;
 import br.com.pluri.eventor.dao.UsuarioDAO;
 import br.com.pluri.eventor.model.Atividade;
-import br.com.pluri.eventor.model.Endereco;
 import br.com.pluri.eventor.model.Usuario;
-import br.com.pluri.eventor.validator.ValidaCPF;
 
 @Service
 public class UsuarioSB extends BaseSB {
-	
-	private ValidaCPF validaCPF = new ValidaCPF();
 	
 	private UsuarioDAO usuarioDAO;
 	
@@ -37,20 +30,26 @@ public class UsuarioSB extends BaseSB {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void insert(Usuario usuario) throws LoginJaCadastradoException {
+	public void insert(Usuario usuario) throws LoginJaCadastradoException, SenhaInvalidaException, CampoObrigatórioException {
 		List<Usuario> result = usuarioDAO.findByLogin(usuario.getLogin());
 		if (CollectionUtils.isEmpty(result)) {
-			String senhaCriptografada = PasswordUtils.criptografarMD5(usuario.getSenha());
-			usuario.setSenha(senhaCriptografada);
+			if(usuario.getSenha() == null) {
+				throw new CampoObrigatórioException(MessageBundleLoader.getMessage("crítica.camposobrigatorios", new Object[] {"'Senha'"}));
+			}
+			if(usuario.getConfirmSenha() == null) {
+				throw new CampoObrigatórioException(MessageBundleLoader.getMessage("crítica.camposobrigatorios", new Object[] {"'Confirma Senha'"}));
+			}
+			if (PasswordUtils.criptografarMD5(usuario.getConfirmSenha()).equals(usuario.getSenha())){
+				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
+			}
+			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);
 		} else {
-			throw new LoginJaCadastradoException("Login j� cadastrado");
+			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginjacadastrado", new Object[] {usuario.getLogin()}));
 		}
 	}
-
-	// TODO buscar apenas usuarios que n�o est�o relacionados no evento e que
-	// n�o seja o usuario logado
+	
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public List<Usuario> findAll() {
 		return usuarioDAO.findAll();
@@ -66,14 +65,14 @@ public class UsuarioSB extends BaseSB {
 		if(usuario.atualizaSenha.equals("S")){
 			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
 			if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
-				throw new SenhaInvalidaException("Senha j� usada !");
+				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhausada"));
 			}
 			if (!validarSenhaOld(usuario)){
-				throw new SenhaInvalidaException("Senha incorreta !");
+				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
 			}
 		}
 		if (!usuario.loginVerificado) {
-			throw new LoginJaCadastradoException("Nome de Login '" + usuario.getLogin() + "' n�o foi verificado.");
+			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginnotverifiqued", new Object[] {usuario.getLogin()}));
 		} else {
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);

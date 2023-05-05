@@ -8,9 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import javafx.scene.chart.PieChart.Data;
 
 import javax.annotation.PostConstruct;
 
@@ -18,18 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.sun.javafx.geom.Edge;
-
 import lombok.Getter;
 import lombok.Setter;
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.EventoSB;
-import br.com.pluri.eventor.business.exception.DataInvalidaException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
-import br.com.pluri.eventor.utils.DataTimeUtils;
 
 @Getter
 @Setter
@@ -72,10 +68,10 @@ public class AtividadeMB extends BaseMB {
 		}
 		if(editAtividade.getId() == null){
 			atividadeSB.insert(editAtividade, idEvento);
-			showInfoMessage("Atividade inserida com sucesso");
+			showInfoMessage(MessageBundleLoader.getMessage("ativ.insert_sucess"));
 		}else{
 			atividadeSB.editAtiv(editAtividade, idEvento);
-			showInfoMessage("Atividade atualizada com sucesso");
+			showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess"));
 		}
 		onAllAtividade();
 		doPrepareSave();
@@ -113,11 +109,11 @@ public class AtividadeMB extends BaseMB {
 	public void getInfoDataEven(){
 		if(editAtividade.evento != null){
 			StringBuilder sb = new StringBuilder();
-			sb.append(formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy") + " dás ");
+			sb.append(formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy") + " " + MessageBundleLoader.getMessage("acento.das") + " ");
 			sb.append(formatarData(editAtividade.evento.getDataInicio(), "HH:mm"));
 			this.infoDataInicioEven = sb.toString();
 			sb = new StringBuilder();
-			sb.append(formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy") + " ás ");
+			sb.append(formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy") + " " + MessageBundleLoader.getMessage("acento.as") + " ");
 			sb.append(formatarData(editAtividade.evento.getDataFim(), "HH:mm"));
 			this.infoDataFimEven = sb.toString();
 		} else {
@@ -141,7 +137,7 @@ public class AtividadeMB extends BaseMB {
 			}
 		} else {
 			this.editAtividade.setUsaPeriodoEven(false);
-			showInfoMessage("Evento não informado!");
+			showInfoMessage(MessageBundleLoader.getMessage("ativ.info_no_even"));
 		}
 	}
 	
@@ -174,8 +170,10 @@ public class AtividadeMB extends BaseMB {
 				
 				int result = dataAtiv.compareTo(dataEven);
 				if(result < 0){
-					throw new PeriodoDataInvalidaException("A data informada '" + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + "' é menor que a data do Evento '" 
-														+ formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy"));
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("ativ.datemenordataeven", 
+									new Object[] {formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy"), 
+												  formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy")}));
 				}
 				this.dataValidada = true;
 				if (result == 0){
@@ -201,8 +199,11 @@ public class AtividadeMB extends BaseMB {
 				
 				int result = dataAtiv.compareTo(dataEven);
 				if(result > 0){
-					throw new PeriodoDataInvalidaException("A data informada '" + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + "' é maior que a data do Evento '" 
-														+ formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy"));
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("ativ.datemaiordataeven", 
+									new Object[] {formatarData(editAtividade.getDataFim(), "dd/MM/yyyy"), 
+											formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy")}, 
+									Locale.getDefault()));
 				}
 				this.dataValidada = true;
 				if (result == 0){
@@ -221,8 +222,11 @@ public class AtividadeMB extends BaseMB {
 			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null) {
 				int result = editAtividade.getDataInicio().compareTo(editAtividade.getDataFim());
 				if(result > 0){
-					throw new PeriodoDataInvalidaException("A data de inicio informada '" + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + "' não pode ser menor que a data de fim '" 
-														+ formatarData(editAtividade.getDataFim(), "dd/MM/yyyy"));
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("date.iniciomaiorfim", 
+									new Object[] {formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy"), 
+											 formatarData(editAtividade.getDataFim(), "dd/MM/yyyy")}, 
+									Locale.getDefault()));
 				}
 			}
 		} catch (PeriodoDataInvalidaException e){
@@ -249,8 +253,11 @@ public class AtividadeMB extends BaseMB {
 					int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
 					
 					if(horaInicAtiv > horaFimAtiv || horaInicAtiv == horaFimAtiv && minutoInicAtiv > minutoFimAtiv){
-						throw new PeriodoDataInvalidaException("O horário de início informado '" + formatarData(editAtividade.getHoraInicio(),"HH:mm") + "' é "
-								+ "maior que o horario de fim informado '" + formatarData(editAtividade.getHoraFim(),"HH:mm"));
+						throw new PeriodoDataInvalidaException(
+								MessageBundleLoader.getMessage("hora.iniciomaiorfim", 
+										new Object[] {formatarData(editAtividade.getHoraInicio(),"HH:mm"), 
+												formatarData(editAtividade.getHoraFim(),"HH:mm")}, 
+										Locale.getDefault()));
 					}
 				}
 			}
@@ -283,8 +290,11 @@ public class AtividadeMB extends BaseMB {
 					int minutoEven = calEven.get(Calendar.MINUTE);
 					
 					if(horaEven > horaAtiv || horaEven == horaAtiv && minutoEven > minutoAtiv){
-						throw new PeriodoDataInvalidaException("O horário de início informado '" + formatarData(editAtividade.getHoraInicio(),"HH:mm") + "' é "
-								+ "menor que o horario de início do Evento '" + formatarData(editAtividade.evento.getDataInicio(),"HH:mm"));
+						throw new PeriodoDataInvalidaException(
+								MessageBundleLoader.getMessage("hora.iniciomenorinicio.even", 
+										new Object[] {formatarData(editAtividade.getHoraInicio(),"HH:mm"), 
+												formatarData(editAtividade.evento.getDataInicio(),"HH:mm")}, 
+										Locale.getDefault()));
 					}
 				}
 				validaHoraIniAtivHoraFimAtiv();
@@ -315,8 +325,11 @@ public class AtividadeMB extends BaseMB {
 					int minutoEven = calEven.get(Calendar.MINUTE);
 					
 					if(horaEven < horaAtiv || horaEven == horaAtiv && minutoEven < minutoAtiv){
-						throw new PeriodoDataInvalidaException("O horário de fim informado '" + formatarData(editAtividade.getHoraFim(),"HH:mm") + "' é "
-								+ "maior que o horario de fim do Evento '" + formatarData(editAtividade.evento.getDataFim(),"HH:mm"));
+						throw new PeriodoDataInvalidaException(
+								MessageBundleLoader.getMessage("hora.fimmaiorfim.even", 
+										new Object[] {formatarData(editAtividade.getHoraFim(),"HH:mm"), 
+												formatarData(editAtividade.evento.getDataFim(),"HH:mm")}, 
+										Locale.getDefault()));
 					}
 				}
 				validaHoraIniAtivHoraFimAtiv();
@@ -446,7 +459,7 @@ public class AtividadeMB extends BaseMB {
 		onEventoChange();
 		this.vagasRestant = 0;
 		for (Atividade ativ : resultadoAtividadeByEvento){
-			if(editAtividade.getNome() != null) {
+			if(editAtividade.getId() != null) {
 				if (!editAtividade.getId().equals(ativ.getId())){
 					this.vagasRestant = vagasRestant + ativ.getVagas();
 				}
@@ -460,7 +473,7 @@ public class AtividadeMB extends BaseMB {
 	public void validaInputVaga(){
 		if(editAtividade.evento != null){
 			if(vagasRestant < editAtividade.getVagas()){
-				showErrorMessage("Quantidade de vagas informada maior que a quantidade de vagas disponível pra esse Evento selecionado");
+				showErrorMessage(MessageBundleLoader.getMessage("critica.vagamaiordisponivel"));
 				editAtividade.setVagas(0);
 				setQtdVagasRest();
 			} else {
@@ -496,16 +509,16 @@ public class AtividadeMB extends BaseMB {
               "                        <p class=\"font-weight-normal\">Detalhes da Atividade:  " + editAtividade.getDetalhes() + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-6 row\">\n" +
-              "                        <p class=\"font-weight-normal\">Começa: " + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + " às " +
+              "                        <p class=\"font-weight-normal\">Comeï¿½a: " + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + " ï¿½s " +
               																	   formatarData(editAtividade.getDataInicio(), "HH:mm") + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-6 row\">\n" +
-              "                        <p class=\"font-weight-normal\">Termina:  " + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + " às " + 
+              "                        <p class=\"font-weight-normal\">Termina:  " + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + " ï¿½s " + 
               																		 formatarData(editAtividade.getDataFim(), "HH:mm") + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-12\">\n" +
               "                        <div class=\"row\">\n" +
-              "                           <p class=\"font-weight-normal\">Preço:  " + editAtividade.getPreco() + "</p>\n" +
+              "                           <p class=\"font-weight-normal\">Preï¿½o:  " + editAtividade.getPreco() + "</p>\n" +
               "                        </div>\n" +
               "                        <div class=\"row\">\n" +
               "                        	 <p class=\"font-weight-normal\">Vagas:  " + editAtividade.getVagas() + "</p>\n" +
