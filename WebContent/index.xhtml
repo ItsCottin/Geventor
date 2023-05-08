@@ -10,6 +10,15 @@
 	
 	<!-- ui define, onde ficara todo conteudo à ser adicionado na master page (dentro do body definido na master page) -->
 	<ui:define name="contentV3">
+		<script type="text/javascript">
+			function selAbaLogin(){
+				$('.nav-tabs a[href="#login"]').tab('show');
+			}
+			function selAbaCadastro(){
+				$('.nav-tabs a[href="#cadastro"]').tab('show');
+			}
+					
+		</script>
 		
 		<div class="row col-md-12 col-xs-12 align-items-center mb-4">
 	      	<div class="col-sm-2 col-xs-1 col-sm-2-no-100-width">
@@ -53,7 +62,8 @@
 						</div>
 						<div class="row ml-1">
 							<div class="form-group">
-								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Entrar" actionListener="#{userContextMB.doLogin}" update=":msgs">
+								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Entrar" 
+									actionListener="#{userContextMB.doLogin}" update=":msgs">
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 								</p:commandButton>
 							</div>
@@ -94,8 +104,11 @@
 									<p:ajax event="blur" listener="#{usuarioMB.verificaAlterLogin(usuarioMB.editUsuario.login)}" update="username, btnVerifica"/>
 								</h:inputText>
 								<div class="input-group-append">
-	                            	<p:commandButton value="#{usuarioMB.editUsuario.loginVerificado eq 'false' ? 'Verificar' : 'Verificado'}" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf text-truncate" 
-	                            		actionListener="#{usuarioMB.verificaLoginExiste()}" disabled="#{usuarioMB.editUsuario.loginVerificado}" update="btnVerifica, username" id="btnVerifica">
+	                            	<p:commandButton value="#{usuarioMB.editUsuario.loginVerificado eq 'false' ? 'Verificar' : 'Verificado'}" 
+	                            		styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf text-truncate" 
+	                            		actionListener="#{usuarioMB.verificaLoginExiste()}" disabled="#{usuarioMB.editUsuario.loginVerificado}" update="btnVerifica, username" 
+	                            		id="btnVerifica">
+	                            		<p:ajax onerror="verificarErro(xhr, status, errorThrown)" />
 	                            		<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 	                            	</p:commandButton>
                             	</div>
@@ -119,7 +132,8 @@
 						</div>
 						<div class="row ml-1">
 							<div class="form-group">
-								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" actionListener="#{usuarioMB.doSave}" update=":msgs">
+								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" 
+									actionListener="#{usuarioMB.doSave}" update=":msgs" >
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 								</p:commandButton>
 							</div>

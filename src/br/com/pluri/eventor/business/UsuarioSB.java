@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
 import br.com.etechoracio.common.view.MessageBundleLoader;
-import br.com.pluri.eventor.business.exception.CampoObrigatórioException;
+import br.com.pluri.eventor.business.exception.CampoObrigatorioException;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
@@ -30,23 +30,30 @@ public class UsuarioSB extends BaseSB {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void insert(Usuario usuario) throws LoginJaCadastradoException, SenhaInvalidaException, CampoObrigatórioException {
+	public void insert(Usuario usuario) throws LoginJaCadastradoException, SenhaInvalidaException, CampoObrigatorioException {
 		List<Usuario> result = usuarioDAO.findByLogin(usuario.getLogin());
+		usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
 		if (CollectionUtils.isEmpty(result)) {
-			if(usuario.getSenha() == null) {
-				throw new CampoObrigatórioException(MessageBundleLoader.getMessage("crítica.camposobrigatorios", new Object[] {"'Senha'"}));
+			if(usuario.getSenha().equals("")) {
+				throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {"'Senha'"}));
 			}
-			if(usuario.getConfirmSenha() == null) {
-				throw new CampoObrigatórioException(MessageBundleLoader.getMessage("crítica.camposobrigatorios", new Object[] {"'Confirma Senha'"}));
+			if(usuario.getConfirmSenha().equals("")) {
+				throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {"'Confirma Senha'"}));
 			}
-			if (PasswordUtils.criptografarMD5(usuario.getConfirmSenha()).equals(usuario.getSenha())){
-				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
-			}
-			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
+			validaUsuario(usuario);
 			usuario.setDataAlter(getDateAlter());
 			usuarioDAO.save(usuario);
 		} else {
 			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginjacadastrado", new Object[] {usuario.getLogin()}));
+		}
+	}
+	
+	public void validaUsuario(Usuario usuario) throws LoginJaCadastradoException, SenhaInvalidaException {
+		if (!usuario.loginVerificado) {
+			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginnotverifiqued", new Object[] {usuario.getLogin()}));
+		}
+		if (!PasswordUtils.criptografarMD5(usuario.getConfirmSenha()).equals(usuario.getSenha())){
+			throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
 		}
 	}
 	
@@ -64,19 +71,13 @@ public class UsuarioSB extends BaseSB {
 		}
 		if(usuario.atualizaSenha.equals("S")){
 			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
-			if (PasswordUtils.criptografarMD5(usuario.getOldsenha()).equals(usuario.getSenha())) {
-				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhausada"));
-			}
 			if (!validarSenhaOld(usuario)){
 				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
 			}
 		}
-		if (!usuario.loginVerificado) {
-			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginnotverifiqued", new Object[] {usuario.getLogin()}));
-		} else {
-			usuario.setDataAlter(getDateAlter());
-			usuarioDAO.save(usuario);
-		}
+		validaUsuario(usuario);
+		usuario.setDataAlter(getDateAlter());
+		usuarioDAO.save(usuario);
 	}
 
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)

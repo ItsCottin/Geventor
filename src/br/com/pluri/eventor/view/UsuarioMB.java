@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 
+import org.primefaces.context.PrimeFacesContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -24,7 +28,7 @@ import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.CPFNotValidException;
-import br.com.pluri.eventor.business.exception.CampoObrigatórioException;
+import br.com.pluri.eventor.business.exception.CampoObrigatorioException;
 import br.com.pluri.eventor.business.exception.DDDInvalidoException;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
@@ -86,8 +90,8 @@ public class UsuarioMB extends BaseMB  {
 		try {
 			if(getCurrentUser() == null) {
 			String campos = validaCampoObrigatorioParaInsert();
-				if(!campos.isEmpty()) {
-					throw new CampoObrigatórioException(MessageBundleLoader.getMessage("crítica.camposobrigatorios", new Object[] {campos}));
+				if(!campos.equals("")) {
+					throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {campos}));
 				}
 			}
 			usuarioSB.insert(editUsuario);
@@ -95,8 +99,7 @@ public class UsuarioMB extends BaseMB  {
 			navigate("PAGE_LOGIN");
 		} catch (LoginJaCadastradoException e2){
 			showErrorMessage(e2.getMessage());
-			validationFailed();
-		} catch (CampoObrigatórioException e) {
+		} catch (CampoObrigatorioException e) {
 			showErrorMessage(e.getMessage());
 		} catch (SenhaInvalidaException e) {
 			showErrorMessage(e.getMessage());
@@ -107,16 +110,21 @@ public class UsuarioMB extends BaseMB  {
 	
 	public String validaCampoObrigatorioParaInsert() {
 		StringBuilder campos = new StringBuilder();
-		if(editUsuario.getNome() == null) {
-			campos.append("'Nome', ");
+		if(editUsuario.getNome().equals("")) {
+			campos.append("'Nome Completo', ");
 		}
-		if(editUsuario.getEmail() == null) {
+		if(editUsuario.getEmail().equals("")) {
 			campos.append("'E-mail', ");
 		}
-		if(editUsuario.getLogin() == null) {
+		if(editUsuario.getLogin().equals("")) {
 			campos.append("'Login', ");
 		}
-		return campos.toString();
+		String camposString = campos.toString();
+		if (camposString.equals("")){
+			return camposString;
+		} else {
+			return camposString.substring(0, camposString.length() - 2);
+		}
 	}
 	
 	public void findAll(){
