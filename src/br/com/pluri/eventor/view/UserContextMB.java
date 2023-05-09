@@ -14,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.security.business.model.UsuarioAutenticado;
 
 @Getter
@@ -42,6 +43,11 @@ public class UserContextMB extends BaseMB {
 		password = null;
 		logado = true;
 		noLogado = false;
+	}
+	
+	public void setInfoLogin(Usuario usu) {
+		this.user = usu.getLogin();
+		this.password = usu.getSenha();
 	}
 	
 	

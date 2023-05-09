@@ -32,7 +32,7 @@
           			
          }
          function openConfirmedDel() {
-                $('#confirmDel').modal('show');
+                $('#newConfirmDel').modal('show');
             }
          
          function openModalConsAtividade() {
@@ -40,7 +40,7 @@
             }
          
          function closeConfirmedDel() {
-                $('#confirmDel').modal('hide');
+                $('#newConfirmDel').modal('hide');
                 window.location.reload();
             }
           
@@ -68,7 +68,9 @@
                   <h1 class="">Eventos</h1>
                   <p:separator style="width:99%;" />
                   <h:form id="formtbl">
-                     <table class="table table-hover" id="tblEven">
+                  
+                  	<!-- Visivel apenas em tela maior que 576px -->
+                     <table class="table table-hover ui-hidden-element-menor576" id="tblEven">
                         <thead>
                            <tr>
                               <th scope="col">Título</th>
@@ -132,7 +134,82 @@
                            </tr>
                         </c:forEach>
                      </table>
+                     
+                     <!-- Visivel apenas em tela menor que 575px -->
+                     <div class="accordion" id="accordionExample">
+                     
+                     <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+					  <div class="card">
+					    <div class="card-header" id="heading_#{even.id}">
+					      <h2 class="mb-0">
+					        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse_#{even.id}" aria-expanded="true" aria-controls="collapse_#{even.id}">
+					          #{even.titulo}
+					        </button>
+					      </h2>
+					    </div>
+					
+					    <div id="collapse_#{even.id}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+					      <div class="card-body">
+					      	<strong>Local: </strong>#{even.cidade}<br />
+					        <strong>Descricao: </strong>#{even.descricao}<br />
+							<strong>Inicio: </strong>#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}<br />
+							<strong>Valor: </strong>#{even.vlr}<br />
+					      </div>
+					      <div class="card-footer text-muted">
+					      	<p:commandButton immediate="true" id="btnCon_#{even.id}"
+                                icon="ui-icon-search" title="Consultar"
+                                actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
+                                process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+                             </p:commandButton>
+                             <p:commandButton immediate="true" id="btnEdit_#{even.id}"
+                                icon="ui-icon-wrench" title="Editar"
+                                actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
+                                process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+                             </p:commandButton>
+                             <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{even.id}"
+                                title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.confirmDel(even)}"
+                                update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
+					      </div>
+					    </div>
+					  </div>
+					  </c:forEach>
+					  
+					</div>
+                     
+                     
                   </h:form>
+                  
+                  <h:form id="formNewModalExc">
+                  	<h:outputText value="#{eventoMB.modalConfirmExcl}" escape="false" />
+                  				<!-- <div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                       <div class="modal-content">
+                                      	 <h:form id="formModalDel">
+	                                          <div class="modal-header">
+	                                             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+	                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                                             <span aria-hidden="true"></span>
+	                                             </button>
+	                                          </div>
+	                                          <div class="modal-body">
+	                                             
+	                                                <h:outputLabel value="Deseja realmente excluir o evento '#{eventoMB.evenSel.titulo}' ?" />
+	                                             
+	                                          </div>
+	                                          <div class="modal-footer">
+	                                             <button type="button" class="btn" data-dismiss="modal">Não</button>
+	                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+	                                                oncomplete="closeConfirmedDel()" 
+	                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+	                                          </div>
+                                          </h:form>
+                                       </div>
+                                    </div>
+                                 </div> -->
+                  	
+                  	
+                  </h:form>
+                  
                </div>
                <div id="adicionareditar" class="tab-pane">
                   <div class="col-md-12">

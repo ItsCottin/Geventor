@@ -509,16 +509,16 @@ public class AtividadeMB extends BaseMB {
               "                        <p class=\"font-weight-normal\">Detalhes da Atividade:  " + editAtividade.getDetalhes() + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-6 row\">\n" +
-              "                        <p class=\"font-weight-normal\">Come�a: " + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + " �s " +
+              "                        <p class=\"font-weight-normal\">Comeca: " + formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy") + "as" +
               																	   formatarData(editAtividade.getDataInicio(), "HH:mm") + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-6 row\">\n" +
-              "                        <p class=\"font-weight-normal\">Termina:  " + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + " �s " + 
+              "                        <p class=\"font-weight-normal\">Termina:  " + formatarData(editAtividade.getDataFim(), "dd/MM/yyyy") + "as" + 
               																		 formatarData(editAtividade.getDataFim(), "HH:mm") + "</p>\n" +
               "                     </div>\n" +
               "                     <div class=\"col-sm-12\">\n" +
               "                        <div class=\"row\">\n" +
-              "                           <p class=\"font-weight-normal\">Pre�o:  " + editAtividade.getPreco() + "</p>\n" +
+              "                           <p class=\"font-weight-normal\">Preco:  " + editAtividade.getPreco() + "</p>\n" +
               "                        </div>\n" +
               "                        <div class=\"row\">\n" +
               "                        	 <p class=\"font-weight-normal\">Vagas:  " + editAtividade.getVagas() + "</p>\n" +

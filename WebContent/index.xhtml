@@ -10,16 +10,18 @@
 	
 	<!-- ui define, onde ficara todo conteudo à ser adicionado na master page (dentro do body definido na master page) -->
 	<ui:define name="contentV3">
-		<script type="text/javascript">
-			function selAbaLogin(){
-				$('.nav-tabs a[href="#login"]').tab('show');
-			}
-			function selAbaCadastro(){
-				$('.nav-tabs a[href="#cadastro"]').tab('show');
-			}
-					
-		</script>
 		
+		<script type="text/javascript">
+			function selAbaLogin(decisao){
+				if(decisao == 'sim'){
+					$('.nav-tabs a[href="#login"]').tab('show');
+				}
+			}
+			
+			function openModalPosCadUsu() {
+	            $('#modalPosCadUsu').modal('show');
+	        } 
+		</script>
 		<div class="row col-md-12 col-xs-12 align-items-center mb-4">
 	      	<div class="col-sm-2 col-xs-1 col-sm-2-no-100-width">
 	      		<img src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" />
@@ -49,7 +51,7 @@
 	      						<label for="Usuario" class="col-form-label">Login:</label>
 	      					</div>
 							<div class="col-sm-8 col-md-8 col-lg-8 col-xl-9 col-small-9-rcf form-group">
-								<h:inputText class="form-control form-control-lg" id="Usuario" value="#{userContextMB.user}" label="Nome" required="true"/>
+								<h:inputText class="form-control form-control-lg" id="usuario" value="#{userContextMB.user}" label="Nome" required="true"/>
 							</div>
 						</div>
 						<div class="row ml-1">
@@ -57,7 +59,7 @@
 								<label for="Senha" class="col-form-label">Senha:</label>
 							</div>
 							<div class="col-sm-8 col-md-8 col-lg-8 col-xl-9 col-small-9-rcf form-group">
-								<h:inputSecret class="form-control form-control-lg" id="Senha" value="#{userContextMB.password}" label="Senha" required="true"/>
+								<h:inputSecret class="form-control form-control-lg" id="senha" value="#{userContextMB.password}" label="Senha" required="true"/>
 							</div>	
 						</div>
 						<div class="row ml-1">
@@ -108,7 +110,6 @@
 	                            		styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf text-truncate" 
 	                            		actionListener="#{usuarioMB.verificaLoginExiste()}" disabled="#{usuarioMB.editUsuario.loginVerificado}" update="btnVerifica, username" 
 	                            		id="btnVerifica">
-	                            		<p:ajax onerror="verificarErro(xhr, status, errorThrown)" />
 	                            		<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 	                            	</p:commandButton>
                             	</div>
@@ -132,13 +133,45 @@
 						</div>
 						<div class="row ml-1">
 							<div class="form-group">
-								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" 
-									actionListener="#{usuarioMB.doSave}" update=":msgs" >
+								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" id="btnCadUsu"
+									actionListener="#{usuarioMB.doSave}" update=":msgs, formModalPosCadUsu" oncomplete="openModalPosCadUsu();">
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 								</p:commandButton>
 							</div>
 						</div>
 						</h:form>
+						<h:form id="formModalPosCadUsu">
+		                  	<h:outputText value="#{usuarioMB.modalPosCadUsu}" escape="false" />
+		                  	
+		                  	<!-- modal -->
+		                 <!-- <div class="modal fade" id="modalPosCadUsu" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog" role="document">
+						      <div class="modal-content">
+						         <div class="modal-header">
+						            <h5 class="modal-title" id="exampleModalLabel">
+						               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						               </button>
+						               Sucesso
+						            </h5>
+						         </div>
+						         <div class="modal-body">
+						            <div class="col-md-12 col-lg-12">
+						               <div class="row mb-3 border-rcf">
+						                  <label>Usuário cadastrado com sucesso, deseja realizar Login?</label>
+						               </div>
+						            </div>
+						         </div>
+						         <div class="modal-footer">
+						        	<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="selAbaLogin('sim');">Sim</button>
+						         	<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="selAbaLogin('nao');">Não</button>
+						         </div>
+						      </div>
+						   </div>
+						</div>-->
+		                  	
+		                  	
+		                  </h:form>
 					</div>
 				</div>
 			</div>

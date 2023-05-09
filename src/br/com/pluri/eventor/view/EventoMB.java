@@ -109,6 +109,7 @@ public class EventoMB extends BaseMB {
 	private String maskTelefone;
 	public boolean dataValidada;
 	public boolean cepvalidoinformado;
+	//public String modalConfirmExcl;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -502,4 +503,36 @@ public class EventoMB extends BaseMB {
 			editEvento.setTelefone("");
 		}
 	}
+	
+	public void confirmDel(Evento even) {
+		//this.modalConfirmExcl = setModalConfirmDel(even);
+	}
+	
+	//public String setModalConfirmDel(Evento even) {
+	//	return "<div class=\"modal fade\" id=\"newConfirmDel\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"confirmDel\" aria-hidden=\"true\">\r\n"
+	//			+ "                                    <div class=\"modal-dialog\" role=\"document\">\r\n"
+	//			+ "                                       <div class=\"modal-content\">\r\n"
+	//			+ "                                      	 <h:form id=\"formModalDel\">\r\n"
+	//			+ "	                                          <div class=\"modal-header\">\r\n"
+	//			+ "	                                             <h5 class=\"modal-title\" id=\"exampleModalLabel\">Confirmação</h5>\r\n"
+	//			+ "	                                             <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n"
+	//			+ "	                                             <span aria-hidden=\"true\"></span>\r\n"
+	//			+ "	                                             </button>\r\n"
+	//			+ "	                                          </div>\r\n"
+	//			+ "	                                          <div class=\"modal-body\">\r\n"
+	//			+ "	                                             \r\n"
+	//			+ "	                                                <h:outputLabel value=\"Deseja realmente excluir o evento '" + even.getTitulo() + "' ?\" />\r\n"
+	//			+ "	                                             \r\n"
+	//			+ "	                                          </div>\r\n"
+	//			+ "	                                          <div class=\"modal-footer\">\r\n"
+	//			+ "	                                             <button type=\"button\" class=\"btn\" data-dismiss=\"modal\">Não</button>\r\n"
+	//			+ "	                                             <p:commandButton styleClass=\"btn btn-danger ui-widget-button-danger-rcf\" value=\"Sim\" \r\n"
+	//			+ "	                                                oncomplete=\"closeConfirmedDel()\" \r\n"
+	//			+ "	                                                actionListener=\"#{eventoMB.doRemove(eventoMB.evenSel)}\" update=\":msgs :formtbl\" />\r\n"
+	//			+ "	                                          </div>\r\n"
+	//			+ "                                          </h:form>\r\n"
+	//			+ "                                       </div>\r\n"
+	//			+ "                                    </div>\r\n"
+	//			+ "                                 </div>";
+	//}
 }

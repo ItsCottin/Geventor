@@ -76,6 +76,7 @@ public class UsuarioMB extends BaseMB  {
 	private Usuario editUsuario = new Usuario();
 	private Usuario usuarioLogado = new Usuario();
 	private boolean modoConsulta;
+	public String modalPosCadUsu;
 	
 	// TODO Implementar funcionalidade que após alteração de 'Nome de Login' não permitir mais realizar alteração de usuario ate um proximo login
 	private boolean edicaoIndisponivel;  
@@ -88,6 +89,7 @@ public class UsuarioMB extends BaseMB  {
 	
 	public void doSave(){
 		try {
+			this.modalPosCadUsu = "";
 			if(getCurrentUser() == null) {
 			String campos = validaCampoObrigatorioParaInsert();
 				if(!campos.equals("")) {
@@ -95,8 +97,7 @@ public class UsuarioMB extends BaseMB  {
 				}
 			}
 			usuarioSB.insert(editUsuario);
-			showInfoMessage(MessageBundleLoader.getMessage("usu.insert_sucess"));
-			navigate("PAGE_LOGIN");
+			this.modalPosCadUsu = setHtmlModalPosCadUsu();
 		} catch (LoginJaCadastradoException e2){
 			showErrorMessage(e2.getMessage());
 		} catch (CampoObrigatorioException e) {
@@ -133,8 +134,8 @@ public class UsuarioMB extends BaseMB  {
 	
 	@PostConstruct
 	public void infoUserLogado(){
-		this.estados = estadoSB.findAll();
 		if (getCurrentUserId()!=null){
+			this.estados = estadoSB.findAll();
 			this.editUsuario = usuarioSB.findById(getCurrentUserId());
 			this.usuarioLogado = usuarioSB.findById(getCurrentUserId());
 			editUsuario.setLoginVerificado(true);
@@ -380,6 +381,33 @@ public class UsuarioMB extends BaseMB  {
         return formatarData(data, formato);
     }
 	
+	private String setHtmlModalPosCadUsu() {
+		return "<div class=\"modal fade\" id=\"modalPosCadUsu\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"confirmDel\" aria-hidden=\"true\">\r\n"
+				+ "						   <div class=\"modal-dialog\" role=\"document\">\r\n"
+				+ "						      <div class=\"modal-content\">\r\n"
+				+ "						         <div class=\"modal-header\">\r\n"
+				+ "						            <h5 class=\"modal-title\" id=\"exampleModalLabel\">\r\n"
+				+ "						               <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n"
+				+ "						               <span aria-hidden=\"true\"></span>\r\n"
+				+ "						               </button>\r\n"
+				+ "						               Sucesso\r\n"
+				+ "						            </h5>\r\n"
+				+ "						         </div>\r\n"
+				+ "						         <div class=\"modal-body\">\r\n"
+				+ "						            <div class=\"col-md-12 col-lg-12\">\r\n"
+				+ "						               <div class=\"row mb-3 border-rcf\">\r\n"
+				+ "						                  <label>Usuário '" + editUsuario.getLogin() + "' cadastrado com sucesso, deseja realizar Login?</label>\r\n"
+				+ "						               </div>\r\n"
+				+ "						            </div>\r\n"
+				+ "						         </div>\r\n"
+				+ "						         <div class=\"modal-footer\">\r\n"
+				+ "						        	<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\" onclick=\"selAbaLogin('sim');\">Sim</button>\r\n"
+				+ "						         	<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\" onclick=\"selAbaLogin('nao');\">Não</button>\r\n"
+				+ "						         </div>\r\n"
+				+ "						      </div>\r\n"
+				+ "						   </div>\r\n"
+				+ "						</div>";
+	}
 	
 	
 }
