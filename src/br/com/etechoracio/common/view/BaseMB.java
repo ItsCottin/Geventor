@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -24,6 +25,7 @@ import org.primefaces.context.RequestContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import br.com.etechoracio.common.model.BaseORM;
+import br.com.pluri.eventor.model.DiferencaData;
 import br.com.pluri.eventor.security.business.model.UsuarioAutenticado;
 import br.com.pluri.eventor.utils.DataTimeUtils;
 /**
@@ -432,5 +434,24 @@ public abstract class BaseMB {
 		} else {
 			return false;
 		}
+	}
+	
+	public DiferencaData calcDifDate(Date dataInicio, Date dataFim) {
+		
+		LocalDateTime inicio = LocalDateTime.ofInstant(dataInicio.toInstant(), ZoneId.of("UTC"));
+	    LocalDateTime fim = LocalDateTime.ofInstant(dataFim.toInstant(), ZoneId.of("UTC"));
+		
+	    Duration duracao = Duration.between(inicio, fim);
+	    long diferenca = Math.abs(duracao.toMinutes());
+
+	    if (diferenca >= 1440) { // Mais de um dia
+	        diferenca = diferenca / 1440;
+	        return new DiferencaData(diferenca, "dias");
+	    } else if (diferenca >= 60) { // Mais de uma hora
+	        diferenca = diferenca / 60;
+	        return new DiferencaData(diferenca, "horas");
+	    } else { // Menos de uma hora
+	        return new DiferencaData(diferenca, "minutos");
+	    }
 	}
 }

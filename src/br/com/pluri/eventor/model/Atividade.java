@@ -67,7 +67,19 @@ public class Atividade extends BaseORM {
 	private Date horaFim;
 	
 	@Transient
+	private boolean doEditAtiv;
+	
+	@Transient
+	private boolean foraPeriodoInicio;
+	
+	@Transient
+	private boolean foraPeriodoFim;
+	
+	@Transient
 	private boolean estaInscrito;
+	
+	@Transient
+	private int qtdInscrito;
 	
 	@Transient
 	private boolean isgratuito;

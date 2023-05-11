@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -54,7 +55,6 @@ public class AtividadeMB extends BaseMB {
 	
 	@PostConstruct
 	public void PostConstruct(){
-		onEventoChange();
 		onEventos();
 		this.modoConsulta = false;
 		onAllAtividade();
@@ -75,10 +75,6 @@ public class AtividadeMB extends BaseMB {
 		}
 		onAllAtividade();
 		doPrepareSave();
-	}
-	
-	public void onEventoChange(){
-		resultadoAtividadeByEvento = atividadeSB.findByEventos(idEvento);
 	}
 	
 	// Metodo criado para alterar a atividade entre eventos.
@@ -352,10 +348,6 @@ public class AtividadeMB extends BaseMB {
 		}
 	}
 	
-	public void listAtividadeByEvento(Long idEvento){
-		resultadoAtividadeByEvento = atividadeSB.findByEventos(idEvento);
-	}
-	
 	public void onAllAtividade() {
 		resultadoAtividadeByEvento = atividadeSB.findAllAtividadeByUsuario(getCurrentUserId());
 	}
@@ -408,9 +400,23 @@ public class AtividadeMB extends BaseMB {
 		this.editAtividade.evento.setVlr("Gratuito");
 	}
 	
+	public void doPrepareDel(Atividade ativ){
+		try {
+			ativ.setExisteInscrito(false);
+			if(atividadeSB.qtdInscritoInAtividade(ativ.getId()) > 0){
+				ativ.setExisteInscrito(true);
+			}
+			this.ativSel = new Atividade();
+			this.ativSel = ativ;
+		} catch (SQLException e) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
+		}
+	}
+	
 	public void doEdit(Atividade edit) throws SQLException{
 		doPrepareSave();
 		prepareEditOuConsulta(edit);
+		this.editAtividade.setDoEditAtiv(true);
 		if(edit.evento != null){
 			if (isVigente(edit.evento.getDataInicio())){
 				this.modoConsulta = false;
@@ -435,6 +441,7 @@ public class AtividadeMB extends BaseMB {
 	public void doConsulta(Atividade edit) throws SQLException {
 		doPrepareSave();
 		prepareEditOuConsulta(edit);
+		this.editAtividade.setDoEditAtiv(false);
 		this.modoConsulta = true;
 	}
 	
@@ -443,7 +450,8 @@ public class AtividadeMB extends BaseMB {
 		this.idEvento = editAtividade.evento.getId();
 		this.editAtividade.setEventonaovigente(false);
 		this.editAtividade.setExisteInscrito(false);
-		if(atividadeSB.qtdInscritoInAtividade(editAtividade.getId()) > 0){
+		this.editAtividade.setQtdInscrito(atividadeSB.qtdInscritoInAtividade(editAtividade.getId()));
+		if(editAtividade.getQtdInscrito() > 0){
 			this.modoConsulta = true;
 			editAtividade.setExisteInscrito(true);
 		}
@@ -456,9 +464,8 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void setQtdVagasRest(){
-		onEventoChange();
 		this.vagasRestant = 0;
-		for (Atividade ativ : resultadoAtividadeByEvento){
+		for (Atividade ativ : atividadeSB.findByEventos(idEvento)){
 			if(editAtividade.getId() != null) {
 				if (!editAtividade.getId().equals(ativ.getId())){
 					this.vagasRestant = vagasRestant + ativ.getVagas();

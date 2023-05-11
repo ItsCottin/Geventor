@@ -78,6 +78,7 @@ public class Evento extends BaseORM {
 	private String numeroLugar;
 	
 	@Column(name="DT_ALTER_EVEN")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataAlter;
 	
 	@Column(name="SITE_PROPRIO")
@@ -92,11 +93,18 @@ public class Evento extends BaseORM {
 	@Transient
 	private String telefonecelular;
 	
-	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
-	@ManyToOne
-	private Usuario usuario;
+	@Transient
+	private long qtdDifTemp;
 	
-	//Atributos transientes
+	@Transient
+	private long qtdInscrito;
+	
+	@Transient
+	private boolean doEditEven;
+	
+	@Transient
+    private String tpDifTemp;
+	
 	@Transient
 	private Date horaInicio;
 	
@@ -109,11 +117,13 @@ public class Evento extends BaseORM {
 	@Transient
 	private boolean mesmoDia;
 	
+	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
+	@ManyToOne
+	private Usuario usuario;
 	
 	@OneToMany(mappedBy="evento")
 	private List<Atividade> atividades;
 
-	
 	public Evento(){}
 	
 	public Evento(Long id){

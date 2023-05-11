@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
+import br.com.pluri.eventor.business.exception.ExisteAtividadeVinculadaException;
 import br.com.pluri.eventor.dao.EventoDAO;
 import br.com.pluri.eventor.dao.EventoDAOImpl;
+import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
 import br.com.pluri.eventor.model.Usuario;
 
@@ -78,6 +80,11 @@ public class EventoSB extends BaseSB {
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<Evento> findAllEventoMenosMeus(Long idUsu){
 		return eventoDAO.findAllEventoMenosMeus(idUsu);
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public List<Evento> findAllEventoMenosMeusRecen(Long idUsu){
+		return eventoDAO.findAllEventoMenosMeusRecen(idUsu);
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)

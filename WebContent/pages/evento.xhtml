@@ -5,6 +5,8 @@
    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
    xmlns:p="http://primefaces.org/ui"
    xmlns:c="http://java.sun.com/jsp/jstl/core"
+   xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+   xmlns:t="http://myfaces.apache.org/tomahawk"
    template="/WEB-INF/template/layoutV3.xhtml">
    <ui:define name="contentV3">
       <script type="text/javascript">
@@ -34,6 +36,14 @@
          function openConfirmedDel() {
                 $('#newConfirmDel').modal('show');
             }
+         
+         function openConfirmEditAtiv() {
+             $('#modalEditAtiv').modal('show');
+         }
+         
+         function closeConfirmEditAtiv() {
+             $('#modalEditAtiv').modal('hide');
+         }
          
          function openModalConsAtividade() {
                 $('#modalConsAtividade').modal('show');
@@ -65,123 +75,56 @@
             </ul>
             <div class="tab-content py-4">
                <div id="visualizar" class="tab-pane active">
-                  <h1 class="">Eventos</h1>
-                  <p:separator style="width:99%;" />
+               	  <div class="form-group">
+                  	<h1 class="">Eventos</h1>
+                  </div>
                   <h:form id="formtbl">
                   
-                  	<!-- Visivel apenas em tela maior que 576px -->
-                     <table class="table table-hover ui-hidden-element-menor576" id="tblEven">
-                        <thead>
-                           <tr>
-                              <th scope="col">Título</th>
-                              <th class="d-none d-lg-block" scope="col">Data</th>
-                              <th scope="col">Cidade</th>
-                              <th class="d-none d-sm-block" scope="col">Estado</th>
-                              <th scope="col">Vaga</th>
-                              <th class="d-none d-md-block" scope="col">Preço</th>
-                              <th scope="col">Configurar</th>
-                           </tr>
-                        </thead>
-                        <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
-                           <tr>
-                              <th scope="col" class="p-3 mb-2 bg-light text-dark">#{even.titulo}</th>
-                              <th class="d-none d-lg-block font-weight-normal" scope="col">
-                              	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
-                              </th>
-                              <th scope="col" class="font-weight-normal">#{even.cidade}</th>
-                              <th class="d-none d-sm-block font-weight-normal" scope="col">#{even.estado}</th>
-                              <th scope="col" class="font-weight-normal">#{even.vagas}</th>
-                              <th class="d-none d-md-block font-weight-normal" scope="col">#{even.vlr}</th>
-                              <th scope="col" class="font-weight-normal">
-                                 <p:commandButton immediate="true" id="consultar_#{even.id}"
+                  	<table class="table-hover">
+					  <thead>
+					    <tr>
+					      <th scope="col">Título</th>
+					      <th scope="col">Data</th>
+					      <th scope="col">Preço</th>
+					      <th scope="col">Configurar</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+						    <tr>
+						      <td data-label="Titulo" class="text-truncate">#{even.titulo}</td>
+						      <td data-label="Data">
+						      	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
+						      </td>
+						      <td data-label="Preço">#{even.vlr}</td>
+						      <td data-label="Configurar">
+						      	<p:commandButton immediate="true" id="btnConNew_#{even.id}"
                                     icon="ui-icon-search" title="Consultar"
                                     actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
                                     process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
                                  </p:commandButton>
-                                 <p:commandButton immediate="true" id="editar_#{even.id}"
+                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
                                     icon="ui-icon-wrench" title="Editar"
                                     actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
                                     process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
                                  </p:commandButton>
-                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{even.id}"
-                                    title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.setEvenSel(even)}"
-                                    update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
-                                 <!-- Modal -->
-                                 <div class="modal fade" id="confirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                       <div class="modal-content">
-                                          <div class="modal-header">
-                                             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
-                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                             <span aria-hidden="true"></span>
-                                             </button>
-                                          </div>
-                                          <div class="modal-body">
-                                             <h:form id="formmodal">
-                                                <h:outputLabel value="Deseja realmente excluir esse evento ?" />
-                                             </h:form>
-                                          </div>
-                                          <div class="modal-footer">
-                                             <button type="button" class="btn" data-dismiss="modal">Não</button>
-                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-                                                oncomplete="closeConfirmedDel()" 
-                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
-                                          </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </th>
-                           </tr>
-                        </c:forEach>
-                     </table>
-                     
-                     <!-- Visivel apenas em tela menor que 575px -->
-                     <div class="accordion" id="accordionExample">
-                     
-                     <c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
-					  <div class="card">
-					    <div class="card-header" id="heading_#{even.id}">
-					      <h2 class="mb-0">
-					        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse_#{even.id}" aria-expanded="true" aria-controls="collapse_#{even.id}">
-					          #{even.titulo}
-					        </button>
-					      </h2>
-					    </div>
+                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
+                                    title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.doPrepareDel(even)}"
+                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" />
+                                 
+							  </td>
+						    </tr>
+					    </c:forEach>
+					  </tbody>
+					</table>
 					
-					    <div id="collapse_#{even.id}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-					      <div class="card-body">
-					      	<strong>Local: </strong>#{even.cidade}<br />
-					        <strong>Descricao: </strong>#{even.descricao}<br />
-							<strong>Inicio: </strong>#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}<br />
-							<strong>Valor: </strong>#{even.vlr}<br />
-					      </div>
-					      <div class="card-footer text-muted">
-					      	<p:commandButton immediate="true" id="btnCon_#{even.id}"
-                                icon="ui-icon-search" title="Consultar"
-                                actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
-                                process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-                             </p:commandButton>
-                             <p:commandButton immediate="true" id="btnEdit_#{even.id}"
-                                icon="ui-icon-wrench" title="Editar"
-                                actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
-                                process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-                             </p:commandButton>
-                             <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{even.id}"
-                                title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.confirmDel(even)}"
-                                update=":msgs, formtbl:formmodal" styleClass="ui-icon-button-rcf" />
-					      </div>
-					    </div>
-					  </div>
-					  </c:forEach>
-					  
-					</div>
-                     
-                     
+					
+					
                   </h:form>
                   
-                  <h:form id="formNewModalExc">
-                  	<h:outputText value="#{eventoMB.modalConfirmExcl}" escape="false" />
-                  				<!-- <div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+                  
+                  	
+                  	<div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                        <div class="modal-content">
                                       	 <h:form id="formModalDel">
@@ -192,23 +135,42 @@
 	                                             </button>
 	                                          </div>
 	                                          <div class="modal-body">
-	                                             
-	                                                <h:outputLabel value="Deseja realmente excluir o evento '#{eventoMB.evenSel.titulo}' ?" />
-	                                             
+	                                          	
+	                                          		<c:choose>
+	                                          			<c:when test="#{eventoMB.evenSel.existeInscrito}">
+	                                          				<div class="alert alert-warning" role="alert">
+																Atenção!, Não é possivel excluir esse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+															</div>
+	                                          			</c:when>
+	                                          			<c:otherwise>
+	                                          				<div class="border-rcf">
+					                                            <label>Deseja realmente excluir o evento <strong>'#{eventoMB.evenSel.titulo}'</strong> ?</label>
+					                                            <c:if test="${fn:length(eventoMB.evenSel.atividades) > 0}">
+								  									<label>Todas as atividades abaixo também serão <strong class="text-danger">apagadas!</strong> </label>
+																</c:if>
+															</div>
+														
+	                                            
+				                                             <ul class="list-group">
+				                                             	
+				                                             	<c:forEach var="ativ" items="#{eventoMB.evenSel.atividades}" step="1" begin="0">
+				                                             		<li class="list-group-item"><strong>Nome:</strong> #{ativ.nome}</li>
+				                                             	</c:forEach>
+				                                             </ul>
+			                                             </c:otherwise>
+													</c:choose>
 	                                          </div>
 	                                          <div class="modal-footer">
-	                                             <button type="button" class="btn" data-dismiss="modal">Não</button>
+	                                             <button type="button" class="btn" data-dismiss="modal">#{eventoMB.evenSel.existeInscrito ? 'Fechar' : 'Não'}</button>
 	                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-	                                                oncomplete="closeConfirmedDel()" 
+	                                                oncomplete="closeConfirmedDel()" rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
 	                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
 	                                          </div>
                                           </h:form>
                                        </div>
                                     </div>
-                                 </div> -->
-                  	
-                  	
-                  </h:form>
+                                 </div>
+                  
                   
                </div>
                <div id="adicionareditar" class="tab-pane">
@@ -216,7 +178,7 @@
                      <h:form id="formEvent">
                         <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
                         <p:separator style="width:99%;" />
-                        <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito}">
+                        <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito ? (eventoMB.editEvento.doEditEven eq 'true' ? 'true' : 'false') : 'false'}">
 		                	<div class="col-md-12 col-lg-12">
 		                    	<div class="alert alert-warning" role="alert">
 									Atenção!, Não é possivel realizar alteração nesse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
@@ -462,15 +424,14 @@
                                     <p:commandButton rendered="#{!eventoMB.modoConsulta}"
                                        value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
                                        id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
-                                       actionListener="#{eventoMB.doSave}" update=":formtbl :formEvent"
-                                       oncomplete="selAbaTbl('nao');" >
+                                       actionListener="#{eventoMB.doSave(true)}" update=":formtbl :formEvent, modalConfirmEdit" >
                                        <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
                                        <f:ajax render="tblEven" />
                                     </p:commandButton>
                                     <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
                                        value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
                                        id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
-                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent"
+                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent, formTodosEven"
                                        oncomplete="selAbaTbl();"  >
                                        <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
                                        <f:ajax render="tblEven" />
@@ -478,90 +439,92 @@
                                  </div>
                               </div>
                            </div>
-                           <table class="table table-hover text-center" id="tblAtiv" >
-                              <thead>
-                                 <tr>
-                                    <th scope="col">Atividade</th>
-                                    <th scope="col">Vagas</th>
-                                    <th scope="col">Configurar</th>
-                                 </tr>
-                              </thead>
-                              <c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
-                                 <tr>
-                                    <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
-                                    <th class="font-weight-normal" scope="col">#{ativ.vagas}</th>
-                                    <th scope="col" class="align-items-end">
-                                       <div class="btn-group" role="group" aria-label="Basic example">
-	                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
-	                                          icon="ui-icon-search" title="Consultar"
-	                                          actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formHtmlModal"
-	                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf">
-	                                          <p:ajaxStatus onstart="PF('status').show()"
-                        						onsuccess="PF('status').hide()" />
-	                                       </p:commandButton> <!-- adicionar condição pra deixar de se inscrever e mudar o 'icon' para 'ui-icon-minusthick' ou 'ui-icon-minus'  -->
-	                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
-	                                          icon="ui-icon-plus" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : 'Inscrever'}" value="Increver" disabled="#{ativ.estaInscrito}"
-	                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
-	                                          process="@this" oncomplete="" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf">
-	                                          <p:ajaxStatus onstart="PF('status').show()"
-                        						onsuccess="PF('status').hide()" />
-	                                       </p:commandButton>
-                                       </div>
-                                    </th>
-                                 </tr>
-                              </c:forEach>
-                           </table>  
+                           <c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">					
+	                           <table class="table table-hover text-center" id="tblAtiv" >
+	                              <thead>
+	                                 <tr>
+	                                    <th scope="col">Atividade</th>
+	                                    <th scope="col">Vagas</th>
+	                                    <th scope="col">Configurar</th>
+	                                 </tr>
+	                              </thead>
+	                              <c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
+	                                 <tr>
+	                                    <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
+	                                    <th class="font-weight-normal" scope="col">#{ativ.vagas - ativ.qtdInscrito}</th>
+	                                    <th scope="col" class="align-items-end">
+	                                       <div class="btn-group" role="group" aria-label="Basic example">
+		                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
+		                                          icon="ui-icon-search" title="Consultar"
+		                                          actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formHtmlModal"
+		                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf">
+		                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+		                                       </p:commandButton> <!-- adicionar condição pra deixar de se inscrever e mudar o 'icon' para 'ui-icon-minusthick' ou 'ui-icon-minus'  -->
+		                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
+		                                          icon="#{ativ.estaInscrito eq 'True' ? 'ui-icon-check' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'ui-icon-closethick' : 'ui-icon-plus')}" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever')}" 
+		                                          value="#{ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever'}" disabled="#{ativ.estaInscrito ? 'true' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'true' : 'false')}"
+		                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
+		                                          process="@this" oncomplete="" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf">
+		                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+		                                       </p:commandButton>
+	                                       </div>
+	                                    </th>
+	                                 </tr>
+	                              </c:forEach>
+	                           </table>
+                           </c:if>  
                         </div>
                      </h:form>
-                     <h:form id="formHtmlModal">
                      
-                     <!-- modal -->
-					 <!-- <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+                     
+                     <!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
 						   <div class="modal-dialog modal-xl" role="document">
 						      <div class="modal-content">
+						      	<h:form id="formHtmlModal">
 						         <div class="modal-header">
 						            <h5 class="modal-title" id="exampleModalLabel">
 						               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						               <span aria-hidden="true"></span>
 						               </button>
-						               <h:outputText value="Evento: #{editAtividade.evento.titulo}" />
+						               <h:outputText value="Evento: #{atividadeMB.editAtividade.evento.titulo}" />
 						            </h5>
 						         </div>
 						         <div class="modal-body">
-						            <h:form id="modalformAtiv">
 						               <h3 class="mb-3">
-						                  <h:outputText value="Atividade: #{editAtividade.nome}" />
+						                  <h:outputText value="Atividade: #{atividadeMB.editAtividade.nome}" />
 						               </h3>
 						               <div class="col-md-12 col-lg-12">
 						                  <div class="row mb-3 border-rcf">
 						                     <div class="col-sm-12 row">
 						                        <p class="font-weight-normal">
-						                           <h:outputText value="Detalhes da Atividade: #{editAtividade.detalhes}" />
+						                           <label><strong>Detalhes da Atividade:</strong> #{atividadeMB.editAtividade.detalhes}</label>
 						                        </p>
 						                     </div>
 						                     <div class="col-sm-6 row">
 						                        <p class="font-weight-normal">
-						                           <h:outputText value="Começa: #{editAtividade.dataInicio}" />
+						                           <label><strong>Começa:</strong> 
+						                           	#{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataInicio, 'formato': 'HH:mm'})}
+						                           </label>
 						                        </p>
 						                     </div>
 						                     <div class="col-sm-6 row">
 						                        <p class="font-weight-normal">
-						                           <h:outputText value="Termina: #{editAtividade.dataFim}" />
+						                           <label><strong>Termina:</strong> 
+						                           	#{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataFim, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataFim, 'formato': 'HH:mm'})}
+						                           </label>
 						                        </p>
 						                     </div>
 						                     <div class="col-sm-12">
 						                        <div class="row">
 						                           <p class="font-weight-normal">
-						                              <h:outputText value="Preço: #{editAtividade.preco}" />
+						                              <label><strong>Preço:</strong> #{atividadeMB.editAtividade.preco}</label>
 						                           </p>
 						                        </div>
 						                        <div class="row">
 						                        	<p class="font-weight-normal">
-						                              <h:outputText value="Vagas: #{editAtividade.vagas}" />
+						                              <label><strong>Vagas:</strong> #{atividadeMB.editAtividade.vagas - atividadeMB.editAtividade.qtdInscrito} de #{atividadeMB.editAtividade.vagas}</label>
 						                            </p>
-						                        </div>
-						                        <div class="row">
-						                        	<button class="btn btn-outline-secondary" type="button" id="button-addon2">Inscrever</button>
 						                        </div>
 						                     </div>
 						                  </div>
@@ -571,13 +534,84 @@
 								            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
 								         </div>
 								       </div>
-						            </h:form>
 						         </div>
+						         </h:form>
 						      </div>
 						   </div>
-						</div> -->
-                        <h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
-                     </h:form>
+						</div>
+						
+						<!-- modal confirmação edição -->
+					 <div class="modal fade" id="modalEditAtiv" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="modalConfirmEdit">
+						         <div class="modal-header">
+						            <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+						            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						             </button>
+						         </div>
+						         <div class="modal-body">
+						         	<div class="row">
+		                                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+		                                	<div class="alert alert-warning" role="alert">
+							                    <strong>Evento:</strong> '#{eventoMB.editEvento.titulo}'<br />
+										  		<strong>Atenção!</strong> todas as atividades listadas abaixo terão o periodo atualizado:
+									  		</div>
+										</div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<h5 class="modal-title" id="exampleModalLabel">Periodo antes da alteração: </h5>
+										</div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<ul class="list-group">
+						                        <c:forEach var="ativ" items="#{eventoMB.editEvento.atividades}" step="1" begin="0">
+						                            <li class="list-group-item">
+						                            	<div class="row">
+						                            	<div class="form-group col-lg-12 col-md-12 col-sm-12">
+						                            		<strong>Nome:</strong> #{ativ.nome}
+						                            	</div>
+						                            	<div class="form-group col-lg-6 col-md-6 col-sm-12">
+					                                 		<label class="form-control bg-light border #{ativ.foraPeriodoInicio ? 'border-danger' : 'border-light'}" id="infoInicioEven">
+					                                 			<strong>Inicio:</strong> #{eventoMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+					                                 		</label>
+					                              		</div>
+					                              		<div class="form-group col-lg-6 col-md-6 col-sm-12">
+					                                 		<label class="form-control bg-light border #{ativ.foraPeriodoFim ? 'border-danger' : 'border-light'}" id="infoInicioEven">
+					                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': ativ.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': ativ.dataFim, 'formato': 'HH:mm'})}
+					                                 		</label>
+					                              		</div>
+					                              		</div>
+						                            </li>
+						                         </c:forEach>
+						                     </ul>
+					                     </div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<h5 class="modal-title" id="exampleModalLabel">Periodo à ser utilizado: </h5>
+										</div>
+										<div class="form-group col-lg-6 col-md-6 col-sm-12">
+	                                 		<label class="form-control bg-light border border-light" id="infoInicioEven">
+	                                 			<strong>Inicio:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataInicio, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataInicio, 'formato': 'HH:mm'})}
+	                                 		</label>
+	                              		</div>
+	                              		<div class="form-group col-lg-6 col-md-6 col-sm-12">
+	                                 		<label class="form-control bg-light border border-light" id="infoInicioEven">
+	                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.horaFim, 'formato': 'HH:mm'})}
+	                                 		</label>
+	                              		</div>
+										
+										
+		                               </div>
+	                               </div>
+	                               <div class="modal-footer">
+	                                  <button type="button" class="btn" data-dismiss="modal">Não</button>
+	                                  <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+	                                      onstart="closeConfirmEditAtiv()" actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+	                                </div>
+						         </h:form>
+						      </div>
+						   </div>
+						</div>	
+						
                      <script type="text/javascript">
                         PrimeFaces.locales['tr'] = {
                         	closeText : 'kapat',
@@ -629,18 +663,17 @@
                            #{event.titulo}
                         </div>
                         <div class="card-body">
-                           <p class="card-text">Descrição: #{event.descricao}</p>
-                           <p class="card-text">Vagas: #{event.vagas} de #{event.vagas}</p>
+                           <p class="card-text"><strong>Descrição:</strong> #{event.descricao}</p>
+                           <p class="card-text"><strong>Vagas:</strong> #{event.vagas - event.qtdInscrito} de #{event.vagas}</p>
                            
 							<p:commandButton immediate="true" id="cardConsEvent_#{event.id}" value="Inscrever"
                                   actionListener="#{eventoMB.doConsulta({'evento': event, 'request': 'card'})}" update=":formEvent" 
                                   process="@this" styleClass="btn btn-primary ui-widget-button-primary-rcf" oncomplete="selAbaEdit('sim')">
-                                  <p:ajaxStatus onstart="PF('status').show()"
-                        			onsuccess="PF('status').hide()" />
+                                  <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
                             </p:commandButton>
                         </div>
                         <div class="card-footer text-muted">
-                           2 dias atrás
+                           #{event.qtdDifTemp} #{event.tpDifTemp eq 'dias' ? 'dias' : (event.tpDifTemp eq 'horas' ? 'horas' : (event.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
                         </div>
                      </div>
                   </div>

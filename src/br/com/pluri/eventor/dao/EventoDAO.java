@@ -1,21 +1,15 @@
 package br.com.pluri.eventor.dao;
 
 import java.math.BigInteger;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import br.com.etechoracio.common.dao.BaseDAO;
+import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
 import br.com.pluri.eventor.model.Usuario;
 
@@ -29,6 +23,9 @@ public interface EventoDAO extends BaseDAO<Evento> {
 	@Query("select e from Evento e " +
 		   " where e.usuario.id != :idUsu")
 	public List<Evento> findAllEventoMenosMeus(@Param("idUsu") Long idUsu);
+	
+	@Query(value = "select * from TBL_evento where ID_USUA != :idUsu and DATAINICIO_EVEN > now()", nativeQuery = true)
+	public List<Evento> findAllEventoMenosMeusRecen(@Param("idUsu") Long idUsu);
 	
 	@Query(value = "select MIN(datainicio_even) as proximoevento from tbl_evento where datainicio_even >= CURDATE() and id_usua = :idUsu",
 			nativeQuery = true)

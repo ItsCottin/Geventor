@@ -14,7 +14,9 @@ import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.primefaces.component.tabview.TabView;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.ScheduleEvent;
@@ -22,6 +24,7 @@ import org.primefaces.model.ScheduleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import br.com.etechoracio.common.view.BaseMB;
 import br.com.etechoracio.common.view.MessageBundleLoader;
@@ -36,10 +39,12 @@ import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.DDDInvalidoException;
 import br.com.pluri.eventor.business.exception.DataInvalidaException;
+import br.com.pluri.eventor.business.exception.ExisteAtividadeVinculadaException;
 import br.com.pluri.eventor.business.exception.NRCasaUsuarioException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
+import br.com.pluri.eventor.model.DiferencaData;
 import br.com.pluri.eventor.model.Endereco;
 import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
@@ -109,25 +114,43 @@ public class EventoMB extends BaseMB {
 	private String maskTelefone;
 	public boolean dataValidada;
 	public boolean cepvalidoinformado;
-	//public String modalConfirmExcl;
+	public String modalConfirmExcl;
+	public boolean exibeModalEditAtiv;
 	
 	@PostConstruct
 	public void postConstruct(){
-		onEventos();
-		estados = estadoSB.findAll();
-		this.modoConsulta = false;
-		this.evenSel = new Evento();
-		this.editEvento = new Evento();
-		findAllEventoMenosMeus();
-		this.usaTelefone = "Telefone";
-		this.maskTelefone = "(99) 9999-9999";
-		this.editEvento.setVlr("Pago");
-		this.dataValidada = false;
-		this.cepvalidoinformado = false;
+		try{
+			onEventos();
+			estados = estadoSB.findAll();
+			this.modoConsulta = false;
+			this.evenSel = new Evento();
+			this.editEvento = new Evento();
+			findAllEventoMenosMeus();
+			this.usaTelefone = "Telefone";
+			this.maskTelefone = "(99) 9999-9999";
+			this.editEvento.setVlr("Pago");
+			this.dataValidada = false;
+			this.cepvalidoinformado = false;
+			this.exibeModalEditAtiv = false;
+		} catch (ConstraintViolationException e){
+			showInfoMessage(e.getStackTrace().toString());
+		}
 	}
 	
 	public void findAllEventoMenosMeus(){
-		this.allEvenMenosMeus = eventoSB.findAllEventoMenosMeus(getCurrentUserId());
+		try {
+			this.allEvenMenosMeus = new ArrayList<Evento>();
+			for (Evento even : eventoSB.findAllEventoMenosMeusRecen(getCurrentUserId())){
+				DiferencaData dd = calcDifDate(even.getDataAlter(), getDateNow());
+				even.setQtdDifTemp(dd.getValor());
+				even.setTpDifTemp(dd.getUnidade());
+				even.setDoEditEven(false);
+				even.setQtdInscrito(eventoSB.qtdInscritoInEvento(even.getId()));
+				this.allEvenMenosMeus.add(even);
+			}
+		} catch (SQLException e) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
+		}
 	}
 	
 	public void onTabChange(TabChangeEvent event) {
@@ -229,22 +252,58 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-	// M001 - insert do evento
-	public void doSave(){
-		eventoSB.insert(editEvento, getCurrentUserId());
-		if (editEvento.getId() == null) {
-			showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess"));
-		} else {
-			showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess"));
+	public void doSave(boolean validarPeriodo) {
+		try {
+			this.editEvento.setDataInicio(merge(editEvento.getDataInicio(), editEvento.getHoraInicio()));
+			this.editEvento.setDataFim(merge(editEvento.getDataFim(), editEvento.getHoraFim()));
+			if(validarPeriodo){
+				List<Atividade> newAtiv = new ArrayList<Atividade>();
+				this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
+				for (Atividade ativ : editEvento.getAtividades()){
+					ativ.setForaPeriodoInicio(false);
+					ativ.setForaPeriodoFim(false);
+					if(doPrepareEditDateIni(ativ.getDataInicio())){
+						ativ.setForaPeriodoInicio(true);
+					}
+					if(doPrepareEditDateFim(ativ.getDataFim())){
+						ativ.setForaPeriodoFim(true);
+					}
+					newAtiv.add(ativ);
+				}
+				this.editEvento.getAtividades().clear();
+				this.editEvento.setAtividades(newAtiv);
+				for (Atividade ativ : editEvento.getAtividades()){
+					if(ativ.isForaPeriodoInicio() || ativ.isForaPeriodoFim()){
+						throw new ExisteAtividadeVinculadaException();
+					}
+				}
+			}
+			if(editEvento.getTitulo() != null) {
+				eventoSB.insert(editEvento, getCurrentUserId());
+			}
+			if (editEvento.getId() == null) {
+				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess"));
+			} else {
+				showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess"));
+			}
+			onEventos();
+			doPrepareSave();
+			RequestContext.getCurrentInstance().execute("selAbaTbl()");
+		} catch (ExisteAtividadeVinculadaException e) {
+			RequestContext.getCurrentInstance().execute("openConfirmEditAtiv()");
 		}
-		onEventos();
-		doPrepareSave(); 
+	}
+	
+	public void doSavePopUp(){
+		ajustPeriodoAtiv();
+		doSave(false);
 	}
 	
 	public void doPrepareSave(){
 		editEvento = new Evento();
 		this.modoConsulta = false;
 		this.resultadoAtividadeByEvento = null;
+		findAllEventoMenosMeus();
 	}
 	
 	public void validaHoraIniEvenHoraFimEven(){
@@ -278,6 +337,12 @@ public class EventoMB extends BaseMB {
 			this.editEvento.setHoraFim(null);
 		}
 	}
+	
+	public String formatarDataFromTela(Map<String, Object> params) {
+		Date data = (Date) params.get("data");
+		String formato = (String) params.get("formato");
+        return formatarData(data, formato);
+    }
 	
 	public void validarDatasEvento(){
 		try {
@@ -317,12 +382,112 @@ public class EventoMB extends BaseMB {
 			this.editEvento.setDataFim(null);
 		}
 	}
+	
+	public void ajustPeriodoAtiv(){
+		List<Atividade> newAtiv = new ArrayList<Atividade>();
+		for (Atividade ativ : editEvento.getAtividades()) {
+			int inicio = ativ.getDataInicio().compareTo(editEvento.getDataInicio());
+			if(inicio == 0){
+				Calendar calEvenIni = Calendar.getInstance();
+				Calendar calAtivIni = Calendar.getInstance();
+				
+				calEvenIni.setTime(editEvento.getDataInicio());
+				calAtivIni.setTime(ativ.getDataInicio());
+				
+				int horaIniEven = calEvenIni.get(Calendar.HOUR_OF_DAY);
+				int minutoIniEven = calEvenIni.get(Calendar.MINUTE);
+				
+				int horaIniAtiv = calAtivIni.get(Calendar.HOUR_OF_DAY);
+				int minutoIniAtiv = calAtivIni.get(Calendar.MINUTE);
+				
+				if(horaIniEven > horaIniAtiv || horaIniEven == horaIniAtiv && minutoIniEven > minutoIniAtiv){
+					ativ.setDataInicio(editEvento.getDataInicio());
+				}
+			} else if (inicio < 0){
+				ativ.setDataInicio(editEvento.getDataInicio());
+			}
+			int fim = ativ.getDataFim().compareTo(editEvento.getDataFim());
+			if(fim == 0){
+				Calendar calEvenFim = Calendar.getInstance();
+				Calendar calAtivFim = Calendar.getInstance();
+				
+				calEvenFim.setTime(editEvento.getHoraFim());
+				calAtivFim.setTime(ativ.getDataFim());
+				
+				int horaFimEven = calEvenFim.get(Calendar.HOUR_OF_DAY);
+				int minutoFimEven = calEvenFim.get(Calendar.MINUTE);
+				
+				int horaFimAtiv = calAtivFim.get(Calendar.HOUR_OF_DAY);
+				int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
+				
+				if(horaFimEven < horaFimAtiv || horaFimEven == horaFimAtiv && minutoFimEven < minutoFimAtiv){
+					ativ.setDataFim(editEvento.getDataFim());
+				}
+			} else if (fim > 0){
+				ativ.setDataFim(editEvento.getDataFim());
+			}
+			newAtiv.add(ativ);
+		}
+		this.editEvento.getAtividades().clear();
+		this.editEvento.setAtividades(newAtiv);
+	}
+	
+	public boolean doPrepareEditDateFim(Date data){
+		int fim = data.compareTo(editEvento.getDataFim());
+		if(fim == 0){
+			Calendar calEvenFim = Calendar.getInstance();
+			Calendar calAtivFim = Calendar.getInstance();
+			
+			calEvenFim.setTime(editEvento.getHoraFim());
+			calAtivFim.setTime(data);
+			
+			int horaFimEven = calEvenFim.get(Calendar.HOUR_OF_DAY);
+			int minutoFimEven = calEvenFim.get(Calendar.MINUTE);
+			
+			int horaFimAtiv = calAtivFim.get(Calendar.HOUR_OF_DAY);
+			int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
+			
+			if(horaFimEven < horaFimAtiv || horaFimEven == horaFimAtiv && minutoFimEven < minutoFimAtiv){
+				return true;
+			}
+		} else if (fim > 0){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean doPrepareEditDateIni(Date data){
+		int inicio = data.compareTo(editEvento.getDataInicio());
+		if(inicio == 0){
+			Calendar calEvenIni = Calendar.getInstance();
+			Calendar calAtivIni = Calendar.getInstance();
+			
+			calEvenIni.setTime(editEvento.getHoraInicio());
+			calAtivIni.setTime(data);
+			
+			int horaIniEven = calEvenIni.get(Calendar.HOUR_OF_DAY);
+			int minutoIniEven = calEvenIni.get(Calendar.MINUTE);
+			
+			int horaIniAtiv = calAtivIni.get(Calendar.HOUR_OF_DAY);
+			int minutoIniAtiv = calAtivIni.get(Calendar.MINUTE);
+			
+			if(horaIniEven > horaIniAtiv || horaIniEven == horaIniAtiv && minutoIniEven > minutoIniAtiv){
+				return true;
+			}
+		} else if (inicio < 0){
+			return true;
+		}
+		return false;
+	}
 
 	public void onEventos(){
 		resultadoEvento = eventoSB.findEventosByUsuario(getCurrentUserId());
 	}
 	
 	public void doRemove(Evento exclui){
+		for(Atividade ativ : exclui.getAtividades()){
+			atividadeSB.delete(ativ);
+		}
 		eventoSB.delete(exclui);
 		showInfoMessage(MessageBundleLoader.getMessage("even.delete_sucess"));
 		onEventos();
@@ -330,12 +495,14 @@ public class EventoMB extends BaseMB {
 	
 	public void doEdit(Evento edit) throws SQLException {
 		onPrepareEditOuConsulta(edit, false);
+		this.editEvento.setDoEditEven(true);
 	}
 	
 	public void doConsulta(Map<String, Object> params) throws SQLException {
 		Evento edit = (Evento) params.get("evento");
 		String request = (String) params.get("request");
 		onPrepareEditOuConsulta(edit, true);
+		this.editEvento.setDoEditEven(false);
 		if (request.equals("card")){
 			setAtividadeSeEstaInscrito(atividadeSB.findByEventos(edit.getId()));
 		} else {
@@ -354,11 +521,16 @@ public class EventoMB extends BaseMB {
 	}
 	
 	public void setAtividadeSeEstaInscrito(List<Atividade> ativ){
-		this.resultadoAtividadeByEvento = null;
-		this.resultadoAtividadeByEvento = new ArrayList<Atividade>();
-		for (Atividade ati : ativ) {
-			ati.setEstaInscrito(findSeEstaInscritoNaAtividade(ati.getId()));
-			this.resultadoAtividadeByEvento.add(ati);
+		try {
+			this.resultadoAtividadeByEvento = null;
+			this.resultadoAtividadeByEvento = new ArrayList<Atividade>();
+			for (Atividade ati : ativ) {
+				ati.setEstaInscrito(findSeEstaInscritoNaAtividade(ati.getId()));
+				ati.setQtdInscrito(atividadeSB.qtdInscritoInAtividade(ati.getId()));
+				this.resultadoAtividadeByEvento.add(ati);
+			}
+		} catch (SQLException e) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
 		}
 	}
 	
@@ -378,6 +550,7 @@ public class EventoMB extends BaseMB {
 		doPrepareSave();
 		this.modoConsulta = consulta;
 		this.editEvento = eventoSB.findById(edit.getId());
+		this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
 		this.editEvento.setMesmoDia(false);
 		this.editEvento.setExisteInscrito(false);
 		if(eventoSB.qtdInscritoInEvento(editEvento.getId()) > 0){
@@ -424,6 +597,20 @@ public class EventoMB extends BaseMB {
 			limpaEndereco();
 			this.cepvalidoinformado = false;
 			this.editEvento.setUsaMyEndereco(false);
+		}
+	}
+	
+	public void doPrepareDel(Evento even){
+		try {
+			even.setExisteInscrito(false);
+			if(eventoSB.qtdInscritoInEvento(even.getId()) > 0){
+				even.setExisteInscrito(true);
+			}
+			even.setAtividades(atividadeSB.findByEventos(even.getId()));
+			this.evenSel = new Evento();
+			this.evenSel = even;
+		} catch (SQLException e) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
 		}
 	}
 	
@@ -502,37 +689,5 @@ public class EventoMB extends BaseMB {
 			showErrorMessage(e.getMessage());
 			editEvento.setTelefone("");
 		}
-	}
-	
-	public void confirmDel(Evento even) {
-		//this.modalConfirmExcl = setModalConfirmDel(even);
-	}
-	
-	//public String setModalConfirmDel(Evento even) {
-	//	return "<div class=\"modal fade\" id=\"newConfirmDel\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"confirmDel\" aria-hidden=\"true\">\r\n"
-	//			+ "                                    <div class=\"modal-dialog\" role=\"document\">\r\n"
-	//			+ "                                       <div class=\"modal-content\">\r\n"
-	//			+ "                                      	 <h:form id=\"formModalDel\">\r\n"
-	//			+ "	                                          <div class=\"modal-header\">\r\n"
-	//			+ "	                                             <h5 class=\"modal-title\" id=\"exampleModalLabel\">Confirmação</h5>\r\n"
-	//			+ "	                                             <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n"
-	//			+ "	                                             <span aria-hidden=\"true\"></span>\r\n"
-	//			+ "	                                             </button>\r\n"
-	//			+ "	                                          </div>\r\n"
-	//			+ "	                                          <div class=\"modal-body\">\r\n"
-	//			+ "	                                             \r\n"
-	//			+ "	                                                <h:outputLabel value=\"Deseja realmente excluir o evento '" + even.getTitulo() + "' ?\" />\r\n"
-	//			+ "	                                             \r\n"
-	//			+ "	                                          </div>\r\n"
-	//			+ "	                                          <div class=\"modal-footer\">\r\n"
-	//			+ "	                                             <button type=\"button\" class=\"btn\" data-dismiss=\"modal\">Não</button>\r\n"
-	//			+ "	                                             <p:commandButton styleClass=\"btn btn-danger ui-widget-button-danger-rcf\" value=\"Sim\" \r\n"
-	//			+ "	                                                oncomplete=\"closeConfirmedDel()\" \r\n"
-	//			+ "	                                                actionListener=\"#{eventoMB.doRemove(eventoMB.evenSel)}\" update=\":msgs :formtbl\" />\r\n"
-	//			+ "	                                          </div>\r\n"
-	//			+ "                                          </h:form>\r\n"
-	//			+ "                                       </div>\r\n"
-	//			+ "                                    </div>\r\n"
-	//			+ "                                 </div>";
-	//}
+	}	
 }
