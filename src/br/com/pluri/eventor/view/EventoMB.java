@@ -114,7 +114,6 @@ public class EventoMB extends BaseMB {
 	private String maskTelefone;
 	public boolean dataValidada;
 	public boolean cepvalidoinformado;
-	public String modalConfirmExcl;
 	public boolean exibeModalEditAtiv;
 	
 	@PostConstruct
@@ -262,11 +261,17 @@ public class EventoMB extends BaseMB {
 				for (Atividade ativ : editEvento.getAtividades()){
 					ativ.setForaPeriodoInicio(false);
 					ativ.setForaPeriodoFim(false);
-					if(doPrepareEditDateIni(ativ.getDataInicio())){
+					if(isData1MaiorData2(editEvento.getDataInicio(), ativ.getDataInicio())){
 						ativ.setForaPeriodoInicio(true);
 					}
-					if(doPrepareEditDateFim(ativ.getDataFim())){
+					if(isData1MaiorData2(ativ.getDataFim(), editEvento.getDataFim())){
 						ativ.setForaPeriodoFim(true);
+					}
+					if(ativ.isForaPeriodoInicio() && isData1MaiorData2(editEvento.getDataInicio() ,ativ.getDataFim())) {
+						ativ.setForaPeriodoFim(true);
+					}
+					if(ativ.isForaPeriodoFim() && isData1MaiorData2(ativ.getDataInicio(), editEvento.getDataFim())) {
+						ativ.setForaPeriodoInicio(true);
 					}
 					newAtiv.add(ativ);
 				}
@@ -282,21 +287,44 @@ public class EventoMB extends BaseMB {
 				eventoSB.insert(editEvento, getCurrentUserId());
 			}
 			if (editEvento.getId() == null) {
-				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess"));
+				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess", new Object[] {editEvento.getTitulo()}));
 			} else {
-				showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess"));
+				showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess", new Object[] {editEvento.getTitulo()}));
 			}
 			onEventos();
 			doPrepareSave();
-			RequestContext.getCurrentInstance().execute("selAbaTbl()");
+			RequestContext.getCurrentInstance().execute("selAba('visualizar')");
 		} catch (ExisteAtividadeVinculadaException e) {
-			RequestContext.getCurrentInstance().execute("openConfirmEditAtiv()");
+			RequestContext.getCurrentInstance().execute("openModal('modalEditAtiv')");
 		}
 	}
 	
 	public void doSavePopUp(){
 		ajustPeriodoAtiv();
 		doSave(false);
+	}
+	
+	public void ajustPeriodoAtiv(){
+		List<Atividade> newAtiv = new ArrayList<Atividade>();
+		for (Atividade ativ : editEvento.getAtividades()) {
+			if(ativ.isForaPeriodoInicio()) {
+				ativ.setDataInicio(editEvento.getDataInicio());
+			}
+			if(ativ.isForaPeriodoFim()) {
+				ativ.setDataFim(editEvento.getDataFim());
+			}
+			newAtiv.add(ativ);
+		}
+		this.editEvento.getAtividades().clear();
+		this.editEvento.setAtividades(newAtiv);
+	}
+	
+	public boolean isData1MaiorData2(Date data1, Date date2){
+		int fim = data1.compareTo(date2);
+		if(fim > 0){
+			return true;
+		}
+		return false;
 	}
 	
 	public void doPrepareSave(){
@@ -382,103 +410,6 @@ public class EventoMB extends BaseMB {
 			this.editEvento.setDataFim(null);
 		}
 	}
-	
-	public void ajustPeriodoAtiv(){
-		List<Atividade> newAtiv = new ArrayList<Atividade>();
-		for (Atividade ativ : editEvento.getAtividades()) {
-			int inicio = ativ.getDataInicio().compareTo(editEvento.getDataInicio());
-			if(inicio == 0){
-				Calendar calEvenIni = Calendar.getInstance();
-				Calendar calAtivIni = Calendar.getInstance();
-				
-				calEvenIni.setTime(editEvento.getDataInicio());
-				calAtivIni.setTime(ativ.getDataInicio());
-				
-				int horaIniEven = calEvenIni.get(Calendar.HOUR_OF_DAY);
-				int minutoIniEven = calEvenIni.get(Calendar.MINUTE);
-				
-				int horaIniAtiv = calAtivIni.get(Calendar.HOUR_OF_DAY);
-				int minutoIniAtiv = calAtivIni.get(Calendar.MINUTE);
-				
-				if(horaIniEven > horaIniAtiv || horaIniEven == horaIniAtiv && minutoIniEven > minutoIniAtiv){
-					ativ.setDataInicio(editEvento.getDataInicio());
-				}
-			} else if (inicio < 0){
-				ativ.setDataInicio(editEvento.getDataInicio());
-			}
-			int fim = ativ.getDataFim().compareTo(editEvento.getDataFim());
-			if(fim == 0){
-				Calendar calEvenFim = Calendar.getInstance();
-				Calendar calAtivFim = Calendar.getInstance();
-				
-				calEvenFim.setTime(editEvento.getHoraFim());
-				calAtivFim.setTime(ativ.getDataFim());
-				
-				int horaFimEven = calEvenFim.get(Calendar.HOUR_OF_DAY);
-				int minutoFimEven = calEvenFim.get(Calendar.MINUTE);
-				
-				int horaFimAtiv = calAtivFim.get(Calendar.HOUR_OF_DAY);
-				int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
-				
-				if(horaFimEven < horaFimAtiv || horaFimEven == horaFimAtiv && minutoFimEven < minutoFimAtiv){
-					ativ.setDataFim(editEvento.getDataFim());
-				}
-			} else if (fim > 0){
-				ativ.setDataFim(editEvento.getDataFim());
-			}
-			newAtiv.add(ativ);
-		}
-		this.editEvento.getAtividades().clear();
-		this.editEvento.setAtividades(newAtiv);
-	}
-	
-	public boolean doPrepareEditDateFim(Date data){
-		int fim = data.compareTo(editEvento.getDataFim());
-		if(fim == 0){
-			Calendar calEvenFim = Calendar.getInstance();
-			Calendar calAtivFim = Calendar.getInstance();
-			
-			calEvenFim.setTime(editEvento.getHoraFim());
-			calAtivFim.setTime(data);
-			
-			int horaFimEven = calEvenFim.get(Calendar.HOUR_OF_DAY);
-			int minutoFimEven = calEvenFim.get(Calendar.MINUTE);
-			
-			int horaFimAtiv = calAtivFim.get(Calendar.HOUR_OF_DAY);
-			int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
-			
-			if(horaFimEven < horaFimAtiv || horaFimEven == horaFimAtiv && minutoFimEven < minutoFimAtiv){
-				return true;
-			}
-		} else if (fim > 0){
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean doPrepareEditDateIni(Date data){
-		int inicio = data.compareTo(editEvento.getDataInicio());
-		if(inicio == 0){
-			Calendar calEvenIni = Calendar.getInstance();
-			Calendar calAtivIni = Calendar.getInstance();
-			
-			calEvenIni.setTime(editEvento.getHoraInicio());
-			calAtivIni.setTime(data);
-			
-			int horaIniEven = calEvenIni.get(Calendar.HOUR_OF_DAY);
-			int minutoIniEven = calEvenIni.get(Calendar.MINUTE);
-			
-			int horaIniAtiv = calAtivIni.get(Calendar.HOUR_OF_DAY);
-			int minutoIniAtiv = calAtivIni.get(Calendar.MINUTE);
-			
-			if(horaIniEven > horaIniAtiv || horaIniEven == horaIniAtiv && minutoIniEven > minutoIniAtiv){
-				return true;
-			}
-		} else if (inicio < 0){
-			return true;
-		}
-		return false;
-	}
 
 	public void onEventos(){
 		resultadoEvento = eventoSB.findEventosByUsuario(getCurrentUserId());
@@ -489,7 +420,7 @@ public class EventoMB extends BaseMB {
 			atividadeSB.delete(ativ);
 		}
 		eventoSB.delete(exclui);
-		showInfoMessage(MessageBundleLoader.getMessage("even.delete_sucess"));
+		showInfoMessage(MessageBundleLoader.getMessage("even.delete_sucess", new Object[] {exclui.getTitulo()}));
 		onEventos();
 	}
 	

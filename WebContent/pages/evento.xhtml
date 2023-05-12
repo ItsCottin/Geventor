@@ -9,74 +9,30 @@
    xmlns:t="http://myfaces.apache.org/tomahawk"
    template="/WEB-INF/template/layoutV3.xhtml">
    <ui:define name="contentV3">
-      <script type="text/javascript">
-         var voltarCard;
-         function selAbaTbl(voltar) {
-        	 if (voltar == 'nao') {
-        		voltarCard = voltar
-        	 }
-        	 if (voltarCard == 'nao') {
-          		 $('.nav-tabs a[href="#visualizar"]').tab('show');
-        	 } else {
-        		 $('.nav-tabs a[href="#disponiveis"]').tab('show');
-        		 $('.nav-tabs a[href="#visualizar"]').tab('show');
-        	 }
-         }
-         
-         function selAbaEdit(voltar) {
-        	 voltarCard = voltar;
-         	var tabEditTitle = document.getElementById("tabEditTitle");
-         	voltarCard
-          	        // Atualiza o conteudo do elemento
-          	        tabEditTitle.innerHTML = "#{eventoMB.editEvento.id eq null ? 'Adicionar' : 'Editar'}";
-          	     	$('.nav-tabs a[href="#gerenciar"]').tab('show');
-          			$('.nav-tabs a[href="#adicionareditar"]').tab('show');
-          			
-         }
-         function openConfirmedDel() {
-                $('#newConfirmDel').modal('show');
-            }
-         
-         function openConfirmEditAtiv() {
-             $('#modalEditAtiv').modal('show');
-         }
-         
-         function closeConfirmEditAtiv() {
-             $('#modalEditAtiv').modal('hide');
-         }
-         
-         function openModalConsAtividade() {
-                $('#modalConsAtividade').modal('show');
-            }
-         
-         function closeConfirmedDel() {
-                $('#newConfirmDel').modal('hide');
-                window.location.reload();
-            }
-          
-      </script>
-      <ul class="nav nav-tabs">
-         <li>
-            <a data-toggle="pill" class="nav-link" href="#gerenciar">Gerenciar</a>
+      <h:outputScript library="js" name="evento.js" />
+      
+      <ul class="nav-tab nav my-3">
+         <li class="nav-tab-item">
+            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab" href="#gerenciar">Gerenciar</a>
          </li>
-         <li class="active">
-            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#disponiveis">Eventos Disponíveis</a>
+         <li class="nav-tab-item active">
+            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#disponiveis">Todos</a>
          </li>
       </ul>
       <div class="tab-content py-4">
          <div id="gerenciar" class="tab-pane">
-            <ul class="nav nav-tabs">
-               <li class="active">
-                  <a data-toggle="pill" class="nav-link active" aria-current="page" href="#visualizar">Visualizar</a>
+            <ul class="nav-tab nav">
+               <li class="nav-tab-item active">
+                  <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#visualizar">Visualizar</a>
                </li>
-               <li>
-                  <a id="tabEditTitle" data-toggle="pill" class="nav-link" href="#adicionareditar">#{eventoMB.editEvento.id eq null ? 'Adicionar' : 'Editar'}</a>
+               <li class="nav-tab-item">
+                  <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#adicionareditar">Adicionar</a>
                </li>
             </ul>
             <div class="tab-content py-4">
                <div id="visualizar" class="tab-pane active">
                	  <div class="form-group">
-                  	<h1 class="">Eventos</h1>
+                  	<h3 class="">Eventos</h3>
                   </div>
                   <h:form id="formtbl">
                   
@@ -93,7 +49,7 @@
 					  	<c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
 						    <tr>
 						      <td data-label="Titulo" class="text-truncate">#{even.titulo}</td>
-						      <td data-label="Data">
+						      <td data-label="Data" class="text-truncate">
 						      	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
 						      </td>
 						      <td data-label="Preço">#{even.vlr}</td>
@@ -109,7 +65,7 @@
                                     process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
                                  </p:commandButton>
                                  <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
-                                    title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{eventoMB.doPrepareDel(even)}"
+                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
                                     update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" />
                                  
 							  </td>
@@ -163,7 +119,7 @@
 	                                          <div class="modal-footer">
 	                                             <button type="button" class="btn" data-dismiss="modal">#{eventoMB.evenSel.existeInscrito ? 'Fechar' : 'Não'}</button>
 	                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-	                                                oncomplete="closeConfirmedDel()" rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
+	                                                oncomplete="closeModal('newConfirmDel')" rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
 	                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
 	                                          </div>
                                           </h:form>
@@ -176,8 +132,9 @@
                <div id="adicionareditar" class="tab-pane">
                   <div class="col-md-12">
                      <h:form id="formEvent">
-                        <h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
-                        <p:separator style="width:99%;" />
+                     	<div class="form-group">
+                        	<h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
+                        </div>
                         <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito ? (eventoMB.editEvento.doEditEven eq 'true' ? 'true' : 'false') : 'false'}">
 		                	<div class="col-md-12 col-lg-12">
 		                    	<div class="alert alert-warning" role="alert">
@@ -186,7 +143,7 @@
 		                    </div>
 	                    </p:panelGrid>
                         <div class="col-md-12 col-lg-12">
-                           <div class="row mb-3 border-rcf">
+                           <div class="row mb-3 border-rcf pt-4 bg-white shadow">
                            	<div class="col-lg-2 col-md-2 col-sm-2 col-small-3-rcf form-group text-right text-truncate">
                               	<label for="titulo" class="col-form-label">Título:</label>
                              </div>
@@ -249,8 +206,6 @@
                                  	<f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
                                  </p:inputMask>
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
                            		<div class="col-lg-6 col-md-6 col-sm-7 col-small-12-rcf form-group input-group">
                                  <div class="input-group-prepend bg-light border border-light">
                                     <div class="input-group-text">
@@ -318,10 +273,10 @@
 	                            	<h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" id="bairro" 
 	                            	value="#{eventoMB.editEvento.bairro}" label="Bairro" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" />
 	                        	</div>
-		                    </div>
-                           <div class="row mb-3 border-rcf">
-	                           		<div class="col-md-6 col-sm-12 form-group input-group">
-	                                 <div class="input-group-prepend bg-light border border-light">
+	                        	<div class="col-lg-0 col-md-6 col-sm-6 col-small-8-rcf form-group">
+	                        	</div>
+	                           	<div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
+	                                <div class="input-group-prepend bg-light border border-light">
 	                                    <div class="input-group-text">
 	                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
 	                                          value="#{eventoMB.editEvento.usaMyTelefone}">
@@ -331,7 +286,7 @@
 	                                 </div>
 	                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
 	                                    value="utilizar meu Telefone?" disabled="true" />
-	                              </div>
+	                            </div>
 		                        <div class="col-md-3 col-sm-6 col-small-6-rcf form-group text-right text-truncate">
 		                            <label for="atualizarsenha" class="col-form-label">Telefone ou Celular?</label>
 		                        </div>
@@ -367,9 +322,6 @@
 		                                <p:ajax event="blur" listener="#{eventoMB.validaDDD(eventoMB.editEvento.telefone)}" update="celular"/>
 		                            </p:inputMask>
 		                        </div>
-                              
-                           </div>
-                           <div class="row mb-3 border-rcf">
                            	<div class="col-md-6 col-sm-12 form-group input-group">
                                  <div class="input-group-prepend bg-light border border-light">
                                     <div class="input-group-text">
@@ -407,38 +359,34 @@
 				                                <f:selectItem itemValue="Gratuito" itemLabel="Gratuito"
 				                                  	noSelectionOption="true" />
 				                            </h:selectOneMenu>
-				                        </div>                           
-		                           </div>
-		                           
-                           <div class="row mb-3 border-rcf">
+				                        </div>
                               <div class="col-sm-12 form-group">
                                  <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
                                     maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{eventoMB.modoConsulta}"
                                     autoResize="false" value="#{eventoMB.editEvento.descricao}"
                                     label="Descrição" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" />
                               </div>
+	                              <div class="col-sm-12 form-group mt-3">
+	                                 <div class="btn-group" role="group" aria-label="Basic example">
+	                                    <p:commandButton rendered="#{!eventoMB.modoConsulta}"
+	                                       value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
+	                                       id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
+	                                       actionListener="#{eventoMB.doSave(true)}" update=":formtbl :formEvent, modalConfirmEdit" >
+	                                       <p:ajaxStatus onstart="PF('status').show()" />
+	                                       <f:ajax render="tblEven" />
+	                                    </p:commandButton>
+	                                    <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
+	                                       value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
+	                                       id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
+	                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent, formTodosEven"
+	                                       oncomplete="selAbaTbl();"  >
+	                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                       <f:ajax render="tblEven" />
+	                                    </p:commandButton>
+	                                 </div>
+	                              </div>
                            </div>
-                           <div class="row mb-3">
-                              <div class="col-sm-12">
-                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <p:commandButton rendered="#{!eventoMB.modoConsulta}"
-                                       value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
-                                       id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
-                                       actionListener="#{eventoMB.doSave(true)}" update=":formtbl :formEvent, modalConfirmEdit" >
-                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-                                       <f:ajax render="tblEven" />
-                                    </p:commandButton>
-                                    <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
-                                       value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
-                                       id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
-                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent, formTodosEven"
-                                       oncomplete="selAbaTbl();"  >
-                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-                                       <f:ajax render="tblEven" />
-                                    </p:commandButton>
-                                 </div>
-                              </div>
-                           </div>
+                           
                            <c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">					
 	                           <table class="table table-hover text-center" id="tblAtiv" >
 	                              <thead>
@@ -457,7 +405,7 @@
 		                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
 		                                          icon="ui-icon-search" title="Consultar"
 		                                          actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formHtmlModal"
-		                                          process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf">
+		                                          process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf">
 		                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 		                                       </p:commandButton> <!-- adicionar condição pra deixar de se inscrever e mudar o 'icon' para 'ui-icon-minusthick' ou 'ui-icon-minus'  -->
 		                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
@@ -556,7 +504,7 @@
 		                                <div class="form-group col-lg-12 col-md-12 col-sm-12">
 		                                	<div class="alert alert-warning" role="alert">
 							                    <strong>Evento:</strong> '#{eventoMB.editEvento.titulo}'<br />
-										  		<strong>Atenção!</strong> todas as atividades listadas abaixo terão o periodo atualizado:
+										  		<strong>Atenção!</strong> todas as atividades listadas abaixo com datas marcadas de <strong class="text-danger">vermelho</strong> terão o periodo atualizado!
 									  		</div>
 										</div>
 										<div class="form-group col-lg-12 col-md-12 col-sm-12">
@@ -598,14 +546,12 @@
 	                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.horaFim, 'formato': 'HH:mm'})}
 	                                 		</label>
 	                              		</div>
-										
-										
 		                               </div>
 	                               </div>
 	                               <div class="modal-footer">
-	                                  <button type="button" class="btn" data-dismiss="modal">Não</button>
-	                                  <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-	                                      onstart="closeConfirmEditAtiv()" actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+	                                  <button type="button" class="btn" data-dismiss="modal">Cancelar</button>
+	                                  <p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" value="Confirmar" 
+	                                      onstart="closeModal('modalEditAtiv')" actionListener="#{eventoMB.doSavePopUp()}" update=":msgs :formtbl" />
 	                                </div>
 						         </h:form>
 						      </div>
@@ -651,8 +597,9 @@
             </div>
          </div>
          <div id="disponiveis" class="tab-pane active">
-            <h3>Eventos Disponíveis</h3>
-            <p:separator style="width:99%;" />
+         	<div class="form-group">
+            	<h3>Eventos Disponíveis</h3>
+            </div>
             <h:form id="formTodosEven">
             	
                <div class="row">

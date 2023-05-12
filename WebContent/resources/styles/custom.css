@@ -1,80 +1,59 @@
-table {
-  border: 1px solid #ccc;
-  border-collapse: collapse;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  table-layout: fixed;
+.nav-tab {
+    display: -webkit-box;
+    display: -moz-box;
+    text-align: center;
+    margin: 40px 0 20px;
 }
 
-table caption {
-  font-size: 1.5em;
-  margin: .5em 0 .75em;
+@media screen and (min-width: 1084px) {
+    .nav-tab {
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: center;
+    }
+    .nav-tab-item {
+        flex: 1;
+        flex-grow: 1;
+    }
 }
 
-table tr {
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  padding: .35em;
+a.nav-tab-link {
+    display: block;
+    background: #E6E6E6;
+    padding: 20px 30px;
+    margin: 0 5px;
+    position: relative;
 }
-
-table th,
-table td {
-  padding: .625em;
-  text-align: center;
-}
-
-table th {
-  font-size: .85em;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-
-@media screen and (max-width: 600px) {
-  table {
-    border: 0;
-  }
-
-  table caption {
-    font-size: 1.3em;
-  }
-  
-  table thead {
-    border: none;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
+a.nav-tab-link:before {
+    content: "";
     position: absolute;
-    width: 1px;
-  }
-  
-  table tr {
-    border-bottom: 3px solid #ddd;
+    left: calc(50% - 10px);
+    bottom: -10px;
+    border-width: 0 20px 20px 0;
+    border-style: solid;
+    border-color: transparent;
+    background: transparent;
     display: block;
-    margin-bottom: .625em;
-  }
-  
-  table td {
-    border-bottom: 1px solid #ddd;
-    display: block;
-    font-size: .8em;
-    text-align: right;
-  }
-  
-  table td::before {
-    /*
-    * aria-label has no advantage, it won't be read inside a table
-    content: attr(aria-label);
-    */
-    content: attr(data-label);
-    float: left;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-  
-  table td:last-child {
-    border-bottom: 0;
-  }
+    width: 0;
+    -ms-transform: rotate(45deg);
+    /* IE 9 */
+
+    -webkit-transform: rotate(45deg);
+    /* Chrome, Safari, Opera */
+
+    transform: rotate(45deg);
+}
+a.nav-tab-link:hover, 
+a.nav-tab-link:hover:before {
+    background: #D2D2D2;
+    border-color: transparent #D2D2D2;
+}
+
+
+/* ignore me */
+body {
+    padding: 50px;
 }

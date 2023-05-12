@@ -7,76 +7,49 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	template="/WEB-INF/template/layoutV3.xhtml">
 	<ui:define name="contentV3">
-		<script type="text/javascript">
-		function openModalConsAtividade() {
-            $('#modalConsAtividade').modal('show');
-        }  
-	          
-	    </script>
-		<ul class="nav nav-tabs">
-	         <li class="active">
-	            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#inscritos">Instritos</a>
+		<ul class="nav nav-tab">
+	         <li class="nav-tab-item active">
+	            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#inscritos">Instritos</a>
 	         </li>
-	         <li>
-	            <a data-toggle="pill" class="nav-link" href="#minhasinscricoes">Minhas Inscrições</a>
+	         <li class="nav-tab-item">
+	            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#minhasinscricoes">Minhas Inscrições</a>
 	         </li>
       	</ul>
 		<div class="tab-content py-4">
 	        <div id="inscritos" class="tab-pane active">
-	         	<h:form id="formtblinsc">
-     	 			<div class="row">
-     	 				<div class="col-sm-8 col-sx-6">
-     	 		  			<h1 class="">Inscritos</h1>
-     	 		 		</div>
-     	 		 		<div class="col-sm-4 col-sx-6">
-     	 		 	
-	     	 		  
-						</div>
-					</div>
-                  	<p:separator style="width:99%;" />
-                  <table class="table" id="tblInscritos">
-                     <thead>
-                        <tr>
-                           <th scope="col">Atividade</th>
-                           <th scope="col">Inscrito</th>
-                           <th scope="col" class="ui-padding-right-0-media-400-rcf ui-padding-left-0-media-400-rcf">Status</th>
-                           <th scope="col" class="ui-margin-right--95px-rcf ui-padding-left-0-media-400-rcf ui-margin-right--95px-rcf">Gerenciar</th>
-                        </tr>			   
-                     </thead>
-                     <c:forEach var="insc" items="#{usuarioAtividadeMB.usuAtiv}" step="1" begin="0">
-                        <tr class="">
-                           <th class="p-3 mb-2 bg-light text-dark ui-vertical-align--webkit-baseline-middle-rcf" scope="col" >
-                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
-	                           	<p:commandButton immediate="true"
+	         	
+     	 			<div class="form-group">
+     	 		  		<h3 class="">Inscritos</h3>
+     	 		 	</div>
+                  <h:form id="formtblinsc">
+                  <table class="table-hover">
+					  <thead>
+					    <tr>
+					      <th scope="col">Atividade</th>
+					      <th scope="col">Inscrito</th>
+					      <th scope="col">Status</th>
+					      <th scope="col">Gerenciar</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<c:forEach var="insc" items="#{usuarioAtividadeMB.usuAtiv}" step="1" begin="0">
+						    <tr>
+						      <td data-label="Atividade" class="text-truncate">
+						      	<p:commandButton immediate="true"
 									icon="ui-icon-search" title="Consultar"
-									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":modalAtiv"
-									process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf mx-2">
-								</p:commandButton>
-								<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
-	                           		<p class="text-truncate ui-trucate-text-rcf">#{insc.atividade.nome}</p>
-	                           	</div>
-							</div>
-                           </th>
-                           <th class="text-dark font-weight-normal ui-padding-right-0-rcf ui-vertical-align--webkit-baseline-middle-rcf" scope="col">
-                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
-                           		<p:commandButton immediate="true"
+									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":formHtmlModal"
+									process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
+								</p:commandButton>#{insc.atividade.nome}
+						      </td>
+						      <td data-label="Inscrito" class="text-truncate">
+						      	<p:commandButton immediate="true"
 									icon="ui-icon-search" title="Consultar"
 									actionListener="#{atividadeMB.doConsulta(ativ)}" update=""
 									process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf mx-2">
-								</p:commandButton>
-								<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
-                           			<p class="text-truncate ui-trucate-text-rcf">#{insc.usuario.nome}</p>
-                           		</div>                           		
-							</div>
-                           </th>
-                           <th class="text-dark font-weight-normal ui-vertical-align-inherit-rcf ui-margin-right--95px-rcf ui-padding-right-0-media-400-rcf" scope="col">
-	                           <p class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}
-	                           		 text-truncate ui-trucate-text-rcf">#{insc.status}</p>
-                           </th>
-                           <th scope="col" class="ui-padding-left-0-media-400-rcf ui-vertical-align--webkit-baseline-middle-rcf">
-                           	<div class="row ui-padding-0-rcf ui-margin-right--95px-rcf">
-                           		<div class="col-sm-7 col-sm-7-no-100-width ui-padding-left-0-media-400-rcf">
-	                           	<p:commandButton immediate="true"
+								</p:commandButton>#{insc.usuario.nome}</td>
+						      <td data-label="Status" class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</td>
+						      <td data-label="Gerenciar">
+						      	<p:commandButton immediate="true"
 									icon="ui-icon-check" title="Aprovar" disabled="#{insc.status eq 'Aprovado' ? 'true' : (insc.status eq 'Pendente' ? 'false' : 'false')}"
 									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Aprovado'})}" update=":formtblinsc"
 									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
@@ -86,77 +59,58 @@
 									actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Reprovado'})}" update=":formtblinsc"
 									process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
 								</p:commandButton>
-								</div>
-							</div>
-                           </th>
-                        </tr>
-                     </c:forEach>
-                  </table>
+                                 
+							  </td>
+						    </tr>
+					    </c:forEach>
+					  </tbody>
+					</table>
+                  
+                  
                   </h:form>
-                  <h:form id="modalAtiv">
-                  	<h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
-                  </h:form>
+                  
 	         
 	        </div>
          	<div id="minhasinscricoes" class="tab-pane">
-	         <div id="minhasinscricoes" class="tab-pane">
-	         	<h:form id="formtblmyinsc">
-     	 			<div class="row">
-     	 				<div class="col-sm-8 col-sx-6">
-     	 		  			<h1 class="">Minhas Inscrições</h1>
-     	 		 		</div>
-     	 		 		<div class="col-sm-4 col-sx-6">
-     	 		 	
-	     	 		  
-						</div>
-					</div>
-                  	<p:separator style="width:99%;" />
-                  <table class="table" id="tblmyinscritos">
-                     <thead>
-                        <tr>
-                           <th scope="col">Atividade</th>
-                           <th scope="col" class="ui-padding-right-0-media-400-rcf ui-padding-left-0-media-400-rcf">Status</th>
-                           <th scope="col" class="ui-margin-right--95px-rcf ui-padding-left-0-media-400-rcf ui-margin-right--95px-rcf">Gerenciar</th>
-                        </tr>			   
-                     </thead>
-                     <c:forEach var="insc" items="#{usuarioAtividadeMB.myInscricoes}" step="1" begin="0">
-                        <tr class="">
-                           <th class="p-3 mb-2 bg-light text-dark ui-vertical-align--webkit-baseline-middle-rcf" scope="col" >
-                           	<div class="row ui-margin-right--95px-rcf">
-	                           	<p:commandButton immediate="true"
+	         	<div class="form-group">
+     	 		  	<h3 class="">Minhas Inscrições</h3>
+     	 		 </div> 	
+     	 		  	<h:form id="formtblmyinsc">
+     	 		  	
+     	 		  	<table class="table-hover">
+					  <thead>
+					    <tr>
+					      <th scope="col">Atividade</th>
+					      <th scope="col">Status</th>
+					      <th scope="col">Gerenciar</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<c:forEach var="insc" items="#{usuarioAtividadeMB.myInscricoes}" step="1" begin="0">
+						    <tr>
+						      <td data-label="Atividade" class="text-truncate">
+						      	<p:commandButton immediate="true"
 									icon="ui-icon-search" title="Consultar"
-									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":modalAtivMyInsc"
-									process="@this" oncomplete="openModalConsAtividade()" styleClass="ui-icon-button-rcf mx-2">
-								</p:commandButton>
-								<div class="col-sm-7 col-sm-7-no-100-width">
-	                           		<p class="text-truncate ui-trucate-text-rcf">#{insc.atividade.nome}</p>
-	                           	</div>
-							</div>
-                           </th>
-                           <th class="text-dark font-weight-normal ui-vertical-align-inherit-rcf ui-margin-right--95px-rcf ui-padding-right-0-media-400-rcf" scope="col">
-	                           <p class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}
-	                           		 text-truncate ui-trucate-text-rcf">#{insc.status}</p>
-                           </th>
-                           <th scope="col" class="ui-vertical-align--webkit-baseline-middle-rcf">
-                           	<div class="row">
-                           		<div class="col-sm-7 col-sm-7-no-100-width">
-		                           	<p:commandButton immediate="true"
+									actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":formHtmlModal"
+									process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
+								</p:commandButton>#{insc.atividade.nome}
+						      </td>
+						      <td data-label="Status" class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</td>
+						      <td data-label="Gerenciar">
+						      	<p:commandButton immediate="true"
 										icon="ui-icon-closethick" title="Desistir"
 										actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
 										process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
 									</p:commandButton>
-								</div>
-							</div>
-                           </th>
-                        </tr>
-                     </c:forEach>
-                  </table>
+                                 
+							  </td>
+						    </tr>
+					    </c:forEach>
+					  </tbody>
+					</table>
+     	 		  	
+     	 		  	
                   </h:form>
-                  <h:form id="modalAtivMyInsc">
-                  	<h:outputText value="#{atividadeMB.htmlModalAtiv}" escape="false" />
-                  </h:form>
-	         
-	        </div>
 	         
 	        </div>
 	        <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -164,6 +118,72 @@
                      </p:dialog>
                      <p:ajaxStatus onstart="PF('status').show()"
                         onsuccess="PF('status').hide()" />
+             
+             <!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formHtmlModal">
+						         <div class="modal-header">
+						            <h5 class="modal-title" id="exampleModalLabel">
+						               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						               </button>
+						               <h:outputText value="Evento: #{atividadeMB.editAtividade.evento.titulo}" />
+						            </h5>
+						         </div>
+						         <div class="modal-body">
+						               <h3 class="mb-3">
+						                  <h:outputText value="Atividade: #{atividadeMB.editAtividade.nome}" />
+						               </h3>
+						               <div class="col-md-12 col-lg-12">
+						                  <div class="row mb-3 border-rcf">
+						                     <div class="col-sm-12 row">
+						                        <p class="font-weight-normal">
+						                           <label><strong>Detalhes da Atividade:</strong> #{atividadeMB.editAtividade.detalhes}</label>
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-6 row">
+						                        <p class="font-weight-normal">
+						                           <label><strong>Começa:</strong> 
+						                           	#{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataInicio, 'formato': 'HH:mm'})}
+						                           </label>
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-6 row">
+						                        <p class="font-weight-normal">
+						                           <label><strong>Termina:</strong> 
+						                           	#{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataFim, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': atividadeMB.editAtividade.dataFim, 'formato': 'HH:mm'})}
+						                           </label>
+						                        </p>
+						                     </div>
+						                     <div class="col-sm-12">
+						                        <div class="row">
+						                           <p class="font-weight-normal">
+						                              <label><strong>Preço:</strong> #{atividadeMB.editAtividade.preco}</label>
+						                           </p>
+						                        </div>
+						                        <div class="row">
+						                        	<p class="font-weight-normal">
+						                              <label><strong>Vagas:</strong> #{atividadeMB.editAtividade.vagas - atividadeMB.editAtividade.qtdInscrito} de #{atividadeMB.editAtividade.vagas}</label>
+						                            </p>
+						                        </div>
+						                     </div>
+						                  </div>
+						               </div>
+						               <div class="col-md-12 col-lg-12 ui-padding-right-0-rcf">
+						                  <div class="d-flex align-items-end flex-column">
+								            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+								         </div>
+								       </div>
+						         </div>
+						         </h:form>
+						      </div>
+						   </div>
+						</div>
+             
+             
+             
 	    </div>
 	</ui:define>
 </ui:composition>

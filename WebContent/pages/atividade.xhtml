@@ -8,163 +8,104 @@
 	template="/WEB-INF/template/layoutV3.xhtml">
 	
 	<ui:define name="contentV3">
-
-		<script type="text/javascript">
-		function selAbaTbl() {
-   			$('.nav-tabs a[href="#visualizar"]').tab('show');
-		}
 		
-		function selAbaEdit() {
-			$('.nav-tabs a[href="#gerenciar"]').tab('show');
-   			
-		}
-		function openConfirmedDel() {
-	        $('#newConfirmDel').modal('show');
-	    }
-		
-		function closeConfirmedDel() {
-	        $('#newConfirmDel').modal('hide');
-	        window.location.reload();
-	    }
-	  </script>
-		
-		<ul class="nav nav-tabs">
-	        <li class="active">
-	            <a data-toggle="pill" class="nav-link active" aria-current="page" href="#visualizar">Visualizar</a>
+		<ul class="nav nav-tab">
+	        <li class="nav-tab-item active">
+	            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#visualizar">Visualizar</a>
 	         </li>
-	         <li>
-	            <a data-toggle="pill" class="nav-link" href="#gerenciar">Gerenciar</a>
+	         <li class="nav-tab-item">
+	            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#gerenciar">Gerenciar</a>
 	         </li>
      	 </ul>
      	 <div class="tab-content py-4">
      	 	<div id="visualizar" class="tab-pane active">
-     	 		<div class="col-md-12">
      	 		<h:form id="formtblAtiv">
-     	 		  <h3 class="">Atividades</h3>
-     	 		 
-                  <p:separator style="width:99%;" />
-                  <table class="table table-hover ui-hidden-element-menor576" id="tblAtiv">
-                     <thead>
-                        <tr>
-                           <th scope="col">Evento</th>
-                           <th class="d-none d-sm-block" scope="col">Detalhes</th>
-                           <th scope="col">Atividade</th>
-                           <th class="d-none d-sm-block" scope="col">Data</th>
-                           <th scope="col">Configurar</th>
-                        </tr>			   
-                     </thead>
-                     <c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
-                        <tr>
-                           <th scope="col" class="p-3 mb-2 bg-light text-dark">#{ativ.evento.titulo}</th>
-                           <th scope="col" class="d-none d-sm-block font-weight-normal">#{ativ.detalhes}</th>
-                           <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
-                           <th scope="col" class="d-none d-sm-block font-weight-normal">
-                           	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
-                           </th>
-                           <th scope="col" >
-                           	<p:commandButton immediate="true" id="consultar_#{ativ.id}"
+     	 		  <div class="form-group">
+     	 		  	<h3 class="">Atividades</h3>
+                  </div>
+                  <table class="table-hover">
+					  <thead>
+					    <tr>
+					      <th scope="col">Nome</th>
+					      <th scope="col">Data</th>
+					      <th scope="col">Preço</th>
+					      <th scope="col">Configurar</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+						    <tr>
+						      <td data-label="Titulo" class="text-truncate">#{ativ.nome}</td>
+						      <td data-label="Data" class="text-truncate">
+						      	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+						      </td>
+						      <td data-label="Preço">#{ativ.preco}</td>
+						      <td data-label="Configurar">
+						      	<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
 								icon="ui-icon-search" title="Consultar"
 								actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-                           	<p:commandButton immediate="true" id="editar_#{ativ.id}"
-								icon="ui-icon-wrench" title="Editar"
-								actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-							<p:commandButton immediate="true" icon="ui-icon-trash" id="excluir_#{ativ.id}"
-								title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
-								update="formModalDel" styleClass="ui-icon-button-rcf" />
-                           </th>
-                        </tr>
-                     </c:forEach>
-                  </table>
-                  
-                  <!-- Visivel apenas em tela menor que 575px -->
-                  <div class="accordion ui-hidden-element-maior577" id="accordionExample">
-                     
-                     <c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
-					  <div class="card">
-					    <div class="card-header" id="heading_#{ativ.id}">
-					      <h2 class="mb-0">
-					        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse_#{ativ.id}" aria-expanded="true" aria-controls="collapse_#{ativ.id}">
-					          #{ativ.nome}
-					        </button>
-					      </h2>
-					    </div>
-					
-					    <div id="collapse_#{ativ.id}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-					      <div class="card-body">
-					       	<strong>Evento: </strong>#{ativ.evento.titulo}<br />
-					        <strong>Descricao: </strong>#{ativ.detalhes}<br />
-							<strong>Inicio: </strong>#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}<br />
-							<strong>Valor: </strong>#{ativ.preco}<br />
-					      </div>
-					      <div class="card-footer text-muted">
-					      	<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
-								icon="ui-icon-search" title="Consultar"
-								actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
+								process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
 							</p:commandButton>
                            	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
 								icon="ui-icon-wrench" title="Editar"
-								actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv"
-								process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf">
+								actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
+								process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
 							</p:commandButton>
-                             <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
-                                title="Excluir" oncomplete="openConfirmedDel()" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
-                                update="formModalDel" styleClass="ui-icon-button-rcf" />
-					      </div>
-					    </div>
-					  </div>
-					  </c:forEach>
-					  
-					</div>
+							<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
+								title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
+								update="formModalDel" styleClass="ui-icon-button-rcf" />
+                                 
+							  </td>
+						    </tr>
+					    </c:forEach>
+					  </tbody>
+					</table>
                  
                   </h:form>
-                   </div>
+                  
+                  <!-- Modal de confirmação de Exclusão -->
                   <div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                       <div class="modal-content">
-                                      	 <h:form id="formModalDel">
-	                                          <div class="modal-header">
-	                                             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
-	                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	                                             <span aria-hidden="true"></span>
-	                                             </button>
-	                                          </div>
-	                                          <div class="modal-body">
-	                                          	
-	                                          		<c:choose>
-	                                          			<c:when test="#{atividadeMB.ativSel.existeInscrito}">
-	                                          				<div class="alert alert-warning" role="alert">
-																Atenção!, Não é possivel excluir essa Atidade, existem inscritos Aprovados ou Pendentes
-															</div>
-	                                          			</c:when>
-	                                          			<c:otherwise>
-	                                          				<div class="border-rcf">
-					                                            <label>Deseja realmente excluir a Atividade <strong>'#{atividadeMB.ativSel.nome}'</strong> ?</label>
-															</div> 
-			                                             </c:otherwise>
-													</c:choose>
-	                                          </div>
-	                                          <div class="modal-footer">
-	                                             <button type="button" class="btn" data-dismiss="modal">#{atividadeMB.ativSel.existeInscrito ? 'Fechar' : 'Não'}</button>
-	                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-	                                                onstart="closeConfirmedDel()" rendered="#{atividadeMB.ativSel.existeInscrito ? 'false' : 'true'}"
-	                                                actionListener="#{atividadeMB.doRemove(atividadeMB.ativSel)}" update=":msgs :formtblAtiv" />
-	                                          </div>
-                                          </h:form>
-                                       </div>
-                                    </div>
-                                 </div>
+				   <div class="modal-dialog" role="document">
+				      <div class="modal-content">
+				     	 <h:form id="formModalDel">
+				          <div class="modal-header">
+				             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+				             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				             <span aria-hidden="true"></span>
+				             </button>
+				          </div>
+				          <div class="modal-body">
+				          	<c:choose>
+				          		<c:when test="#{atividadeMB.ativSel.existeInscrito}">
+				          			<div class="alert alert-warning" role="alert">
+										Atenção!, Não é possivel excluir essa Atidade, existem inscritos Aprovados ou Pendentes
+									</div>
+				          		</c:when>
+				          		<c:otherwise>
+				          			<div class="border-rcf">
+				                    	<label>Deseja realmente excluir a Atividade <strong>'#{atividadeMB.ativSel.nome}'</strong> ?</label>
+									</div> 
+				                </c:otherwise>
+							</c:choose>
+				          </div>
+				          <div class="modal-footer">
+				             <button type="button" class="btn" data-dismiss="modal">#{atividadeMB.ativSel.existeInscrito ? 'Fechar' : 'Não'}</button>
+				             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+				                onstart="closeModal('newConfirmDel')" rendered="#{atividadeMB.ativSel.existeInscrito ? 'false' : 'true'}"
+				                actionListener="#{atividadeMB.doRemove(atividadeMB.ativSel)}" update=":msgs :formtblAtiv" />
+				          </div>
+				         </h:form>
+				      </div>
+				   </div>
+				</div>
+                  
                   
      	 	</div>
      	 	<div id="gerenciar" class="tab-pane">
-     	 		<div class="col-md-12">
-                     <h:form id="formAtiv">
-                     <h3 class="">#{atividadeMB.editAtividade.id eq null ? 'Adicionar Atividade' : (atividadeMB.modoConsulta ? 'Consultando a Atividade' : 'Editar Atividade')}</h3>
-                  		<p:separator style="width:99%;" />
+                 <h:form id="formAtiv">
+                 	<div class="form-group">
+                     	<h3 class="">#{atividadeMB.editAtividade.id eq null ? 'Adicionar Atividade' : (atividadeMB.modoConsulta ? 'Consultando a Atividade' : 'Editar Atividade')}</h3>
+                  	</div>	
                   		<p:panelGrid rendered="#{atividadeMB.editAtividade.eventonaovigente ? (atividadeMB.editAtividade.doEditAtiv eq 'true' ? 'true' : 'false') : 'false'}">
 		                	<div class="col-md-12 col-lg-12">
 		                    	<div class="alert alert-warning" role="alert">
@@ -180,7 +121,7 @@
 		                    </div>
 	                    </p:panelGrid>
                         <div class="col-md-12 col-lg-12">
-                           <div class="row mb-3 border-rcf">
+                           <div class="row mb-3 pt-4 border-rcf bg-white shadow">
                            		<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
                               		<label for="titulo" class="col-form-label">Nome:</label>
                               	</div>
@@ -203,8 +144,6 @@
 											itemLabel="#{event.titulo}" itemValue="#{event.id}" />
 									</h:selectOneMenu>
 								</div>
-							</div>
-                            <div class="row mb-3 border-rcf">
                             	<div class="col-lg-6 col-md-6 col-sm-12 col-small-12-rcf form-group input-group">
                                  <div class="input-group-prepend bg-light border border-light">
                                     <div class="input-group-text">
@@ -278,8 +217,6 @@
                                  	<p:ajax event="blur" listener="#{atividadeMB.validaHoraFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/>   
                                  </p:inputMask>
                               </div>
-                           </div>
-                           <div class="row mb-3 border-rcf">
                               <div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
                                  <div class="input-group-prepend bg-light border border-light">
                                     <div class="input-group-text">
@@ -324,15 +261,12 @@
                                     <p:ajax event="blur" update="titulo, dataInicio, datafim, horafrom, horafim, detalhes"/>
                                  </h:inputTextarea>
                               </div>
-                           </div>
-                           <div class="row mb-3">
-                              <div class="col-sm-12">
+                              <div class="col-sm-12 form-group mt-3">
                               	 <div class="btn-group" role="group" aria-label="Basic example">
 	                                 <p:commandButton rendered="#{!atividadeMB.modoConsulta}"
 	                                    value="#{atividadeMB.editAtividade.id eq null ? 'Cadastra Atividade' : 'Salvar Alterações'}"
 	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
-	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv"
-	                                    oncomplete="selAbaTbl();" >
+	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv" >
 	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 	                                    <p:ajax render="tblAtiv" update="formAtiv, formtblAtiv" />
 	                                 </p:commandButton>
@@ -340,7 +274,7 @@
 	                                    value="#{atividadeMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
 	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
 	                                    actionListener="#{atividadeMB.doPrepareSave}" update=":formtblAtiv :formAtiv"
-	                                    oncomplete="selAbaTbl();"  >
+	                                    oncomplete="selAba('visualizar')"  >
 	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 	                                    <p:ajax render="tblAtiv" update=":formtblAtiv :formAtiv" />
 	                                 </p:commandButton>
@@ -383,7 +317,6 @@
                      </p:dialog>
                      <p:ajaxStatus onstart="PF('status').show()"
                         onsuccess="PF('status').hide()" />
-                  </div>
      	 	</div>
      	 </div>
 	</ui:define>

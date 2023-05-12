@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import org.primefaces.context.PrimeFacesContext;
+import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -89,15 +90,9 @@ public class UsuarioMB extends BaseMB  {
 	
 	public void doSave(){
 		try {
-			this.modalPosCadUsu = "";
-			if(getCurrentUser() == null) {
-			String campos = validaCampoObrigatorioParaInsert();
-				if(!campos.equals("")) {
-					throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {campos}));
-				}
-			}
 			usuarioSB.insert(editUsuario);
-			this.modalPosCadUsu = setHtmlModalPosCadUsu();
+			showInfoMessage(MessageBundleLoader.getMessage("usu.insert_sucess", new Object[] {editUsuario.getLogin()}));
+			RequestContext.getCurrentInstance().execute("selAba('login')");
 		} catch (LoginJaCadastradoException e2){
 			showErrorMessage(e2.getMessage());
 		} catch (CampoObrigatorioException e) {
@@ -106,25 +101,6 @@ public class UsuarioMB extends BaseMB  {
 			showErrorMessage(e.getMessage());
 			editUsuario.setSenha(null);
 			editUsuario.setConfirmSenha(null);
-		}
-	}
-	
-	public String validaCampoObrigatorioParaInsert() {
-		StringBuilder campos = new StringBuilder();
-		if(editUsuario.getNome().equals("")) {
-			campos.append("'Nome Completo', ");
-		}
-		if(editUsuario.getEmail().equals("")) {
-			campos.append("'E-mail', ");
-		}
-		if(editUsuario.getLogin().equals("")) {
-			campos.append("'Login', ");
-		}
-		String camposString = campos.toString();
-		if (camposString.equals("")){
-			return camposString;
-		} else {
-			return camposString.substring(0, camposString.length() - 2);
 		}
 	}
 	
@@ -379,35 +355,5 @@ public class UsuarioMB extends BaseMB  {
 		Date data = (Date) params.get("data");
 		String formato = (String) params.get("formato");
         return formatarData(data, formato);
-    }
-	
-	private String setHtmlModalPosCadUsu() {
-		return "<div class=\"modal fade\" id=\"modalPosCadUsu\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"confirmDel\" aria-hidden=\"true\">\r\n"
-				+ "						   <div class=\"modal-dialog\" role=\"document\">\r\n"
-				+ "						      <div class=\"modal-content\">\r\n"
-				+ "						         <div class=\"modal-header\">\r\n"
-				+ "						            <h5 class=\"modal-title\" id=\"exampleModalLabel\">\r\n"
-				+ "						               <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n"
-				+ "						               <span aria-hidden=\"true\"></span>\r\n"
-				+ "						               </button>\r\n"
-				+ "						               Sucesso\r\n"
-				+ "						            </h5>\r\n"
-				+ "						         </div>\r\n"
-				+ "						         <div class=\"modal-body\">\r\n"
-				+ "						            <div class=\"col-md-12 col-lg-12\">\r\n"
-				+ "						               <div class=\"row mb-3 border-rcf\">\r\n"
-				+ "						                  <label>Usuário '" + editUsuario.getLogin() + "' cadastrado com sucesso, deseja realizar Login?</label>\r\n"
-				+ "						               </div>\r\n"
-				+ "						            </div>\r\n"
-				+ "						         </div>\r\n"
-				+ "						         <div class=\"modal-footer\">\r\n"
-				+ "						        	<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\" onclick=\"selAbaLogin('sim');\">Sim</button>\r\n"
-				+ "						         	<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\" onclick=\"selAbaLogin('nao');\">Não</button>\r\n"
-				+ "						         </div>\r\n"
-				+ "						      </div>\r\n"
-				+ "						   </div>\r\n"
-				+ "						</div>";
-	}
-	
-	
+	}	
 }

@@ -28,3 +28,42 @@ tabButtons.forEach(button => {
     document.getElementById(target).classList.add('active');
   });
 });
+
+function selAba(aba) {
+ 	$('.nav-tab a[href="#'+ aba + '"]').tab('show');		
+}
+
+function openModal(modal) {
+	$('#' + modal + '').modal('show');
+}
+
+function closeModal(modal) {
+	$('#' + modal + '').modal('show');
+}
+
+// seleciona todos os elementos .nav-tab-link
+var tabs = document.querySelectorAll('.nav-tab-link');
+
+// adiciona um ouvinte de eventos de clique a cada tab
+tabs.forEach(function(tab) {
+ tab.addEventListener('click', function(e) {
+   e.preventDefault();
+
+   // remove a classe 'active' de todas as tabs e tab-panes
+   var activeTabs = document.querySelectorAll('.nav-link.active');
+   activeTabs.forEach(function(activeTab) {
+     activeTab.classList.remove('active');
+   });
+   var activePanes = document.querySelectorAll('.tab-pane.active');
+   activePanes.forEach(function(activePane) {
+     activePane.classList.remove('active');
+   });
+
+   // adiciona a classe 'active' à tab e pane clicadas
+   var tabClicked = e.target;
+   var tabId = tabClicked.getAttribute('href');
+   var pane = document.querySelector(tabId);
+   tabClicked.classList.add('active');
+   pane.classList.add('active');
+ });
+});
