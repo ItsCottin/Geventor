@@ -73,9 +73,11 @@ public class AtividadeSB extends BaseSB {
 	 }
 	
 	@Transactional(propagation=Propagation.REQUIRED)
-	public void editAtiv (Atividade ativ, Long idEven) {
-		ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
-		ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
+	public void editAtiv (Atividade ativ, Long idEven, boolean dataEstaIncompleta) {
+		if(dataEstaIncompleta) {
+			ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
+			ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
+		}
 		ativ.setDataAlter(getDateAlter());
 		atividadeDAO.save(ativ);
 	}

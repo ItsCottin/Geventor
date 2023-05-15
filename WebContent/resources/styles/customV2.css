@@ -492,7 +492,7 @@ table th {
 }
 
 @media screen and (min-width: 601px) {
-	table {
+	.table-rcf-shadow {
 		box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 	}
 }

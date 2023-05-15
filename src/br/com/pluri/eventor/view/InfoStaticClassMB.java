@@ -14,6 +14,14 @@ import lombok.Setter;
 *	4. Adicionado class contendo todas as informacoes de alteracoes
 *	5. Alterado templete criando um fooster para deixar visivel versao do sistema.
 *	6. Alterado botão Menu para ficar visivel apenas quando estiver logado.
+*	7. Ajustado novo Layout em todas as paginas.
+*	8. Adicionado exibicao de mensagem de nenhum registro disponivel para exibicao caso nao tenha nenhum regsitro para exibir em todas as telas.
+*	9. Adicionado funcionalidade de alteracao de periodo de Atividade com base na alteracao no perido no evento.
+*	10. Adicionado funcionalidade de exclusao de atividades vinculadas no evento caso seja solicitado exclusao do evento.
+*	11. Adicionado funcionalidade de validacao na exclusao de evento e de atividade para nao permitir excluir caso tenha Inscrito 'Pendente' ou 'Aprovado'.
+*	12. Adicionado pagina evento.xhtml com parametro de id para que o usuario possa compartilhar o link com as informacoes do evento em qualquer plataforma.
+*	13. Adicionado funcionalidade para gerar um GUID (utilizado para carregar informacoes do evento na pagina 'evento.xhtmtl') e já exibir previa do link de compartilhamento na tela de cadastro de Evento.
+*	14. 
 *  
 *   v0.2.9 - 04 de Maio de 2023
 *	1. Primeira Parte de implementação de regras CRUD.

@@ -27,7 +27,7 @@
                   <div class="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
                   <c:choose>
 		             <c:when test="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0}">
-		               <table class="table-hover">
+		               <table class="table-hover table-rcf-shadow">
 						  <thead>
 						    <tr>
 						      <th scope="col">Nome</th>
@@ -131,6 +131,10 @@
 								</div>
 		                    </div>
 	                    </p:panelGrid>
+	                    <div class="col-md-12 col-lg-12 d-flex justify-content-center align-items-center"> 
+	                    	<h:outputLabel styleClass="#{atividadeMB.evenSemVaga ? (atividadeMB.editAtividade.doEditAtiv eq 'alert alert-warning' ? 'alert alert-warning' : '') : ''}" id="infEvenSemVaga" 
+	                    		value="#{atividadeMB.evenSemVaga ? (atividadeMB.editAtividade.doEditAtiv eq 'Evento selecionado sem vaga disponível para cadastro de Atividades.' ? 'Evento selecionado sem vaga disponível para cadastro de Atividades.' : '') : ''}" />
+	                    </div>
                         <div class="col-md-12 col-lg-12">
                            <div class="row mb-3 pt-4 border-rcf bg-white shadow">
                            		<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
@@ -146,9 +150,9 @@
                               		<label for="eventos" class="col-form-label">Evento:</label>
                               	</div>
                               	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
-	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" label="Evento" required="true"
-											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta}">
-										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update="cbxIsGratuito, infoInicioEven, infoFimEven, vagas, vagadisponivel, preco, vlrativ, titulo, :formtblAtiv"/>
+	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control #{atividadeMB.modoConsulta ? (atividadeMB.evenSemVaga ? 'bg-white' : 'bg-light border border-light') : 'bg-white'}" label="Evento" required="true"
+											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta ? (atividadeMB.evenSemVaga ? 'false' : 'true') : 'false'}">
+										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update=":formtblAtiv :formAtiv"/>
 										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
 											noSelectionOption="true" />
 										<f:selectItems value="#{atividadeMB.resultadoEvento}" var="event"
@@ -268,7 +272,7 @@
                                  <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Detalhes da Atividade"
                                     maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{atividadeMB.modoConsulta}"
                                     autoResize="false" value="#{atividadeMB.editAtividade.detalhes}"
-                                    label="Descrição" styleClass="form-control" id="detalhes" >
+                                    label="Descrição" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="detalhes" >
                                     <p:ajax event="blur" update="titulo, dataInicio, datafim, horafrom, horafim, detalhes"/>
                                  </h:inputTextarea>
                               </div>

@@ -4,12 +4,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +17,7 @@ import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,7 @@ import br.com.pluri.eventor.business.exception.CEPInvalidoException;
 import br.com.pluri.eventor.business.exception.DDDInvalidoException;
 import br.com.pluri.eventor.business.exception.DataInvalidaException;
 import br.com.pluri.eventor.business.exception.ExisteAtividadeVinculadaException;
+import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.NRCasaUsuarioException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
@@ -96,16 +96,12 @@ public class EventoMB extends BaseMB {
 	private List<Atividade> resultadoAtividadeByEvento;
 	private List<Evento> resultadoEvento;
 	private Evento editEvento;
-	private Map<String,Map<String,String>> data = new HashMap<String, Map<String,String>>();
 	private List<Cidade> cidades;
 	private List<Estado> estados;
 	private int indexTab = 0;
 	private List<Evento> resultEven;
 	private List<Evento> allEvenMenosMeus;
 	private static final long serialVersionUID = 1L;
-	private ScheduleModel eventModel;
-    private ScheduleModel lazyEventModel;
-    private ScheduleEvent event = new DefaultScheduleEvent();
 	private boolean confirmaExclui = false;
 	public boolean modoConsulta;
 	public Evento evenSel;
@@ -115,6 +111,7 @@ public class EventoMB extends BaseMB {
 	public boolean dataValidada;
 	public boolean cepvalidoinformado;
 	public boolean exibeModalEditAtiv;
+	public int vagasInAtividades;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -124,6 +121,7 @@ public class EventoMB extends BaseMB {
 			this.modoConsulta = false;
 			this.evenSel = new Evento();
 			this.editEvento = new Evento();
+			this.editEvento.setGuid(PasswordUtils.generateGUID());
 			findAllEventoMenosMeus();
 			this.usaTelefone = "Telefone";
 			this.maskTelefone = "(99) 9999-9999";
@@ -166,12 +164,16 @@ public class EventoMB extends BaseMB {
 		cidades = cidadeSB.findByEstado(editEvento.getEstado());
 	}
 	
+	public void getQtdVagasInAtividadesByEvento(Long idEven) {
+		for (Atividade ativ : atividadeSB.findByEventos(idEven)) {
+			this.vagasInAtividades = vagasInAtividades + ativ.getVagas();
+		}
+	}
+	
 	public void onChangeUtilizarSite(){
 		if(!editEvento.isSiteProprio()){
-			this.editEvento.setGuid("");
 			this.editEvento.setSite("");
 		} else {
-			this.editEvento.setGuid(PasswordUtils.generateGUID());
 			this.editEvento.setSite("https://geventor.azurewebsites.net/evento.xhtml?id=" + editEvento.getGuid());
 		}
 	}
@@ -276,6 +278,9 @@ public class EventoMB extends BaseMB {
 	
 	public void doSave(boolean validaPeriodoAtiv) {
 		try {
+			if(editEvento.getVagas() == 0) {
+				throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
+			}
 			boolean isCad = false;
 			if(editEvento.getId() == null){
 				isCad = true;
@@ -312,6 +317,14 @@ public class EventoMB extends BaseMB {
 			}
 			if(editEvento.getTitulo() != null) {
 				eventoSB.insert(editEvento, getCurrentUserId());
+				if(editEvento.getAtividades() != null) {
+					if(editEvento.getAtividades().size() > 0) {
+						for (Atividade ativ : editEvento.getAtividades()){
+							atividadeSB.editAtiv(ativ, editEvento.getId(), false);
+							showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {ativ.getNome()}));
+						}
+					}
+				}
 			}
 			if (isCad) {
 				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess", new Object[] {editEvento.getTitulo()}));
@@ -323,6 +336,9 @@ public class EventoMB extends BaseMB {
 			RequestContext.getCurrentInstance().execute("selAba('visualizar')");
 		} catch (ExisteAtividadeVinculadaException e) {
 			RequestContext.getCurrentInstance().execute("openModal('modalEditAtiv')");
+		} catch (LoginJaCadastradoException e) {
+			this.editEvento.setVagas(1);
+			showErrorMessage(e.getMessage());
 		}
 	}
 	
@@ -356,6 +372,8 @@ public class EventoMB extends BaseMB {
 	
 	public void doPrepareSave(){
 		editEvento = new Evento();
+		this.vagasInAtividades = 0;
+		this.editEvento.setGuid(PasswordUtils.generateGUID());
 		this.modoConsulta = false;
 		this.resultadoAtividadeByEvento = null;
 		findAllEventoMenosMeus();
@@ -460,7 +478,18 @@ public class EventoMB extends BaseMB {
 	
 	public void doEdit(Evento edit) throws SQLException {
 		onPrepareEditOuConsulta(edit, false);
+		getQtdVagasInAtividadesByEvento(edit.getId());
 		this.editEvento.setDoEditEven(true);
+	}
+	
+	public void validaVagasDoEditEven() {
+		if(editEvento.getVagas() < vagasInAtividades) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.qtdvagasineven", new Object[] {vagasInAtividades}));
+			editEvento.setVagas(vagasInAtividades);
+		} else if (editEvento.getVagas() < 1 && vagasInAtividades == 0) {
+			showErrorMessage(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
+			editEvento.setVagas(1);
+		}
 	}
 	
 	public void doConsulta(Map<String, Object> params) throws SQLException {

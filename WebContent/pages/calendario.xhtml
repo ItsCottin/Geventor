@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+   xmlns:p="http://primefaces.org/ui"
+   xmlns:c="http://java.sun.com/jsp/jstl/core"
+   template="/WEB-INF/template/layoutV3.xhtml">
+   <ui:define name="contentV3">
+   	<div class="container-fluid">
+	   	<div class="form-group">
+	      <h3 class="">Calendário</h3>
+	   	</div>
+   		<p:panel styleClass="shadow no-border-rcf" id="timeLineEvent" header="Todos seus eventos em time line">
+			<h:panelGrid styleClass="no-border-rcf no-shadow-rcf" columns="1" cellpadding="9" style="width: 100%;">
+				<h:form id="formEventCalendario">
+			    	<p:schedule id="schedule2" value="#{eventoMB.eventModel}" widgetVar="myschedule" >
+		                                 
+		            </p:schedule>
+		        </h:form>
+	        </h:panelGrid>
+        </p:panel>
+   
+   	</div>
+   </ui:define>
+</ui:composition>

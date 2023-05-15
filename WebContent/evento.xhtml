@@ -31,6 +31,14 @@
 							<h1 class="text-center"><strong>Evento:</strong> #{URLsharedEventMB.evento.titulo}</h1>
 						</div>
 					</div>
+					<div class="row mt-3">
+			    		<div class="col-xl-12 col-md-12 col-sm-12">
+			    			<p><strong>Descrição:</strong> #{URLsharedEventMB.evento.descricao}</p>
+			    			<p><strong>Custo:</strong> #{URLsharedEventMB.evento.vlr}</p>
+			    			<p><strong>Data:</strong> dás #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'HH:mm'})} até #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'HH:mm'})}</p>
+			    			<p><strong>Endereço:</strong> Estado: #{URLsharedEventMB.evento.estado}, Cidade: #{URLsharedEventMB.evento.cidade}, Bairro: #{URLsharedEventMB.evento.bairro}, Endereço: #{URLsharedEventMB.evento.endereco}, Numero: #{URLsharedEventMB.evento.numeroLugar}</p>
+			    		</div>
+			    	</div>
 		    	</div>
 			    <div class="row">
 			    	<div class="col-xl-12 col-md-12 col-sm-12">

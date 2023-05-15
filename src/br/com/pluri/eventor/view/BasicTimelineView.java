@@ -1,5 +1,6 @@
 package br.com.pluri.eventor.view;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -8,6 +9,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.primefaces.event.timeline.TimelineSelectEvent;
+import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.model.LazyScheduleModel;
+import org.primefaces.model.ScheduleEvent;
+import org.primefaces.model.ScheduleModel;
 import org.primefaces.model.timeline.TimelineEvent;
 import org.primefaces.model.timeline.TimelineModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +47,13 @@ public class BasicTimelineView extends BaseMB {
    
     @PostConstruct 
     protected void initialize() { 
+    	
     	gerEventIndex();
         model = new TimelineModel();
         for(Evento event : gerEvent){
         	model.add(new TimelineEvent(event.getTitulo(), event.getDataInicio()));
         }
-    }  
+    }
     
     public void gerEventIndex(){
     	this.gerEvent = eventoSB.findAll();
@@ -54,5 +61,6 @@ public class BasicTimelineView extends BaseMB {
    
     public void onSelect(TimelineSelectEvent e) {  
         TimelineEvent timelineEvent = e.getTimelineEvent(); 
-    }    
+    }   
+    
 }

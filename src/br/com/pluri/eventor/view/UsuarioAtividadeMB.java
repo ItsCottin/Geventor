@@ -30,6 +30,7 @@ public class UsuarioAtividadeMB extends BaseMB {
 	@Autowired
 	private UsuarioSB usuSB;
 	
+	private Usuario usuario;
 	private List<Usuario> inscritos;
 	private List<UsuarioAtividade> usuAtiv;
 	private List<UsuarioAtividade> myInscricoes;	
@@ -62,6 +63,11 @@ public class UsuarioAtividadeMB extends BaseMB {
 	public void doDelete(UsuarioAtividade usuAtiv){
 		usuAtivSB.delete(usuAtiv);
 		findMyInscricoes();
+	}
+	
+	public void doConsultaUsuario(Usuario usuario) {
+		this.usuario = new Usuario();
+		this.usuario = usuario;
 	}
 	
 	

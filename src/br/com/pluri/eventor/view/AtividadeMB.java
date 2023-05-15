@@ -26,6 +26,7 @@ import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.EventoSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
+import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
@@ -57,6 +58,7 @@ public class AtividadeMB extends BaseMB {
 	public boolean dataValidada;
 	public String infoDataInicioEven;
 	public String infoDataFimEven;
+	public boolean evenSemVaga;
 	
 	@PostConstruct
 	public void PostConstruct(){
@@ -68,25 +70,39 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void doSave(){
-		if(idEvento == null) {
-			idEvento = editAtividade.evento.getId();
+		try {
+			if(editAtividade.getVagas() == 0) {
+				throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
+			}
+			if(idEvento == null) {
+				idEvento = editAtividade.evento.getId();
+			}
+			if(editAtividade.getId() == null){
+				atividadeSB.insert(editAtividade, idEvento);
+				showInfoMessage(MessageBundleLoader.getMessage("ativ.insert_sucess", new Object[] {editAtividade.getNome()}));
+			}else{
+				atividadeSB.editAtiv(editAtividade, idEvento, true);
+				showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {editAtividade.getNome()}));
+			}
+			RequestContext.getCurrentInstance().execute("selAba('visualizar')");
+			onAllAtividade();
+			doPrepareSave();
+		} catch(LoginJaCadastradoException e) {
+			showErrorMessage(e.getMessage());
+			this.editAtividade.setVagas(1);
 		}
-		if(editAtividade.getId() == null){
-			atividadeSB.insert(editAtividade, idEvento);
-			showInfoMessage(MessageBundleLoader.getMessage("ativ.insert_sucess", new Object[] {editAtividade.getNome()}));
-		}else{
-			atividadeSB.editAtiv(editAtividade, idEvento);
-			showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {editAtividade.getNome()}));
-		}
-		RequestContext.getCurrentInstance().execute("selAba('visualizar')");
-		onAllAtividade();
-		doPrepareSave();
 	}
 	
 	// Metodo criado para alterar a atividade entre eventos.
 	public void onEventoChangeV2(){
 		editAtividade.evento = eventoSB.findById(idEvento);
 		setQtdVagasRest();
+		this.evenSemVaga = false;
+		this.modoConsulta = false;
+		if(vagasRestant == 0) {
+			this.evenSemVaga = true;
+			this.modoConsulta = true;
+		}
 		if(editAtividade.evento.getVlr().equals("Gratuito")){
 			editAtividade.setIsgratuito(true);
 			editAtividade.setPreco("Gratuito");
@@ -448,6 +464,7 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void doPrepareSave(){
+		this.evenSemVaga = false;
 		this.editAtividade = new Atividade();
 		onEventos();
 		this.vagasRestant = 0; 
@@ -498,7 +515,11 @@ public class AtividadeMB extends BaseMB {
 		if(editAtividade.evento != null){
 			if(vagasRestant < editAtividade.getVagas()){
 				showErrorMessage(MessageBundleLoader.getMessage("critica.vagamaiordisponivel"));
-				editAtividade.setVagas(0);
+				editAtividade.setVagas(1);
+				setQtdVagasRest();
+			} else if(editAtividade.getVagas() == 0) {
+				showErrorMessage(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
+				editAtividade.setVagas(1);
 				setQtdVagasRest();
 			} else {
 				setQtdVagasRest();

@@ -24,7 +24,7 @@
                  	<div class="${fn:length(usuarioAtividadeMB.usuAtiv) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
                  	<c:choose>
 		             <c:when test="${fn:length(usuarioAtividadeMB.usuAtiv) > 0}">
-		               	<table class="table-hover">
+		               	<table class="table-hover table-rcf-shadow">
 						  <thead>
 						    <tr>
 						      <th scope="col">Atividade</th>
@@ -37,18 +37,21 @@
 						  	<c:forEach var="insc" items="#{usuarioAtividadeMB.usuAtiv}" step="1" begin="0">
 							    <tr>
 							      <td data-label="Atividade" class="text-truncate">
-							      	<p:commandButton immediate="true"
-										icon="ui-icon-search" title="Consultar"
-										actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":formHtmlModal"
-										process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
-									</p:commandButton>#{insc.atividade.nome}
+								      	<p:commandButton immediate="true"
+											icon="ui-icon-search" title="Consultar"
+											actionListener="#{atividadeMB.prepareEditOuConsulta(insc.atividade)}" update=":formHtmlModal"
+											process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
+										</p:commandButton>
+									#{insc.atividade.nome}
 							      </td>
 							      <td data-label="Inscrito" class="text-truncate">
-							      	<p:commandButton immediate="true"
-										icon="ui-icon-search" title="Consultar"
-										actionListener="#{atividadeMB.doConsulta(ativ)}" update=""
-										process="@this" oncomplete="selAbaEdit()" styleClass="ui-icon-button-rcf mx-2">
-									</p:commandButton>#{insc.usuario.nome}</td>
+								      	<p:commandButton immediate="true"
+											icon="ui-icon-search" title="Consultar"
+											actionListener="#{usuarioAtividadeMB.doConsultaUsuario(insc.usuario)}" update="formModalConsUsuario"
+											process="@this" oncomplete="openModal('modalConsUsuario')" styleClass="ui-icon-button-rcf mx-2">
+										</p:commandButton>
+									#{insc.usuario.nome}
+								  </td>
 							      <td data-label="Status" class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</td>
 							      <td data-label="Gerenciar">
 							      	<p:commandButton immediate="true"
@@ -87,7 +90,7 @@
      	 		 	<div class="${fn:length(usuarioAtividadeMB.myInscricoes) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
      	 		 	<c:choose>
 		             <c:when test="${fn:length(usuarioAtividadeMB.myInscricoes) > 0}">
-		               <table class="table-hover">
+		               <table class="table-hover table-rcf-shadow">
 						  <thead>
 						    <tr>
 						      <th scope="col">Atividade</th>
@@ -108,11 +111,10 @@
 							      <td data-label="Status" class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</td>
 							      <td data-label="Gerenciar">
 							      	<p:commandButton immediate="true"
-											icon="ui-icon-closethick" title="Desistir"
-											actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
-											process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
-										</p:commandButton>
-	                                 
+										icon="ui-icon-closethick" title="Desistir"
+										actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
+										process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+									</p:commandButton>
 								  </td>
 							    </tr>
 						    </c:forEach>
@@ -187,6 +189,51 @@
 						                     </div>
 						                  </div>
 						               </div>
+						               <div class="col-md-12 col-lg-12 ui-padding-right-0-rcf">
+						                  <div class="d-flex align-items-end flex-column">
+								            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+								         </div>
+								       </div>
+						         </div>
+						         </h:form>
+						      </div>
+						   </div>
+						</div>
+						
+						<!-- modal consulta Usuario -->
+					 <div class="modal fade" id="modalConsUsuario" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formModalConsUsuario">
+						         <div class="modal-header">
+						            <h5 class="modal-title" id="exampleModalLabel">
+						               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						               </button>
+						               <h:outputText value="Usuario" />
+						            </h5>
+						         </div>
+						         <div class="modal-body">
+						               <h3 class="mb-3">
+						                  <h:outputText value="Nome: #{usuarioAtividadeMB.usuario.nome}" />
+						               </h3>
+										  <ul class="list-group">
+										       <li class="list-group-item no-border-rcf">
+										      	  <div class="row">
+											      	 <div class="col-sm-4 col-md-4 col-lg-2 col-small-4-rcf">
+											        	 <h:graphicImage library="perfil" name="#{usuarioAtividadeMB.usuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
+											         </div>
+											         <div class="col-sm-8 col-md-8 col-lg-10 col-small-8-rcf">
+											        	 <p class=""><strong>Nome:</strong> #{usuarioAtividadeMB.usuario.nome}</p>
+				                           				 <p class=""><strong>Contato:</strong> #{usuarioAtividadeMB.usuario.email}</p>
+				                           				 <p class=""><strong>#{usuarioAtividadeMB.usuario.telefone eq null ? 'Sem contato de Telefone' : (usuarioAtividadeMB.usuario.telefone eq '' ? 'Sem contato de Telefone' : 'Telefone:')}</strong> #{usuarioAtividadeMB.usuario.telefone eq null ? '' : (usuarioAtividadeMB.usuario.telefone eq '' ? '' : usuarioAtividadeMB.usuario.telefone)}</p>
+				                           				 <p class=""><strong>#{usuarioAtividadeMB.usuario.celular eq null ? 'Sem contato de Celular' : (usuarioAtividadeMB.usuario.celular eq '' ? 'Sem contato de Celular' : 'Celular:')}</strong> #{usuarioAtividadeMB.usuario.celular eq null ? '' : (usuarioAtividadeMB.usuario.celular eq '' ? '' : usuarioAtividadeMB.usuario.celular)}</p>
+				                           				 <p class=""><strong>#{usuarioAtividadeMB.usuario.estado eq null ? 'Sem informação de Estado' : (usuarioAtividadeMB.usuario.estado eq '' ? 'Sem informação de Estado' : 'Estado:')}</strong> #{usuarioAtividadeMB.usuario.estado eq null ? '' : (usuarioAtividadeMB.usuario.estado eq '' ? '' : usuarioAtividadeMB.usuario.estado)}</p>
+				                           				 <p class=""><strong>#{usuarioAtividadeMB.usuario.cidade eq null ? 'Sem informação de Cidade' : (usuarioAtividadeMB.usuario.cidade eq '' ? 'Sem informação de Cidade' : 'Cidade:')}</strong> #{usuarioAtividadeMB.usuario.cidade eq null ? '' : (usuarioAtividadeMB.usuario.cidade eq '' ? '' : usuarioAtividadeMB.usuario.cidade)}</p>
+											         </div>
+										          </div>
+										       </li>
+										   </ul>
 						               <div class="col-md-12 col-lg-12 ui-padding-right-0-rcf">
 						                  <div class="d-flex align-items-end flex-column">
 								            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>

@@ -2,7 +2,9 @@ package br.com.pluri.eventor.view;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -73,5 +75,11 @@ public class URLsharedEventMB extends BaseMB {
 	    this.evento.getAtividades().clear();
 	    this.evento.setAtividades(newAtiv);
 	}
+	
+	public String formatarDataFromTela(Map<String, Object> params) {
+		Date data = (Date) params.get("data");
+		String formato = (String) params.get("formato");
+        return formatarData(data, formato);
+    }
 
 }
