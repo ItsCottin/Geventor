@@ -6,10 +6,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,6 @@ import org.primefaces.model.ScheduleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import br.com.etechoracio.common.view.BaseMB;
 import br.com.etechoracio.common.view.MessageBundleLoader;
@@ -42,6 +41,7 @@ import br.com.pluri.eventor.business.exception.DataInvalidaException;
 import br.com.pluri.eventor.business.exception.ExisteAtividadeVinculadaException;
 import br.com.pluri.eventor.business.exception.NRCasaUsuarioException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
+import br.com.pluri.eventor.business.util.PasswordUtils;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.DiferencaData;
@@ -166,6 +166,16 @@ public class EventoMB extends BaseMB {
 		cidades = cidadeSB.findByEstado(editEvento.getEstado());
 	}
 	
+	public void onChangeUtilizarSite(){
+		if(!editEvento.isSiteProprio()){
+			this.editEvento.setGuid("");
+			this.editEvento.setSite("");
+		} else {
+			this.editEvento.setGuid(PasswordUtils.generateGUID());
+			this.editEvento.setSite("https://geventor.azurewebsites.net/evento.xhtml?id=" + editEvento.getGuid());
+		}
+	}
+	
 	public void onChangeMyEndereco(){
 		try{
 			if (editEvento.isUsaMyEndereco()){
@@ -205,22 +215,30 @@ public class EventoMB extends BaseMB {
 			usu = usuarioSB.findById(getCurrentUserId());
 			if(usaTelefone.equals("Telefone")){
 				if(usu.getTelefone() != null){
-					setMaskTelefone();
-					editEvento.setTelefone(usu.getTelefone());
+					if(usu.getTelefone().equals("")){
+						retOnChangeMyTelefone("Telefone");
+					} else {
+						setMaskTelefone();
+						editEvento.setTelefone(usu.getTelefone());
+					}
 				} else {
-					showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"Telefone"}));
+					retOnChangeMyTelefone("Telefone");
 				}
 			}
 			if(usaTelefone.equals("Celular")){
 				if(usu.getCelular() != null){
-					setMaskTelefone();
-					editEvento.setTelefone(usu.getCelular());
+					if(usu.getCelular().equals("")){
+						retOnChangeMyTelefone("Celular");
+					} else {
+						setMaskTelefone();
+						editEvento.setTelefone(usu.getCelular());
+					}
 				} else {
-					showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"Celular"}));
+					retOnChangeMyTelefone("Celular");
 				}
 			}
 			if(usu.getEmail() == null || usu.getEmail().equals("")){
-				showInfoMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {"E-mail"}));
+				retOnChangeMyTelefone("E-mail");
 			} else {
 				editEvento.setEmail(usu.getEmail());
 			}
@@ -233,6 +251,11 @@ public class EventoMB extends BaseMB {
 				this.maskTelefone = "(99) 99999-9999";
 			}
 		}
+	}
+	
+	public void retOnChangeMyTelefone(String msg){
+		showErrorMessage(MessageBundleLoader.getMessage("info.informacaonotfoundinusu", new Object[] {msg}));
+		this.editEvento.setUsaMyTelefone(false);
 	}
 	
 	public void onChangePrecoEven(){
@@ -251,11 +274,15 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
-	public void doSave(boolean validarPeriodo) {
+	public void doSave(boolean validaPeriodoAtiv) {
 		try {
+			boolean isCad = false;
+			if(editEvento.getId() == null){
+				isCad = true;
+			}
 			this.editEvento.setDataInicio(merge(editEvento.getDataInicio(), editEvento.getHoraInicio()));
 			this.editEvento.setDataFim(merge(editEvento.getDataFim(), editEvento.getHoraFim()));
-			if(validarPeriodo){
+			if(editEvento.getId() != null && validaPeriodoAtiv){
 				List<Atividade> newAtiv = new ArrayList<Atividade>();
 				this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
 				for (Atividade ativ : editEvento.getAtividades()){
@@ -286,7 +313,7 @@ public class EventoMB extends BaseMB {
 			if(editEvento.getTitulo() != null) {
 				eventoSB.insert(editEvento, getCurrentUserId());
 			}
-			if (editEvento.getId() == null) {
+			if (isCad) {
 				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess", new Object[] {editEvento.getTitulo()}));
 			} else {
 				showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess", new Object[] {editEvento.getTitulo()}));
@@ -354,8 +381,7 @@ public class EventoMB extends BaseMB {
 						throw new PeriodoDataInvalidaException(
 								MessageBundleLoader.getMessage("hora.iniciomaiorfim", 
 										new Object[] {formatarData(editEvento.getHoraInicio(),"HH:mm"), 
-												formatarData(editEvento.getHoraFim(),"HH:mm")}, 
-										Locale.getDefault()));
+												formatarData(editEvento.getHoraFim(),"HH:mm")}));
 					}
 				}
 			}
@@ -382,15 +408,13 @@ public class EventoMB extends BaseMB {
 					throw new PeriodoDataInvalidaException(
 							MessageBundleLoader.getMessage("date.iniciomenoratual", 
 									new Object[] {formatarData(editEvento.getDataInicio(),"dd/MM/yyyy"), 
-											formatarData(dataAtual,"dd/MM/yyyy")}, 
-									Locale.getDefault()));
+											formatarData(dataAtual,"dd/MM/yyyy")}));
 				}
 				if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
 					throw new DataInvalidaException(
 							MessageBundleLoader.getMessage("date.iniciomaiorfim", 
 									new Object[] {formatarData(editEvento.getDataInicio(), "dd/MM/yyyy"), 
-											 formatarData(editEvento.getDataFim(), "dd/MM/yyyy")}, 
-									Locale.getDefault()));
+											 formatarData(editEvento.getDataFim(), "dd/MM/yyyy")}));
 				}
 				if(editEvento.getDataInicio().equals(editEvento.getDataFim())){
 					this.editEvento.setMesmoDia(true);
@@ -415,10 +439,20 @@ public class EventoMB extends BaseMB {
 		resultadoEvento = eventoSB.findEventosByUsuario(getCurrentUserId());
 	}
 	
+	// 100% Funcional.
 	public void doRemove(Evento exclui){
+		List<UsuarioAtividade> inscritosNaAtiv = new ArrayList<UsuarioAtividade>();
 		for(Atividade ativ : exclui.getAtividades()){
+			inscritosNaAtiv = inscritosSB.findAllInscritosByIdAtividade(ativ.getId());
+			if(inscritosNaAtiv.size() > 0){
+				for(UsuarioAtividade insc : inscritosNaAtiv){
+					inscritosSB.delete(insc);
+				}
+				inscritosNaAtiv.clear();
+			}
 			atividadeSB.delete(ativ);
 		}
+		exclui.setAtividades(null);
 		eventoSB.delete(exclui);
 		showInfoMessage(MessageBundleLoader.getMessage("even.delete_sucess", new Object[] {exclui.getTitulo()}));
 		onEventos();

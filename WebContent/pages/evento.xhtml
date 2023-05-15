@@ -6,7 +6,6 @@
    xmlns:p="http://primefaces.org/ui"
    xmlns:c="http://java.sun.com/jsp/jstl/core"
    xmlns:fn="http://java.sun.com/jsp/jstl/functions"
-   xmlns:t="http://myfaces.apache.org/tomahawk"
    template="/WEB-INF/template/layoutV3.xhtml">
    <ui:define name="contentV3">
       <h:outputScript library="js" name="evento.js" />
@@ -35,51 +34,58 @@
                   	<h3 class="">Eventos</h3>
                   </div>
                   <h:form id="formtbl">
-                  
-                  	<table class="table-hover">
-					  <thead>
-					    <tr>
-					      <th scope="col">Título</th>
-					      <th scope="col">Data</th>
-					      <th scope="col">Preço</th>
-					      <th scope="col">Configurar</th>
-					    </tr>
-					  </thead>
-					  <tbody>
-					  	<c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+                  	<div class="${fn:length(eventoMB.resultadoEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+                  	<c:choose>
+		             <c:when test="${fn:length(eventoMB.resultadoEvento) > 0}">
+		               <table class="table-hover">
+						  <thead>
 						    <tr>
-						      <td data-label="Titulo" class="text-truncate">#{even.titulo}</td>
-						      <td data-label="Data" class="text-truncate">
-						      	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
-						      </td>
-						      <td data-label="Preço">#{even.vlr}</td>
-						      <td data-label="Configurar">
-						      	<p:commandButton immediate="true" id="btnConNew_#{even.id}"
-                                    icon="ui-icon-search" title="Consultar"
-                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
-                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-                                 </p:commandButton>
-                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
-                                    icon="ui-icon-wrench" title="Editar"
-                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
-                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-                                 </p:commandButton>
-                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
-                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
-                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" />
-                                 
-							  </td>
+						      <th scope="col">Título</th>
+						      <th scope="col">Data</th>
+						      <th scope="col">Preço</th>
+						      <th scope="col">Configurar</th>
 						    </tr>
-					    </c:forEach>
-					  </tbody>
-					</table>
-					
-					
-					
+						  </thead>
+						  <tbody>
+						  	<c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+							    <tr>
+							      <td data-label="Titulo" class="text-truncate">#{even.titulo}</td>
+							      <td data-label="Data" class="text-truncate">
+							      	#{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})}
+							      </td>
+							      <td data-label="Preço">#{even.vlr}</td>
+							      <td data-label="Configurar">
+							      	<p:commandButton immediate="true" id="btnConNew_#{even.id}"
+	                                    icon="ui-icon-search" title="Consultar"
+	                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
+	                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+	                                 </p:commandButton>
+	                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
+	                                    icon="ui-icon-wrench" title="Editar"
+	                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
+	                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+	                                 </p:commandButton>
+	                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
+	                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
+	                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" />
+	                                 
+								  </td>
+							    </tr>
+						    </c:forEach>
+						  </tbody>
+						</table>
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Você não tem nenhum Evento cadastrado, cadastre um evento na Aba de 'Adicionar'.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+					</div>
                   </h:form>
                   
                   
-                  	
+                  	<!-- Modal de confirmação de exclusão -->
                   	<div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                        <div class="modal-content">
@@ -119,8 +125,10 @@
 	                                          <div class="modal-footer">
 	                                             <button type="button" class="btn" data-dismiss="modal">#{eventoMB.evenSel.existeInscrito ? 'Fechar' : 'Não'}</button>
 	                                             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-	                                                oncomplete="closeModal('newConfirmDel')" rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
-	                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl" />
+	                                                rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
+	                                                actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl"  >
+	                                                <p:ajax onstart="closeModal('newConfirmDel')" />
+	                                             </p:commandButton>	                                                
 	                                          </div>
                                           </h:form>
                                        </div>
@@ -169,7 +177,6 @@
                                     <p:ajax event="blur" listener="#{eventoMB.validarDatasEvento}" update="datafim, dataInicio" />
                                     <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC"/>
                                  </p:inputText>
-                                 <!-- <f:convertDateTime pattern="yyyy-MM-dd"  locale="pt_BR" timeZone="America/Sao_Paulo" /> -->
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-4 col-small-6-rcf form-group text-right text-truncate">
                                  <label for="horafrom" class="col-form-label">Hora Começo:</label>
@@ -279,8 +286,8 @@
 	                                <div class="input-group-prepend bg-light border border-light">
 	                                    <div class="input-group-text">
 	                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
-	                                          value="#{eventoMB.editEvento.usaMyTelefone}">
-	                                          <p:ajax event="change" update="celular, email" listener="#{eventoMB.onChangeMyTelefone}" />
+	                                          value="#{eventoMB.editEvento.usaMyTelefone}" id="checkboxUsaMyTelefone">
+	                                          <p:ajax event="change" update="celular, email, checkboxUsaMyTelefone" listener="#{eventoMB.onChangeMyTelefone}" />
 	                                       </h:selectBooleanCheckbox>
 	                                    </div>
 	                                 </div>
@@ -327,21 +334,18 @@
                                     <div class="input-group-text">
                                        <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
                                           value="#{eventoMB.editEvento.siteProprio}">
-                                          <p:ajax event="change" update="cbxSiteProprio" />
+                                          <p:ajax event="change" update="cbxSiteProprio" listener="#{eventoMB.onChangeUtilizarSite}" />
                                        </h:selectBooleanCheckbox>
                                     </div>
                                  </div>
                                  <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
                                     value="utilizar site fornecido pelo geventor." disabled="true" />
                               </div>
-                           	<div class="col-md-6 col-sm-12 form-group input-group">
+                           	<div class="col-md-6 col-sm-12 form-group">
                                  <h:inputText styleClass="form-control #{eventoMB.editEvento.siteProprio ? 'bg-light border border-light' : (eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white')}" placeholder="Site proprio do Evento"
                                     value="#{eventoMB.editEvento.site}" 
                                     disabled="#{eventoMB.editEvento.siteProprio or eventoMB.modoConsulta}"
                                     label="site do evento" id="cbxSiteProprio" />
-                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon3">.eventor.com.br</span>
-                                 </div>
                               </div>
                               
                              
@@ -387,21 +391,22 @@
 	                              </div>
                            </div>
                            
-                           <c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">					
-	                           <table class="table table-hover text-center" id="tblAtiv" >
-	                              <thead>
-	                                 <tr>
-	                                    <th scope="col">Atividade</th>
-	                                    <th scope="col">Vagas</th>
-	                                    <th scope="col">Configurar</th>
-	                                 </tr>
-	                              </thead>
-	                              <c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
-	                                 <tr>
-	                                    <th scope="col" class="bg-light text-dark font-weight-normal">#{ativ.nome}</th>
-	                                    <th class="font-weight-normal" scope="col">#{ativ.vagas - ativ.qtdInscrito}</th>
-	                                    <th scope="col" class="align-items-end">
-	                                       <div class="btn-group" role="group" aria-label="Basic example">
+                           <c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">
+                           	<table class="table-hover">
+							  <thead>
+							    <tr>
+							      <th scope="col">Atividade</th>
+							      <th scope="col">Vagas</th>
+							      <th scope="col">Configurar</th>
+							    </tr>
+							  </thead>
+							  <tbody>
+							  	<c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
+								    <tr>
+								      <td data-label="Atividade" class="text-truncate">#{ativ.nome}</td>
+								      <td data-label="Vagas" class="text-truncate">#{ativ.vagas - ativ.qtdInscrito}</td>
+								      <td data-label="Configurar">
+								      	<div class="btn-group" role="group" aria-label="Basic example">
 		                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
 		                                          icon="ui-icon-search" title="Consultar"
 		                                          actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formHtmlModal"
@@ -416,10 +421,11 @@
 		                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 		                                       </p:commandButton>
 	                                       </div>
-	                                    </th>
-	                                 </tr>
-	                              </c:forEach>
-	                           </table>
+									  </td>
+								    </tr>
+							    </c:forEach>
+							  </tbody>
+							</table>  
                            </c:if>  
                         </div>
                      </h:form>
@@ -602,29 +608,42 @@
             </div>
             <h:form id="formTodosEven">
             	
-               <div class="row">
-               <c:forEach var="event" items="#{eventoMB.allEvenMenosMeus}" step="1" begin="0">
-                  <div class="col-xd-4 col-md-4 col-sm-6 mt-4">
-                     <div class="card">
-                        <div class="card-header">
-                           #{event.titulo}
-                        </div>
-                        <div class="card-body">
-                           <p class="card-text"><strong>Descrição:</strong> #{event.descricao}</p>
-                           <p class="card-text"><strong>Vagas:</strong> #{event.vagas - event.qtdInscrito} de #{event.vagas}</p>
-                           
-							<p:commandButton immediate="true" id="cardConsEvent_#{event.id}" value="Inscrever"
-                                  actionListener="#{eventoMB.doConsulta({'evento': event, 'request': 'card'})}" update=":formEvent" 
-                                  process="@this" styleClass="btn btn-primary ui-widget-button-primary-rcf" oncomplete="selAbaEdit('sim')">
-                                  <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-                            </p:commandButton>
-                        </div>
-                        <div class="card-footer text-muted">
-                           #{event.qtdDifTemp} #{event.tpDifTemp eq 'dias' ? 'dias' : (event.tpDifTemp eq 'horas' ? 'horas' : (event.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
-                        </div>
-                     </div>
-                  </div>
-                  </c:forEach>
+               <div class="row ${fn:length(eventoMB.allEvenMenosMeus) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+               
+               <c:choose>
+	             <c:when test="${fn:length(eventoMB.allEvenMenosMeus) > 0}">
+	               <c:forEach var="event" items="#{eventoMB.allEvenMenosMeus}" step="1" begin="0">
+	                  <div class="col-xd-4 col-md-4 col-sm-6 mt-4">
+	                     <div class="card no-border-rcf shadow">
+	                        <div class="card-header no-border-rcf">
+	                           #{event.titulo}
+	                        </div>
+	                        <div class="card-body no-border-rcf">
+	                           <p class="card-text"><strong>Descrição:</strong> #{event.descricao}</p>
+	                           <p class="card-text"><strong>Vagas:</strong> #{event.vagas - event.qtdInscrito} de #{event.vagas}</p>
+	                           
+								<p:commandButton immediate="true" id="cardConsEvent_#{event.id}" value="Inscrever"
+	                                  actionListener="#{eventoMB.doConsulta({'evento': event, 'request': 'card'})}" update=":formEvent" 
+	                                  process="@this" styleClass="btn btn-primary ui-widget-button-primary-rcf" oncomplete="selAbaEdit('sim')">
+	                                  <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                            </p:commandButton>
+	                        </div>
+	                        <div class="card-footer no-border-rcf text-muted">
+	                           #{event.qtdDifTemp > 0 ? '' : event.qtdDifTemp} #{event.tpDifTemp eq 'dias' ? 'dias' : (event.tpDifTemp eq 'horas' ? 'horas' : (event.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
+	                        </div>
+	                     </div>
+	                  </div>
+	                 </c:forEach>
+	              </c:when>
+	              <c:otherwise>
+	                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+						Não existe nenhum Evento disponível para se Increver.
+					</div>
+			      </c:otherwise>
+				</c:choose>
+               
+               
+               
                </div>
                
             </h:form>

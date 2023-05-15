@@ -42,7 +42,7 @@ DATAFIM_EVEN DateTime not null,
 TITULO_EVEN varchar(100) not null,
 DESCRICAO_EVEN varchar(500) not null,
 VAGAS int not null,
-SITE_EVEN varchar(50),
+SITE_EVEN varchar(250),						-- 0.3.0
 EMAIL_EVEN varchar(50) not null,
 TELEFONE_EVEN varchar(15) not null,
 PRECO_EVEN varchar(100) not null,
@@ -54,6 +54,7 @@ DT_ALTER_EVEN DateTime,						-- 0.2.9
 MY_ENDERECO_EVEN bool default false,		-- 0.2.9
 MY_TELEFONE_EVEN bool default false,		-- 0.2.9
 VLR_EVEN varchar(10) default 'Pago',		-- 0.2.9
+GUID_EVEN varchar(100) not null,			-- 0.3.0
 foreign key (ID_USUA) references TBL_USUARIO(ID_USUA)
 );
 
@@ -166,3 +167,7 @@ SELECT * FROM TBL_USUARIO
 -- alter table TBL_ATIVIDADE add column DT_ALTER_ATIVI DateTime;
 
 -- alter table TBL_ATIVIDADE add COLUMN IS_PERIODO_EVEN_ATIVI bool default false;
+
+-- alter table TBL_EVENTO add column GUID_EVEN varchar(100) not null;
+-- alter table TBL_EVENTO MODIFY COLUMN SITE_EVEN varchar(250);	
+

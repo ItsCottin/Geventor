@@ -27,4 +27,7 @@ public interface AtividadeDAO extends BaseDAO<Atividade> {
 	
 	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS IN ('Pendente', 'Aprovado') AND ID_ATIVI = :idAtiv", nativeQuery = true)
 	public BigInteger qtdInscritoInAtividade (@Param("idAtiv") Long idAtiv);
+	
+	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS = :status AND ID_ATIVI = :idAtiv", nativeQuery = true)
+	public BigInteger qtdInscritoSitInAtividade (@Param("status") String status, @Param("idAtiv") Long idAtiv);
 }

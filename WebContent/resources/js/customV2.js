@@ -38,7 +38,7 @@ function openModal(modal) {
 }
 
 function closeModal(modal) {
-	$('#' + modal + '').modal('show');
+	$('#' + modal + '').modal('hide');
 }
 
 // seleciona todos os elementos .nav-tab-link

@@ -44,9 +44,25 @@ public class UsuarioAtividadeSB extends BaseSB {
 		return usuarioAtividadeDAO.findMyInscricoes(idUsuario);
 	}
 	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findAllInscritosByIdAtividade(Long idAtiv) {
+		return usuarioAtividadeDAO.findAllInscritosByIdAtividade(idAtiv);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findAllInscritosByIdAtividadeAndStatus(String status, Long idAtiv) {
+		return usuarioAtividadeDAO.findAllInscritosByIdAtividadeAndStatus(status, idAtiv);
+	}
+	
+	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void delete(UsuarioAtividade usuAtiv) {
 		usuarioAtividadeDAO.delete(usuAtiv);
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void deleteByIdAtiv(long idAtiv) {
+		usuarioAtividadeDAO.deleteByIdAtiv(idAtiv);
 	}
 
 }

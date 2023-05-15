@@ -82,6 +82,12 @@ public class Atividade extends BaseORM {
 	private int qtdInscrito;
 	
 	@Transient
+	private long qtdDifTemp;
+	
+	@Transient
+    private String tpDifTemp;
+	
+	@Transient
 	private boolean isgratuito;
 	
 	@Transient

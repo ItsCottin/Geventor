@@ -19,48 +19,59 @@
      	 </ul>
      	 <div class="tab-content py-4">
      	 	<div id="visualizar" class="tab-pane active">
-     	 		<h:form id="formtblAtiv">
-     	 		  <div class="form-group">
+     	 		<div class="form-group">
      	 		  	<h3 class="">Atividades</h3>
                   </div>
-                  <table class="table-hover">
-					  <thead>
-					    <tr>
-					      <th scope="col">Nome</th>
-					      <th scope="col">Data</th>
-					      <th scope="col">Preço</th>
-					      <th scope="col">Configurar</th>
-					    </tr>
-					  </thead>
-					  <tbody>
-					  	<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+     	 		<h:form id="formtblAtiv">
+     	 		  
+                  <div class="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+                  <c:choose>
+		             <c:when test="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0}">
+		               <table class="table-hover">
+						  <thead>
 						    <tr>
-						      <td data-label="Titulo" class="text-truncate">#{ativ.nome}</td>
-						      <td data-label="Data" class="text-truncate">
-						      	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
-						      </td>
-						      <td data-label="Preço">#{ativ.preco}</td>
-						      <td data-label="Configurar">
-						      	<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
-								icon="ui-icon-search" title="Consultar"
-								actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
-								process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-                           	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
-								icon="ui-icon-wrench" title="Editar"
-								actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
-								process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
-							</p:commandButton>
-							<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
-								title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
-								update="formModalDel" styleClass="ui-icon-button-rcf" />
-                                 
-							  </td>
+						      <th scope="col">Nome</th>
+						      <th scope="col">Data</th>
+						      <th scope="col">Preço</th>
+						      <th scope="col">Configurar</th>
 						    </tr>
-					    </c:forEach>
-					  </tbody>
-					</table>
-                 
+						  </thead>
+						  <tbody>
+						  	<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+							    <tr>
+							      <td data-label="Titulo" class="text-truncate">#{ativ.nome}</td>
+							      <td data-label="Data" class="text-truncate">
+							      	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+							      </td>
+							      <td data-label="Preço">#{ativ.preco}</td>
+							      <td data-label="Configurar">
+							      	<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
+									icon="ui-icon-search" title="Consultar"
+									actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
+									process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+								</p:commandButton>
+	                           	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
+									icon="ui-icon-wrench" title="Editar"
+									actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
+									process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+								</p:commandButton>
+								<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
+									title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
+									update="formModalDel" styleClass="ui-icon-button-rcf" />
+	                                 
+								  </td>
+							    </tr>
+						    </c:forEach>
+						  </tbody>
+						</table>
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Você não tem nenhuma Atividade cadastrada, cadastre sua primeira Atividade na aba 'Adicionar'.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+                 	</div>
                   </h:form>
                   
                   <!-- Modal de confirmação de Exclusão -->

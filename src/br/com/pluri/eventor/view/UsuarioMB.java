@@ -331,11 +331,15 @@ public class UsuarioMB extends BaseMB  {
 			if(editUsuario.getAtualizaSenha().equals("N")){
 				this.editUsuario.setSenha(usuarioSB.findById(getCurrentUserId()).getSenha());
 			}
-			if(editUsuario.getCelular().contains("_")){
-				editUsuario.setCelular(null);
+			if(editUsuario.getCelular() != null) {
+				if(editUsuario.getCelular().contains("_")){
+					editUsuario.setCelular(null);
+				}
 			}
-			if(editUsuario.getTelefone().contains("_")){
-				editUsuario.setTelefone(null);
+			if(editUsuario.getTelefone() != null) {
+				if(editUsuario.getTelefone().contains("_")){
+					editUsuario.setTelefone(null);
+				}
 			}
 			usuarioSB.editeUsuario(editUsuario);	
 			showInfoMessage(MessageBundleLoader.getMessage("usu.update_sucess"));

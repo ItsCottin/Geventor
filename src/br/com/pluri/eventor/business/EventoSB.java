@@ -35,9 +35,6 @@ public class EventoSB extends BaseSB {
 		evento.setUsuario(new Usuario(idUsuarioLogado));
 		evento.setDataInicio(merge(evento.getDataInicio(), evento.getHoraInicio()));
 		evento.setDataFim(merge(evento.getDataFim(), evento.getHoraFim()));
-		if (evento.isSiteProprio()){
-			evento.setSite("www.evento.pluri.com.br");
-		}
 		evento.setDataAlter(getDateAlter());
 		eventoDAO.save(evento);
 	}
@@ -67,6 +64,14 @@ public class EventoSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	 public Evento findById(Long id){
 		 Evento resultado = eventoDAO.findOne(id);
+		 resultado.setHoraInicio(resultado.getDataInicio());
+		 resultado.setHoraFim(resultado.getDataFim());
+		 return resultado;
+	 }
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	 public Evento findByGUID(String guid){
+		 Evento resultado = eventoDAO.findByGUID(guid);
 		 resultado.setHoraInicio(resultado.getDataInicio());
 		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;

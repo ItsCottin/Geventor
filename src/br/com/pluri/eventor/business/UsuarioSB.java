@@ -14,6 +14,8 @@ import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.SenhaInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
 import br.com.pluri.eventor.dao.UsuarioDAO;
+import br.com.pluri.eventor.enums.TipoPessoaEnum;
+import br.com.pluri.eventor.enums.TipoUsuarioEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Usuario;
 
@@ -33,15 +35,13 @@ public class UsuarioSB extends BaseSB {
 	public void insert(Usuario usuario) throws LoginJaCadastradoException, SenhaInvalidaException, CampoObrigatorioException {
 		List<Usuario> result = usuarioDAO.findByLogin(usuario.getLogin());
 		usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));
-		if (CollectionUtils.isEmpty(result)) {
-			if(usuario.getSenha().equals("")) {
-				throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {"'Senha'"}));
-			}
-			if(usuario.getConfirmSenha().equals("")) {
-				throw new CampoObrigatorioException(MessageBundleLoader.getMessage("critica.camposobrigatorios", new Object[] {"'Confirma Senha'"}));
-			}
+		usuario.setAtualizaSenha("S");
+		if (CollectionUtils.isEmpty(result)){
 			validaUsuario(usuario);
 			usuario.setDataAlter(getDateAlter());
+			usuario.setAvatar("default.png");
+			usuario.setTpUsuario(TipoUsuarioEnum.COMUM);
+			usuario.setTipoPessoa(TipoPessoaEnum.FISICA);
 			usuarioDAO.save(usuario);
 		} else {
 			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginjacadastrado", new Object[] {usuario.getLogin()}));
@@ -52,8 +52,10 @@ public class UsuarioSB extends BaseSB {
 		if (!usuario.loginVerificado) {
 			throw new LoginJaCadastradoException(MessageBundleLoader.getMessage("critica.loginnotverifiqued", new Object[] {usuario.getLogin()}));
 		}
-		if (!PasswordUtils.criptografarMD5(usuario.getConfirmSenha()).equals(usuario.getSenha())){
-			throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
+		if(usuario.atualizaSenha.equals("S")){
+			if (!PasswordUtils.criptografarMD5(usuario.getConfirmSenha()).equals(usuario.getSenha())){
+				throw new SenhaInvalidaException(MessageBundleLoader.getMessage("critica.senhaincorreta"));
+			}
 		}
 	}
 	
@@ -64,10 +66,12 @@ public class UsuarioSB extends BaseSB {
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void editeUsuario(Usuario usuario) throws SenhaInvalidaException, LoginJaCadastradoException {
-		if(usuario.getCpfCnpj().contains("_")){
-			usuario.setCpfCnpj("");
-		} else {
-			usuario.setCpfCnpj(usuario.getCpfCnpj().replace(".", "").replace("-", ""));
+		if(usuario.getCpfCnpj() != null) {
+			if(usuario.getCpfCnpj().contains("_")){
+				usuario.setCpfCnpj("");
+			} else {
+				usuario.setCpfCnpj(usuario.getCpfCnpj().replace(".", "").replace("-", ""));
+			}
 		}
 		if(usuario.atualizaSenha.equals("S")){
 			usuario.setSenha(PasswordUtils.criptografarMD5(usuario.getSenha()));

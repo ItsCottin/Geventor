@@ -90,17 +90,20 @@ public class Evento extends BaseORM {
 	@Column(name="MY_TELEFONE_EVEN")
 	private boolean usaMyTelefone;
 	
-	@Transient
-	private String telefonecelular;
+	@Column(name="GUID_EVEN")
+	private String guid;
 	
 	@Transient
-	private long qtdDifTemp;
+	private String telefonecelular;
 	
 	@Transient
 	private long qtdInscrito;
 	
 	@Transient
 	private boolean doEditEven;
+	
+	@Transient
+	private long qtdDifTemp;
 	
 	@Transient
     private String tpDifTemp;

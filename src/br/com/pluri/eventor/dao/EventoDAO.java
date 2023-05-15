@@ -39,4 +39,7 @@ public interface EventoDAO extends BaseDAO<Evento> {
     "(SELECT ID_EVEN FROM TBL_EVENTO WHERE ID_EVEN = :idEven))", nativeQuery = true)
 	public BigInteger qtdInscritoInEvento (@Param("idEven") Long idEven);
 	
+	@Query(value = "SELECT * FROM TBL_EVENTO WHERE GUID_EVEN = :guid", nativeQuery = true)
+	public Evento findByGUID(@Param("guid") String guid);
+	
 }

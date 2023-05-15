@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -24,9 +25,11 @@ import br.com.etechoracio.common.view.BaseMB;
 import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.EventoSB;
+import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.UsuarioAtividade;
 
 @Getter
 @Setter
@@ -39,6 +42,9 @@ public class AtividadeMB extends BaseMB {
 
 	@Autowired
 	private AtividadeSB atividadeSB;
+	
+	@Autowired
+	private UsuarioAtividadeSB inscritosSB;
 	
 	private List<Atividade> resultadoAtividadeByEvento;
 	private Atividade editAtividade = new Atividade();
@@ -72,6 +78,7 @@ public class AtividadeMB extends BaseMB {
 			atividadeSB.editAtiv(editAtividade, idEvento);
 			showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {editAtividade.getNome()}));
 		}
+		RequestContext.getCurrentInstance().execute("selAba('visualizar')");
 		onAllAtividade();
 		doPrepareSave();
 	}
@@ -385,6 +392,15 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void doRemove(Atividade exclui){
+		List<UsuarioAtividade> inscritosNaAtiv = new ArrayList<UsuarioAtividade>();
+		inscritosNaAtiv = inscritosSB.findAllInscritosByIdAtividade(exclui.getId());
+		if(inscritosNaAtiv.size() > 0){
+			for(UsuarioAtividade insc : inscritosNaAtiv){
+				inscritosSB.delete(insc);
+			}
+			inscritosNaAtiv.clear();
+		}
+		exclui.setUsuarioAtividade(null);
 		atividadeSB.delete(exclui);
 		showInfoMessage(MessageBundleLoader.getMessage("ativ.delete_sucess", new Object[] {exclui.getNome()}));
 	}
@@ -419,7 +435,9 @@ public class AtividadeMB extends BaseMB {
 		this.editAtividade.setDoEditAtiv(true);
 		if(edit.evento != null){
 			if (isVigente(edit.evento.getDataInicio())){
-				this.modoConsulta = false;
+				if(!editAtividade.isExisteInscrito()){
+					this.modoConsulta = false;
+				}
 			} else {
 				this.modoConsulta = true;
 				editAtividade.setEventonaovigente(true);

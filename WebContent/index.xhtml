@@ -125,7 +125,7 @@
 						<div class="row ml-1">
 							<div class="form-group">
 								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" id="btnCadUsu"
-									actionListener="#{usuarioMB.doSave}" update=":msgs">
+									actionListener="#{usuarioMB.doSave()}" update=":msgs">
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
 								</p:commandButton>
 							</div>

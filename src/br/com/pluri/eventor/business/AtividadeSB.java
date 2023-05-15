@@ -44,6 +44,12 @@ public class AtividadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public int qtdInscritoSitInAtividade(String status ,Long  idAtiv) throws SQLException{
+		BigInteger bigInt = atividadeDAO.qtdInscritoSitInAtividade(status, idAtiv);
+		return bigInt.intValue();
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<Atividade> findByEventos (Long idEvento){
 		return atividadeDAO.findByEventos(idEvento);
 	}
@@ -70,7 +76,7 @@ public class AtividadeSB extends BaseSB {
 	public void editAtiv (Atividade ativ, Long idEven) {
 		ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
 		ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
-		ativ.setOrganizacao("Comum");
+		ativ.setDataAlter(getDateAlter());
 		atividadeDAO.save(ativ);
 	}
 

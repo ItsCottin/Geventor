@@ -462,7 +462,7 @@ body {
 
 table {
   border-radius: 0.25rem;
-  border-collapse: inherit;
+  border-collapse: collapse;
   margin: 0;
   padding: 0;
   width: 100%;

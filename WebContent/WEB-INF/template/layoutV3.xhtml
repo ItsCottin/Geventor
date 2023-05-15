@@ -2,7 +2,9 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
 
 	<h:head>
 		<f:facet name="first">
@@ -15,6 +17,7 @@
 		<h:outputStylesheet library="bootstrap4/styles" name="bootstrap.min.css" />
 		<h:outputScript library="bootstrap4/js" name="bootstrap.min.js" />
 		
+		
 		<h:outputStylesheet library="styles" name="customV2.css" />
 		<h:outputScript library="js" name="customV2.js" />
 	
@@ -23,8 +26,7 @@
 	<h:body class="bg-light">
 		
 	<div class="my-7">	
-	<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false" 
-			life="5000" />
+		<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false" life="5000" />
 	</div>
 		
 			
