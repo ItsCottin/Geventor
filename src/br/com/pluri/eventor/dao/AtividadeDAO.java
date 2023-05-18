@@ -13,6 +13,11 @@ import br.com.pluri.eventor.model.Atividade;
 @Repository
 public interface AtividadeDAO extends BaseDAO<Atividade> {
 	
+	public Atividade findById (Long id);
+	
+	@Query("select a from Atividade a where a.nome = :nome")
+	public Atividade findByNome (@Param("nome") String nome);
+	
 	@Query("select a from Atividade a " +
 			" inner join a.evento e " +
 			" where e.id = :id")
@@ -22,8 +27,6 @@ public interface AtividadeDAO extends BaseDAO<Atividade> {
 			" inner join a.evento e " +
 			" where e.usuario.id = :id")
 	public List<Atividade> findAllAtividadeByUsuario (@Param("id") Long idUsu);
-	
-	public Atividade findById (Long id);
 	
 	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS IN ('Pendente', 'Aprovado') AND ID_ATIVI = :idAtiv", nativeQuery = true)
 	public BigInteger qtdInscritoInAtividade (@Param("idAtiv") Long idAtiv);

@@ -454,4 +454,18 @@ public abstract class BaseMB {
 	        return new DiferencaData(diferenca, "minutos");
 	    }
 	}
+	
+	public boolean dataEstaDentroPeriodo(Date inicio, Date fim, Date compararInicio, Date compararFim){
+		if(compararInicio.before(inicio) && compararFim.after(fim)){
+			return true;
+		}
+		else if(compararInicio.after(inicio) && compararInicio.before(fim)){
+			return true;
+		}
+		else if(compararFim.before(fim) && compararFim.after(inicio)){
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

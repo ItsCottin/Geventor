@@ -105,6 +105,7 @@ public class EventoMB extends BaseMB {
 	private boolean confirmaExclui = false;
 	public boolean modoConsulta;
 	public Evento evenSel;
+	public Atividade atividade;
 	private Endereco enderecoDoCEP;
 	private String usaTelefone;
 	private String maskTelefone;
@@ -211,6 +212,11 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
+	public void doConsultaAtiv(Atividade ativ) throws SQLException{
+		this.atividade = ativ;
+		this.atividade.setQtdInscrito(atividadeSB.qtdInscritoInAtividade(atividade.getId()));
+	}
+	
 	public void onChangeMyTelefone(){
 		if(editEvento.isUsaMyTelefone()){
 			Usuario usu = new Usuario();
@@ -285,8 +291,6 @@ public class EventoMB extends BaseMB {
 			if(editEvento.getId() == null){
 				isCad = true;
 			}
-			this.editEvento.setDataInicio(merge(editEvento.getDataInicio(), editEvento.getHoraInicio()));
-			this.editEvento.setDataFim(merge(editEvento.getDataFim(), editEvento.getHoraFim()));
 			if(editEvento.getId() != null && validaPeriodoAtiv){
 				List<Atividade> newAtiv = new ArrayList<Atividade>();
 				this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
@@ -320,7 +324,7 @@ public class EventoMB extends BaseMB {
 				if(editEvento.getAtividades() != null) {
 					if(editEvento.getAtividades().size() > 0) {
 						for (Atividade ativ : editEvento.getAtividades()){
-							atividadeSB.editAtiv(ativ, editEvento.getId(), false);
+							atividadeSB.editAtiv(ativ, editEvento.getId());
 							showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {ativ.getNome()}));
 						}
 					}
@@ -379,37 +383,6 @@ public class EventoMB extends BaseMB {
 		findAllEventoMenosMeus();
 	}
 	
-	public void validaHoraIniEvenHoraFimEven(){
-		try {
-			if(editEvento.getDataFim() != null && editEvento.getDataInicio() != null) {
-				if(editEvento.getHoraFim() != null && editEvento.getHoraInicio() != null && editEvento.getDataFim().equals(editEvento.getDataInicio())) {
-					Calendar calEvenIni = Calendar.getInstance();
-					Calendar calEvenFim = Calendar.getInstance();
-					
-					calEvenIni.setTime(editEvento.getHoraInicio());
-					calEvenFim.setTime(editEvento.getHoraFim());
-					
-					int horaInicAtiv = calEvenIni.get(Calendar.HOUR_OF_DAY);
-					int minutoInicAtiv = calEvenIni.get(Calendar.MINUTE);
-					
-					int horaFimAtiv = calEvenFim.get(Calendar.HOUR_OF_DAY);
-					int minutoFimAtiv = calEvenFim.get(Calendar.MINUTE);
-					
-					if(horaInicAtiv > horaFimAtiv || horaInicAtiv == horaFimAtiv && minutoInicAtiv > minutoFimAtiv){
-						throw new PeriodoDataInvalidaException(
-								MessageBundleLoader.getMessage("hora.iniciomaiorfim", 
-										new Object[] {formatarData(editEvento.getHoraInicio(),"HH:mm"), 
-												formatarData(editEvento.getHoraFim(),"HH:mm")}));
-					}
-				}
-			}
-		} catch (PeriodoDataInvalidaException e){
-			showErrorMessage(e.getMessage());
-			this.editEvento.setHoraInicio(null);
-			this.editEvento.setHoraFim(null);
-		}
-	}
-	
 	public String formatarDataFromTela(Map<String, Object> params) {
 		Date data = (Date) params.get("data");
 		String formato = (String) params.get("formato");
@@ -418,27 +391,29 @@ public class EventoMB extends BaseMB {
 	
 	public void validarDatasEvento(){
 		try {
+			this.dataValidada = false;
 			if (editEvento.getDataInicio() != null && editEvento.getDataFim() != null) {
-				this.dataValidada = false;
+				// Nova Logica completa.
+				if(editEvento.getDataInicio().after(editEvento.getDataFim())){
+					throw new DataInvalidaException(MessageBundleLoader.getMessage("date.iniciomaiorfim", 
+						new Object[] {formatarData(editEvento.getDataInicio(), "dd/MM/yyyy"), formatarData(editEvento.getDataFim(), "dd/MM/yyyy")}));
+				}
 				Date dataAtual = getDateNow();
-				int result = editEvento.getDataInicio().compareTo(dataAtual);
-				if(result < 0){
-					throw new PeriodoDataInvalidaException(
-							MessageBundleLoader.getMessage("date.iniciomenoratual", 
-									new Object[] {formatarData(editEvento.getDataInicio(),"dd/MM/yyyy"), 
-											formatarData(dataAtual,"dd/MM/yyyy")}));
+				if(editEvento.getDataInicio().before(dataAtual)){
+					throw new PeriodoDataInvalidaException(MessageBundleLoader.getMessage("date.iniciomenoratual", 
+						new Object[] {formatarData(editEvento.getDataInicio(),"dd/MM/yyyy"), formatarData(dataAtual,"dd/MM/yyyy")}));
 				}
-				if (editEvento.getDataFim().before(editEvento.getDataInicio())) {
-					throw new DataInvalidaException(
-							MessageBundleLoader.getMessage("date.iniciomaiorfim", 
-									new Object[] {formatarData(editEvento.getDataInicio(), "dd/MM/yyyy"), 
-											 formatarData(editEvento.getDataFim(), "dd/MM/yyyy")}));
+				List<Atividade> myAtividade = new ArrayList<Atividade>();
+				for(UsuarioAtividade insc : inscritosSB.findMyInscricoes(getCurrentUserId())){
+					myAtividade.add(insc.getAtividade());
 				}
-				if(editEvento.getDataInicio().equals(editEvento.getDataFim())){
-					this.editEvento.setMesmoDia(true);
+				for(Atividade ativ : myAtividade){
+					if(dataEstaDentroPeriodo(ativ.getDataInicio(), ativ.getDataFim(), editEvento.getDataInicio(), editEvento.getDataFim())){
+						throw new PeriodoDataInvalidaException(MessageBundleLoader.getMessage("critica.periodojacomprometido", 
+							new Object[] {ativ.getNome()}));
+					}
 				}
 				this.dataValidada = true;
-				validaHoraIniEvenHoraFimEven();
 			} else {
 				this.dataValidada = true;
 			}
@@ -544,6 +519,9 @@ public class EventoMB extends BaseMB {
 		doPrepareSave();
 		this.modoConsulta = consulta;
 		this.editEvento = eventoSB.findById(edit.getId());
+		if(editEvento.getGuid() == null || editEvento.getGuid().equals("")){
+			this.editEvento.setGuid(PasswordUtils.generateGUID());
+		}
 		this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
 		this.editEvento.setMesmoDia(false);
 		this.editEvento.setExisteInscrito(false);

@@ -1,59 +1,49 @@
-.nav-tab {
-    display: -webkit-box;
-    display: -moz-box;
-    text-align: center;
-    margin: 40px 0 20px;
-}
-
-@media screen and (min-width: 1084px) {
-    .nav-tab {
-        display: -ms-flexbox;
-        display: -webkit-flex;
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        justify-content: center;
-    }
-    .nav-tab-item {
-        flex: 1;
-        flex-grow: 1;
-    }
-}
-
-a.nav-tab-link {
-    display: block;
-    background: #E6E6E6;
-    padding: 20px 30px;
-    margin: 0 5px;
-    position: relative;
-}
-a.nav-tab-link:before {
-    content: "";
-    position: absolute;
-    left: calc(50% - 10px);
-    bottom: -10px;
-    border-width: 0 20px 20px 0;
-    border-style: solid;
-    border-color: transparent;
-    background: transparent;
-    display: block;
-    width: 0;
-    -ms-transform: rotate(45deg);
-    /* IE 9 */
-
-    -webkit-transform: rotate(45deg);
-    /* Chrome, Safari, Opera */
-
-    transform: rotate(45deg);
-}
-a.nav-tab-link:hover, 
-a.nav-tab-link:hover:before {
-    background: #D2D2D2;
-    border-color: transparent #D2D2D2;
-}
-
-
-/* ignore me */
-body {
-    padding: 50px;
+@media only screen and (max-width: 800px) {
+    
+    /* Force table to not be like tables anymore */
+	#no-more-tables table, 
+	#no-more-tables thead, 
+	#no-more-tables tbody, 
+	#no-more-tables th, 
+	#no-more-tables td, 
+	#no-more-tables tr { 
+		display: block; 
+	}
+ 
+	/* Hide table headers (but not display: none;, for accessibility) */
+	#no-more-tables thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+ 
+	#no-more-tables tr { border: 1px solid #ccc; }
+ 
+	#no-more-tables td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+		white-space: normal;
+		text-align:left;
+	}
+ 
+	#no-more-tables td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		text-align:left;
+		font-weight: bold;
+	}
+ 
+	/*
+	Label the data
+	*/
+	#no-more-tables td:before { content: attr(data-title); }
 }

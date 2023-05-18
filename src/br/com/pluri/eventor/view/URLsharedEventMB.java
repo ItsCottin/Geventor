@@ -24,6 +24,7 @@ import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.DiferencaData;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.model.UsuarioAtividade;
 
 
@@ -46,7 +47,7 @@ public class URLsharedEventMB extends BaseMB {
 	private UsuarioSB usuarioSB;
 	
 	private Evento evento;
-	
+	private Usuario usuario;
 	public String idEven;
 	
 	@PostConstruct
@@ -81,5 +82,9 @@ public class URLsharedEventMB extends BaseMB {
 		String formato = (String) params.get("formato");
         return formatarData(data, formato);
     }
+	
+	public void doConsultaUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
 
 }

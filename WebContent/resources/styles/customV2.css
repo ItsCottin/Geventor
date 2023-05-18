@@ -139,7 +139,6 @@ body {
 	box-shadow:0 0 0 .2rem rgba(108,117,125,.5)!important;
 }
 
-
 .ui-widget-button-outline-secondary-rcf.focus,.ui-widget-button-outline-secondary-rcf:focus{
 	box-shadow:0 0 0 .2rem rgba(108,117,125,.5)!important;
 	background: #6c757d!important;
@@ -281,6 +280,19 @@ body {
 
 .ui-padding-left-0-rcf {
 	padding-left: 0!important;
+}
+
+.ui-padding-bottom-0-rcf {
+	padding-bottom: 0!important;
+}
+
+.ui-padding-top-bottom-0-15-rcf {
+	padding-top: 0.15rem;
+	padding-bottom: 0.15rem;
+}
+
+.ui-margin-bottom-0-rcf {
+	margin-bottom: 0!important;
 }
 
 .ui-margin-right--95px-rcf {
@@ -451,6 +463,10 @@ body {
 	box-shadow: none!important;
 }
 
+.ui-width-100-rcf {
+	width: 100%!important;
+}
+
 .navbar {
 	flex-wrap: inherit!important;
 }
@@ -493,11 +509,10 @@ table th {
 
 @media screen and (min-width: 601px) {
 	.table-rcf-shadow {
-		box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+		box-shadow: 0 2px 14px rgba(0, 0, 0, 0.14);
 	}
 }
 
-@media screen and (max-width: 600px) {
   table {
     border: 0;
     border-collapse: collapse;
@@ -519,14 +534,14 @@ table th {
   }
   
   table tr {
-    display: block;
+    display: block!important;
     margin-bottom: .625em;
     border-radius: 0.25rem;
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.14);
   }
   
   table td {
-    display: block;
+    display: block!important;
     font-size: .8em;
     text-align: right;
   }
@@ -545,7 +560,7 @@ table th {
   table td:last-child {
     border-bottom: 0;
   }
-}
+
 
 
 
@@ -625,4 +640,59 @@ a.nav-tab-link:hover::after {
 
 .tab-content .tab-pane.active {
 	display: block;
+}
+
+.shadow {
+	box-shadow: 0 2px 14px rgba(0, 0, 0, 0.14)!important;
+}
+
+.list-group-item-ajust-rcf {
+	padding: .15rem 1.0rem!important;
+	border: none!important;
+}
+
+.list-group-item-ajust-rcf-com-border {
+	padding: .15rem 1.0rem!important;
+}
+
+.first-init-reply {
+  margin:auto;
+}
+.first-init-reply .list-group-item {
+    position: relative;
+    padding-left: 40px;
+}
+.first-init-reply .list-group-item svg {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+} 
+
+
+.ui-card-titulo-rcf {
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.ui-card-conteudo-rcf {
+    font-size: .8em;
+    text-align: right;
+    padding-bottom: .35em;
+    padding-top: .35em;
+}
+
+div::before {
+	content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.ui-card-rcf {
+	padding: .625em;
+}
+
+.ui-padding-0-625em-rcf {
+	padding: .625em;
 }

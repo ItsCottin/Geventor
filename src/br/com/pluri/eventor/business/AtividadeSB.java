@@ -28,14 +28,20 @@ public class AtividadeSB extends BaseSB {
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void insert(Atividade atividade, Long idEvento){
 		atividade.setEvento(new Evento(idEvento));
-		atividade.setDataInicio(merge(atividade.getDataInicio(), atividade.getHoraInicio()));
-		atividade.setDataFim(merge(atividade.getDataFim(), atividade.getHoraFim()));
 		atividade.setDataAlter(getDateAlter());
 		if(atividade.getOrganizacao() == null){
 			atividade.setOrganizacao("Comum");
 		}
 		atividadeDAO.save(atividade);
 	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	 public Atividade findByNome(String nome){
+		 Atividade resultado = atividadeDAO.findByNome(nome);
+		 resultado.setHoraInicio(resultado.getDataInicio());
+		 resultado.setHoraFim(resultado.getDataFim());
+		 return resultado;
+	 }
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public int qtdInscritoInAtividade(Long  idAtiv) throws SQLException{
@@ -73,11 +79,7 @@ public class AtividadeSB extends BaseSB {
 	 }
 	
 	@Transactional(propagation=Propagation.REQUIRED)
-	public void editAtiv (Atividade ativ, Long idEven, boolean dataEstaIncompleta) {
-		if(dataEstaIncompleta) {
-			ativ.setDataInicio(merge(ativ.getDataInicio(), ativ.getHoraInicio()));
-			ativ.setDataFim(merge(ativ.getDataFim(), ativ.getHoraFim()));
-		}
+	public void editAtiv (Atividade ativ, Long idEven) {
 		ativ.setDataAlter(getDateAlter());
 		atividadeDAO.save(ativ);
 	}

@@ -33,18 +33,23 @@
 					</div>
 					<div class="row mt-3">
 			    		<div class="col-xl-12 col-md-12 col-sm-12">
-			    			<p><strong>Descrição:</strong> #{URLsharedEventMB.evento.descricao}</p>
-			    			<p><strong>Custo:</strong> #{URLsharedEventMB.evento.vlr}</p>
-			    			<p><strong>Data:</strong> dás #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'HH:mm'})} até #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'HH:mm'})}</p>
-			    			<p><strong>Endereço:</strong> Estado: #{URLsharedEventMB.evento.estado}, Cidade: #{URLsharedEventMB.evento.cidade}, Bairro: #{URLsharedEventMB.evento.bairro}, Endereço: #{URLsharedEventMB.evento.endereco}, Numero: #{URLsharedEventMB.evento.numeroLugar}</p>
+			    			<ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+						       	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{URLsharedEventMB.evento.descricao}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Custo:</strong> #{URLsharedEventMB.evento.vlr}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Data:</strong> dás #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'HH:mm'})} até #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'HH:mm'})}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Endereço:</strong> Estado: #{URLsharedEventMB.evento.estado}, Cidade: #{URLsharedEventMB.evento.cidade}, Bairro: #{URLsharedEventMB.evento.bairro}, Endereço: #{URLsharedEventMB.evento.endereco}, Numero: #{URLsharedEventMB.evento.numeroLugar}</li>
+							</ul>
 			    		</div>
 			    	</div>
 		    	</div>
 			    <div class="row">
 			    	<div class="col-xl-12 col-md-12 col-sm-12">
-						<h3 class="text-center">Atividades:</h3>
+			    		<c:if test="${fn:length(URLsharedEventMB.evento.atividades) > 0}">
+					 		<h3 class="text-center">Atividades:</h3>
+						</c:if>
 					</div>
 		    	</div>
+		    	<div class="row mb-3">
 		    	<c:forEach var="ativ" items="#{URLsharedEventMB.evento.atividades}" step="1" begin="0">
 		    		<div class="col-xd-6 col-md-6 col-sm-12 mt-4">
 	                	<div class="card no-border-rcf shadow">
@@ -52,8 +57,10 @@
 	                           <strong>Atividade:</strong> #{ativ.nome}
 	                        </div>
 	                        <div class="card-body no-border-rcf">
-	                           <p class="card-text"><strong>Descrição:</strong> #{ativ.detalhes}</p>
-	                           <p class="card-text"><strong>Vagas:</strong> #{ativ.vagas - ativ.qtdInscrito} de #{ativ.vagas}</p>
+	                           <ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+						            <li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{ativ.detalhes}</li>
+									<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Vagas:</strong> #{ativ.vagas - ativ.qtdInscrito} de #{ativ.vagas}</li>
+								</ul>
 	                         </div>
 	                         
 	                         <c:choose>
@@ -62,21 +69,20 @@
 										 <strong>Inscritos:</strong>
 									  </div>
 									  <div class="card-body no-border-rcf">
-										  <ul class="list-group">
-										     <c:forEach var="insc" items="#{ativ.usuarioAtividade}" step="1" begin="0">
-										       <li class="list-group-item no-border-rcf">
-										      	  <div class="row">
-											      	 <div class="col-sm-4 col-small-4-rcf">
-											        	 <h:graphicImage library="perfil" name="#{insc.usuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
-											         </div>
-											         <div class="col-sm-8 col-small-8-rcf">
-											        	 <p class="card-text"><strong>Nome:</strong> #{insc.usuario.nome}</p>
-				                           				 <p class="card-text"><strong>Contato:</strong> #{insc.usuario.email}</p>
-											         </div>
-										          </div>
-										       </li>
-										     </c:forEach>
-										   </ul>
+										 <c:forEach var="insc" items="#{ativ.usuarioAtividade}" step="1" begin="0">
+										   <div class="row">
+												<ul class="list-group ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+											       <li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf">
+											      		<p:commandButton immediate="true"
+															icon="ui-icon-search" title="Consultar"
+															actionListener="#{URLsharedEventMB.doConsultaUsuario(insc.usuario)}" update="formModalConsUsuario"
+															process="@this" oncomplete="openModal('modalConsUsuario')" styleClass="ui-icon-button-rcf mx-2">
+														</p:commandButton>
+														#{insc.usuario.nome}
+													</li>
+												</ul>
+											</div>
+										  </c:forEach>
 										</div>
 			                        	<div class="card-footer no-border-rcf text-muted">
 			                           		#{0 > ativ.qtdDifTemp ? '' : ativ.qtdDifTemp} #{ativ.tpDifTemp eq 'dias' ? 'dias' : (ativ.tpDifTemp eq 'horas' ? 'horas' : (ativ.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
@@ -92,7 +98,51 @@
 	                     	</div>
 	                  </div>
 	             </c:forEach>
+	             </div>
+	             
+	             
 		    </h:form>
+		    <!-- modal consulta Usuario -->
+	             <div class="modal fade" id="modalConsUsuario" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formModalConsUsuario">
+									<div class="modal-header bg-light">
+										<div class="col-md-12 col-lg-12">
+										   <ul class="list-group first-init-reply">
+											  <li class="list-group-item list-group-item-ajust-rcf bg-light">
+												<h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
+											  </li>
+										   </ul>
+											
+										</div>
+									</div>
+									<div class="modal-body">
+										<div class="row">
+											<div class="col-sm-4 col-md-4 col-lg-2 col-small-4-rcf ui-padding-right-0-rcf">
+												<h:graphicImage library="perfil" name="#{URLsharedEventMB.usuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
+											</div>
+											<div class="col-sm-8 col-md-8 col-lg-10 col-small-8-rcf ui-padding-left-0-rcf">
+												<ul class="list-group first-init-reply">
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Nome:</strong> #{URLsharedEventMB.usuario.nome}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Contato:</strong> #{URLsharedEventMB.usuario.email}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.telefone eq null ? 'Sem contato de Telefone' : (URLsharedEventMB.usuario.telefone eq '' ? 'Sem contato de Telefone' : 'Telefone:')}</strong> #{URLsharedEventMB.usuario.telefone eq null ? '' : (URLsharedEventMB.usuario.telefone eq '' ? '' : URLsharedEventMB.usuario.telefone)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.celular eq null ? 'Sem contato de Celular' : (URLsharedEventMB.usuario.celular eq '' ? 'Sem contato de Celular' : 'Celular:')}</strong> #{URLsharedEventMB.usuario.celular eq null ? '' : (URLsharedEventMB.usuario.celular eq '' ? '' : URLsharedEventMB.usuario.celular)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.estado eq null ? 'Sem informação de Estado' : (URLsharedEventMB.usuario.estado eq '' ? 'Sem informação de Estado' : 'Estado:')}</strong> #{URLsharedEventMB.usuario.estado eq null ? '' : (URLsharedEventMB.usuario.estado eq '' ? '' : URLsharedEventMB.usuario.estado)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.cidade eq null ? 'Sem informação de Cidade' : (URLsharedEventMB.usuario.cidade eq '' ? 'Sem informação de Cidade' : 'Cidade:')}</strong> #{URLsharedEventMB.usuario.cidade eq null ? '' : (URLsharedEventMB.usuario.cidade eq '' ? '' : URLsharedEventMB.usuario.cidade)}</li>
+												</ul>
+											 </div>
+										</div>
+									</div>
+						        </h:form>
+						        <div class="modal-footer">
+						            <div class="d-flex align-items-end flex-column">
+								        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal('modalConsUsuario')">Fechar</button>
+								    </div>
+								</div>
+						      </div>
+						   </div>
+						</div>
 	    </div>
 	</h:body>
 </html>

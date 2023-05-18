@@ -27,43 +27,54 @@
                   <div class="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
                   <c:choose>
 		             <c:when test="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0}">
-		               <table class="table-hover table-rcf-shadow">
-						  <thead>
-						    <tr>
-						      <th scope="col">Nome</th>
-						      <th scope="col">Data</th>
-						      <th scope="col">Preço</th>
-						      <th scope="col">Configurar</th>
-						    </tr>
-						  </thead>
-						  <tbody>
-						  	<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
-							    <tr>
-							      <td data-label="Titulo" class="text-truncate">#{ativ.nome}</td>
-							      <td data-label="Data" class="text-truncate">
-							      	#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
-							      </td>
-							      <td data-label="Preço">#{ativ.preco}</td>
-							      <td data-label="Configurar">
-							      	<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
-									icon="ui-icon-search" title="Consultar"
-									actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
-									process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
-								</p:commandButton>
-	                           	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
-									icon="ui-icon-wrench" title="Editar"
-									actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
-									process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
-								</p:commandButton>
-								<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
-									title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
-									update="formModalDel" styleClass="ui-icon-button-rcf" />
-	                                 
-								  </td>
-							    </tr>
-						    </c:forEach>
-						  </tbody>
-						</table>
+						
+						<div class="row">
+								<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+										<div class="card no-border-rcf shadow ui-card-rcf">
+											<div class="row">
+												<div data-label="Evento" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.evento.titulo}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Data" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Preço" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.preco}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Gerenciar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
+														icon="ui-icon-search" title="Consultar"
+														actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
+														process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+						                           	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
+														icon="ui-icon-wrench" title="Editar"
+														actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
+														process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+													<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
+														title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
+														update="formModalDel" styleClass="ui-icon-button-rcf" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						
+						
 		              </c:when>
 		              <c:otherwise>
 		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
@@ -78,17 +89,16 @@
                   <div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
 				   <div class="modal-dialog" role="document">
 				      <div class="modal-content">
-				     	 <h:form id="formModalDel">
-				          <div class="modal-header">
-				             <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
-				             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				             <span aria-hidden="true"></span>
-				             </button>
-				          </div>
+				     	 <h:form id="formModalDel" styleClass="ui-margin-bottom-0-rcf">
+				             <div class="modal-header bg-light ">
+								<div class="d-flex align-items-start flex-column form-control bg-light no-border-rcf">
+									<h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+								</div>	
+					         </div>
 				          <div class="modal-body">
 				          	<c:choose>
 				          		<c:when test="#{atividadeMB.ativSel.existeInscrito}">
-				          			<div class="alert alert-warning" role="alert">
+				          			<div class="alert alert-warning ui-margin-bottom-0-rcf" role="alert">
 										Atenção!, Não é possivel excluir essa Atidade, existem inscritos Aprovados ou Pendentes
 									</div>
 				          		</c:when>
@@ -99,7 +109,7 @@
 				                </c:otherwise>
 							</c:choose>
 				          </div>
-				          <div class="modal-footer">
+				          <div class="modal-footer bg-light">
 				             <button type="button" class="btn" data-dismiss="modal">#{atividadeMB.ativSel.existeInscrito ? 'Fechar' : 'Não'}</button>
 				             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
 				                onstart="closeModal('newConfirmDel')" rendered="#{atividadeMB.ativSel.existeInscrito ? 'false' : 'true'}"
@@ -186,50 +196,26 @@
                                  <label for="from" class="col-form-label">Começa:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputText pt:type="date" label="Data inicio"
-                                    styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data inicio"
+                                    styleClass="form-control ui-width-100-rcf #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataInicio}" required="true"
                                     id="dataInicio" placeholder="Data inicio" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC"/>
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC"/>
                                     <p:ajax event="blur" listener="#{atividadeMB.validaDataInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>
-                                 </p:inputText>
-                              </div>
-                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
-                                 <label for="horafrom" class="col-form-label">Hora Começo:</label>
-                              </div>
-                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="UTC"
-                                 	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
-                                    value="#{atividadeMB.editAtividade.horaInicio}" required="true"
-                                    label="Hora inicio" id="horafrom" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}">
-                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
-                                    <p:ajax event="blur" listener="#{atividadeMB.validaHoraInicio}" update="titulo, dataInicio, datafim, horafrom, horafim"/>                                 
                                  </p:inputMask>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
                                  <label for="datafim" class="col-form-label">Termina:</label>
                               </div>
                               <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputText pt:type="date" label="Data Fim"
-                                    styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data Fim"
+                                    styleClass="form-control ui-width-100-rcf #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
                                     disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
                                     value="#{atividadeMB.editAtividade.dataFim}" required="true"
                                     id="datafim" placeholder="Data Fim" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd" locale="pt_BR" timeZone="UTC" />
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC" />
                                     <p:ajax event="blur" listener="#{atividadeMB.validaDataFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/> 
-                                 </p:inputText>
-                              </div>
-                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
-                                 <label for="horafim" class="col-form-label">Hora Termino:</label>
-                              </div>
-                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
-                                 <p:inputMask mask="99:99" timeOnly="true" timeZone="UTC"
-                                 	styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
-                                    value="#{atividadeMB.editAtividade.horaFim}" required="true"
-                                    label="Hora Fim" id="horafim" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" >
-                                    <f:convertDateTime pattern="HH:mm" locale="pt_BR" timeZone="UTC" />
-                                 	<p:ajax event="blur" listener="#{atividadeMB.validaHoraFim}" update="titulo, dataInicio, datafim, horafrom, horafim"/>   
                                  </p:inputMask>
                               </div>
                               <div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">

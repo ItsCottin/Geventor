@@ -1,5 +1,7 @@
 package br.com.pluri.eventor.view;
 
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import br.com.etechoracio.common.view.BaseMB;
+import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.model.Atividade;
@@ -30,10 +33,14 @@ public class UsuarioAtividadeMB extends BaseMB {
 	@Autowired
 	private UsuarioSB usuSB;
 	
+	@Autowired
+	private AtividadeSB atividadeSB;
+	
 	private Usuario usuario;
 	private List<Usuario> inscritos;
 	private List<UsuarioAtividade> usuAtiv;
 	private List<UsuarioAtividade> myInscricoes;	
+	private Atividade atividade;
 	
 	@PostConstruct
 	public void postConstruct(){
@@ -66,9 +73,18 @@ public class UsuarioAtividadeMB extends BaseMB {
 	}
 	
 	public void doConsultaUsuario(Usuario usuario) {
-		this.usuario = new Usuario();
 		this.usuario = usuario;
 	}
 	
+	public void doConsultaAtiv(Atividade ativ) throws SQLException{
+		this.atividade = ativ;
+		this.atividade.setQtdInscrito(atividadeSB.qtdInscritoInAtividade(atividade.getId()));
+	}
+	
+	public String formatarDataFromTela(Map<String, Object> params) {
+		Date data = (Date) params.get("data");
+		String formato = (String) params.get("formato");
+        return formatarData(data, formato);
+    }
 	
 }

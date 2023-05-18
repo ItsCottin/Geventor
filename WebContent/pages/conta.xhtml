@@ -70,7 +70,7 @@
                         </div>
                         <div class="col-sm-4 col-md-4 col-lg-3 col-small-8-rcf form-group">
                             <p:inputMask value="#{usuarioMB.editUsuario.cpfCnpj}" label="cpf" mask="999.999.999-99"
-								styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{usuarioMB.modoConsulta}" >
+								styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{usuarioMB.modoConsulta}" >
 								<p:ajax event="blur" listener="#{usuarioMB.validaCPFTab(usuarioMB.editUsuario.cpfCnpj)}" update="formUsuario"/>
 							</p:inputMask> <!-- #{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'} -->
                         </div>
@@ -90,7 +90,7 @@
                         </div>
                         <div class="col-sm-4 col-md-4 col-lg-3 col-small-8-rcf form-group">
                             <p:inputMask value="#{usuarioMB.cepInformado}" label="cep" mask="99999-999"
-								styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'border border-info bg-white'}" 
+								styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'border border-info bg-white'}" 
 								disabled="#{usuarioMB.modoConsulta}">
 								<p:ajax event="blur" listener="#{usuarioMB.findEnderecoByCEP()}" update="formUsuario"/>
 							</p:inputMask>
@@ -136,7 +136,7 @@
                             <label for="celular" class="col-form-label">Celular:</label>
                         </div>
                         <div class="col-sm-4 col-small-7-rcf form-group">
-                            <p:inputMask pt:type="" styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="celular"
+                            <p:inputMask pt:type="" styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="celular"
                                     label="Celular" mask="(99) 99999-9999" disabled="#{usuarioMB.modoConsulta}"
                                     value="#{usuarioMB.editUsuario.celular}" >
                                     <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.celular)}" update="formUsuario"/>
@@ -153,7 +153,7 @@
                             <label for="telefone" class="col-form-label">Telefone:</label>
                         </div>
                         <div class="col-sm-4 col-small-7-rcf form-group">
-                            <p:inputMask pt:type="" styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="telefone"
+                            <p:inputMask pt:type="" styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="telefone"
                                     label="Telefone" mask="(99) 9999-9999" disabled="#{usuarioMB.modoConsulta}"
                                     value="#{usuarioMB.editUsuario.telefone}" >
                                  <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.telefone)}" update="formUsuario"/>

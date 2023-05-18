@@ -33,12 +33,9 @@ public class EventoSB extends BaseSB {
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void insert(Evento evento, Long idUsuarioLogado){
 		evento.setUsuario(new Usuario(idUsuarioLogado));
-		evento.setDataInicio(merge(evento.getDataInicio(), evento.getHoraInicio()));
-		evento.setDataFim(merge(evento.getDataFim(), evento.getHoraFim()));
 		evento.setDataAlter(getDateAlter());
 		eventoDAO.save(evento);
 	}
-	
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<Evento> findEventosByUsuario(Long  idUsuarioLogado){

@@ -76,6 +76,38 @@
     
     			
     			<div class="container my-5">
+    				<!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsVersao" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formConsVersaoModal">
+						         <div class="modal-header bg-light">
+						            <div class="col-md-12 col-lg-12">
+						               <ul class="list-group first-init-reply">
+							               <li class="list-group-item list-group-item-ajust-rcf bg-light">
+							               	<h5 class="ui-margin-bottom-0-rcf">Novidades :)</h5>
+							               </li>
+							           </ul>
+						            </div>
+						         </div>
+						         <div class="modal-body">
+						               <div class="col-md-12 col-lg-12">
+						                  	<ul class="list-group first-init-reply">
+						                  		<li class="list-group-item list-group-item-ajust-rcf"><h5 class="mb-3">v0.3.1 - Em construção</h5></li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">1. Implementado nova lógica de validação de Data Inicio e Data Fim dando suporte para proxima fase da Implementação de Validações de Periodos de Atividades.</li>
+  											</ul>
+						               </div>
+						         </div>
+						         
+						         </h:form>
+						         <div class="modal-footer bg-light">
+						             <div class="d-flex align-items-end flex-column">
+								         <button type="button" class="btn btn-secondary" data-dismiss="modal">Legal</button>
+								     </div>
+								 </div>
+						      </div>
+						   </div>
+						</div>
 					<section class="">
 						<ui:insert name="contentV3" />
 					</section>
@@ -91,10 +123,13 @@
 		<div class="ui-aling-item-left-rcf">
 			<div class="nav-link">
 	       		<a class="text-muted text-reset font-weight-lighter text-secondary">Versão:</a>
-	       		<a class="text-muted text-reset font-weight-lighter text-secondary" href="/changeset.xhtml">#{infoStaticClassMB.versao}</a>
-       		</div>
-        </div>
-	</div>	
+	       		<p:commandLink class="text-muted text-reset font-weight-lighter text-secondary" value="v0.3.1" onclick="openModal('modalConsVersao')"/>
+	       		
+	       		
+	       		</div>
+	        </div>
+		</div>	
+		
 	</h:body>
 
 </ui:composition>

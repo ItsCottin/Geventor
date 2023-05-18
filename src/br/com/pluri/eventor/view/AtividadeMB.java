@@ -15,6 +15,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.ScheduleEntryMoveEvent;
+import org.primefaces.event.ScheduleEntryResizeEvent;
+import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.model.ScheduleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -81,7 +86,7 @@ public class AtividadeMB extends BaseMB {
 				atividadeSB.insert(editAtividade, idEvento);
 				showInfoMessage(MessageBundleLoader.getMessage("ativ.insert_sucess", new Object[] {editAtividade.getNome()}));
 			}else{
-				atividadeSB.editAtiv(editAtividade, idEvento, true);
+				atividadeSB.editAtiv(editAtividade, idEvento);
 				showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {editAtividade.getNome()}));
 			}
 			RequestContext.getCurrentInstance().execute("selAba('visualizar')");
@@ -140,25 +145,6 @@ public class AtividadeMB extends BaseMB {
 		}
 	}
 	
-	public void onSetDataHoraEvenNaAtiv(){
-		if(editAtividade.evento != null){
-			if(editAtividade.isUsaPeriodoEven()){
-				this.editAtividade.setDataInicio(editAtividade.evento.getDataInicio());
-				this.editAtividade.setHoraInicio(editAtividade.evento.getDataInicio());
-				this.editAtividade.setDataFim(editAtividade.evento.getDataFim());
-				this.editAtividade.setHoraFim(editAtividade.evento.getDataFim());
-			} else {
-				this.editAtividade.setDataInicio(null);
-				this.editAtividade.setHoraInicio(null);
-				this.editAtividade.setDataFim(null);
-				this.editAtividade.setHoraFim(null);
-			}
-		} else {
-			this.editAtividade.setUsaPeriodoEven(false);
-			showInfoMessage(MessageBundleLoader.getMessage("ativ.info_no_even"));
-		}
-	}
-	
 	public void setTituloAtiv(){
 		this.editAtividade.setNome(editAtividade.getNome());
 	}
@@ -196,7 +182,6 @@ public class AtividadeMB extends BaseMB {
 				this.dataValidada = true;
 				if (result == 0){
 					editAtividade.setMesmodiainicio(true);
-					validaHoraInicio();
 				}
 			}
 		} catch (PeriodoDataInvalidaException e){
@@ -226,7 +211,6 @@ public class AtividadeMB extends BaseMB {
 				this.dataValidada = true;
 				if (result == 0){
 					editAtividade.setMesmodiafim(true);
-					validaHoraFim();
 				}
 			}
 		} catch (PeriodoDataInvalidaException e){
@@ -251,110 +235,6 @@ public class AtividadeMB extends BaseMB {
 			showErrorMessage(e.getMessage());
 			this.editAtividade.setDataFim(null);
 			this.editAtividade.setDataInicio(null);
-		}
-	}
-	
-	public void validaHoraIniAtivHoraFimAtiv(){
-		try {
-			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null) {
-				if(editAtividade.getHoraFim() != null && editAtividade.getHoraInicio() != null && editAtividade.getDataFim().equals(editAtividade.getDataInicio())) {
-					Calendar calAtivIni = Calendar.getInstance();
-					Calendar calAtivFim = Calendar.getInstance();
-					
-					calAtivIni.setTime(editAtividade.getHoraInicio());
-					calAtivFim.setTime(editAtividade.getHoraFim());
-					
-					int horaInicAtiv = calAtivIni.get(Calendar.HOUR_OF_DAY);
-					int minutoInicAtiv = calAtivIni.get(Calendar.MINUTE);
-					
-					int horaFimAtiv = calAtivFim.get(Calendar.HOUR_OF_DAY);
-					int minutoFimAtiv = calAtivFim.get(Calendar.MINUTE);
-					
-					if(horaInicAtiv > horaFimAtiv || horaInicAtiv == horaFimAtiv && minutoInicAtiv > minutoFimAtiv){
-						throw new PeriodoDataInvalidaException(
-								MessageBundleLoader.getMessage("hora.iniciomaiorfim", 
-										new Object[] {formatarData(editAtividade.getHoraInicio(),"HH:mm"), 
-												formatarData(editAtividade.getHoraFim(),"HH:mm")}, 
-										Locale.getDefault()));
-					}
-				}
-			}
-		} catch (PeriodoDataInvalidaException e){
-			showErrorMessage(e.getMessage());
-			this.editAtividade.setHoraInicio(null);
-			this.editAtividade.setHoraFim(null);
-		}
-	}
-	
-	
-	
-	public void validaHoraInicio(){
-		try{
-			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null && editAtividade.getHoraInicio() != null) {
-				if(!dataValidada){
-					validaDataInicio();
-				}
-				if(editAtividade.isMesmodiainicio()){
-					Calendar calAtiv = Calendar.getInstance();
-					Calendar calEven = Calendar.getInstance();
-					
-					calAtiv.setTime(editAtividade.getHoraInicio());
-					calEven.setTime(editAtividade.evento.getDataInicio());
-					
-					int horaAtiv = calAtiv.get(Calendar.HOUR_OF_DAY);
-					int minutoAtiv = calAtiv.get(Calendar.MINUTE);
-					
-					int horaEven = calEven.get(Calendar.HOUR_OF_DAY);
-					int minutoEven = calEven.get(Calendar.MINUTE);
-					
-					if(horaEven > horaAtiv || horaEven == horaAtiv && minutoEven > minutoAtiv){
-						throw new PeriodoDataInvalidaException(
-								MessageBundleLoader.getMessage("hora.iniciomenorinicio.even", 
-										new Object[] {formatarData(editAtividade.getHoraInicio(),"HH:mm"), 
-												formatarData(editAtividade.evento.getDataInicio(),"HH:mm")}, 
-										Locale.getDefault()));
-					}
-				}
-				validaHoraIniAtivHoraFimAtiv();
-			}
-		} catch (PeriodoDataInvalidaException e) {
-			showErrorMessage(e.getMessage());
-			this.editAtividade.setHoraInicio(null);
-		}
-	}
-	
-	public void validaHoraFim(){
-		try{
-			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null && editAtividade.getHoraFim() != null) {
-				if(!dataValidada){
-					validaDataFim();
-				}
-				if(editAtividade.isMesmodiafim()){
-					Calendar calAtiv = Calendar.getInstance();
-					Calendar calEven = Calendar.getInstance();
-					
-					calAtiv.setTime(editAtividade.getHoraFim());
-					calEven.setTime(editAtividade.evento.getDataFim());
-					
-					int horaAtiv = calAtiv.get(Calendar.HOUR_OF_DAY);
-					int minutoAtiv = calAtiv.get(Calendar.MINUTE);
-					
-					int horaEven = calEven.get(Calendar.HOUR_OF_DAY);
-					int minutoEven = calEven.get(Calendar.MINUTE);
-					
-					if(horaEven < horaAtiv || horaEven == horaAtiv && minutoEven < minutoAtiv){
-						throw new PeriodoDataInvalidaException(
-								MessageBundleLoader.getMessage("hora.fimmaiorfim.even", 
-										new Object[] {formatarData(editAtividade.getHoraFim(),"HH:mm"), 
-												formatarData(editAtividade.evento.getDataFim(),"HH:mm")}, 
-										Locale.getDefault()));
-					}
-				}
-				validaHoraIniAtivHoraFimAtiv();
-			}
-		} catch (PeriodoDataInvalidaException e) {
-			showErrorMessage(e.getMessage());
-			this.editAtividade.setHoraFim(null);
 		}
 	}
 	

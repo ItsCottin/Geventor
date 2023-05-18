@@ -26,17 +26,19 @@
 		            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link tab nav-link active" aria-current="page" href="#login">Login</a>
 		         </li>
 		         <li class="nav-tab-item">
-		            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link tab nav-link" href="#cadastro">Cadastre-se</a>
+		            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link tab nav-link" href="#cadastro">Cadastro</a>
 		         </li>
 	     	 </ul>
      	 </div>
 		<div class="tab-content py-4">
      	 	<div id="login" class="tab-pane active">
       			<div class="col-md-8 col-lg-6 border-rcf bg-white shadow">
-      				<div class="mb-4">
-	      				<h3>Realize seu Login</h3>
+      				<div class="row ml-1 mt-3">
+      					<div class="col form-group text-truncate">
+	      					<h3>Realize seu Login</h3>
+	      				</div>
 	      			</div>
-	      			<h:form id="login">
+	      			<h:form id="login" style="margin-bottom: 2px!important">
       					<div class="row ml-1">
       						<div class="col-sm-3 col-md-3 col-lg-3 col-xl-2 col-small-3-rcf form-group text-truncate">
 	      						<label for="Usuario" class="col-form-label">Login:</label>
@@ -54,7 +56,7 @@
 							</div>	
 						</div>
 						<div class="row ml-1">
-							<div class="form-group">
+							<div class="col form-group mt-3">
 								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Entrar" 
 									actionListener="#{userContextMB.doLogin}" update=":msgs">
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
@@ -66,10 +68,12 @@
 			</div>
 				<div id="cadastro" class="tab-pane">
       				<div class="col-sm-12 col-md-9 col-lg-8 col-xl-6 border-rcf  bg-white shadow">
-      					<div class="mb-4">
-	      					<h3>Informe seus dados</h3>
+      					<div class="row ml-1 mt-3">
+      						<div class="col form-group text-truncate">
+	      						<h3>Informe seus dados</h3>
+	      					</div>
 	      				</div>
-	      				<h:form id="cadastroLogin">
+	      				<h:form id="cadastroLogin" style="margin-bottom: 2px!important">
 	      				<div class="row ml-1">
 	      					<div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 col-small-12-rcf form-group text-truncate">
 	      						<label for="name" class="col-form-label">Nome Completo:</label>
@@ -123,7 +127,7 @@
 							</div>
 						</div>
 						<div class="row ml-1">
-							<div class="form-group">
+							<div class="col form-group mt-3">
 								<p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" icon="ui-icon-check" value="Cadastrar" id="btnCadUsu"
 									actionListener="#{usuarioMB.doSave()}" update=":msgs">
 									<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
