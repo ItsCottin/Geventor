@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.etechoracio.common.business.BaseSB;
 import br.com.pluri.eventor.dao.AtividadeDAO;
+import br.com.pluri.eventor.enums.TipoAtividadeEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
 
@@ -30,7 +31,7 @@ public class AtividadeSB extends BaseSB {
 		atividade.setEvento(new Evento(idEvento));
 		atividade.setDataAlter(getDateAlter());
 		if(atividade.getOrganizacao() == null){
-			atividade.setOrganizacao("Comum");
+			atividade.setOrganizacao(TipoAtividadeEnum.COMUM.tipo);
 		}
 		atividadeDAO.save(atividade);
 	}
@@ -56,8 +57,13 @@ public class AtividadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public List<Atividade> findByEventos (Long idEvento){
-		return atividadeDAO.findByEventos(idEvento);
+	public List<Atividade> findByIdEven(Long idEvento){
+		return atividadeDAO.findByIdEven(idEvento);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<Atividade> findByIdEvenAndTipoAtiv(Long idEvento, String tpAtiv){
+		return atividadeDAO.findByIdEvenAndTipoAtiv(idEvento, tpAtiv);
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)

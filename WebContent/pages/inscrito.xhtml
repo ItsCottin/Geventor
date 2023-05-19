@@ -111,12 +111,24 @@
 											</div>
 										</div>
 										<div class="row">
+											<div data-label="Tipo" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<span class="#{insc.atividade.organizacao eq 'Gerencia' ? 'text-success' : ''}">#{insc.atividade.organizacao}</span>
+											</div>
+										</div>
+										<div class="row">
 											<div data-label="Gerenciar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
-												<p:commandButton immediate="true"
-													icon="ui-icon-closethick" title="Desistir"
-													actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
-													process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
-												</p:commandButton>
+												<c:choose>
+		            	 							<c:when test="#{insc.atividade.organizacao eq 'Comum'}">
+														<p:commandButton immediate="true"
+															icon="ui-icon-closethick" title="Desistir"
+															actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
+															process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+														</p:commandButton>
+													</c:when>
+													<c:otherwise>
+														Não permitido
+													</c:otherwise>
+												</c:choose>
 											</div>
 										</div>
 									</div>

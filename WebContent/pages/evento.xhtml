@@ -52,6 +52,12 @@
 											</div>
 										</div>
 										<div class="row">
+											<div data-label="Duração" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<c:set var="difDate" value="#{eventoMB.getDifDateFromTela({'datainicio': even.dataInicio, 'datafim': even.dataFim})}" />
+												#{difDate.valor} #{difDate.unidade}
+											</div>
+										</div>
+										<div class="row">
 											<div data-label="Custo" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
 												#{even.vlr} 
 											</div>
@@ -101,23 +107,20 @@
 					             <div class="modal-body">
 					             	
 					             		<c:choose>
-					             			<c:when test="#{eventoMB.evenSel.existeInscrito}">
+					             			<c:when test="#{eventoMB.editEvento.existeInscrito}">
 					             				<div class="alert alert-warning ui-margin-bottom-0-rcf" role="alert">
-													Atenção!, Não é possivel excluir esse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+													Não é possivel excluir esse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
 												</div>
 					             			</c:when>
 					             			<c:otherwise>
 					             				<div class="border-rcf">
-					                               <label>Deseja realmente excluir o evento <strong>'#{eventoMB.evenSel.titulo}'</strong> ?</label>
-					                               <c:if test="${fn:length(eventoMB.evenSel.atividades) > 0}">
+					                               <label>Deseja realmente excluir o evento <strong>'#{eventoMB.editEvento.titulo}'</strong> ?</label>
+					                               <c:if test="${fn:length(eventoMB.editEvento.atividades) > 0}">
 					 									<label>Todas as atividades abaixo também serão <strong class="text-danger">apagadas!</strong> </label>
 													</c:if>
 												</div>
-											
-					               
 					                            <ul class="list-group first-init-reply">
-					                            	
-					                            	<c:forEach var="ativ" items="#{eventoMB.evenSel.atividades}" step="1" begin="0">
+					                            	<c:forEach var="ativ" items="#{eventoMB.editEvento.atividades}" step="1" begin="0">
 					                            		<li class="list-group-item list-group-item-ajust-rcf"><strong>Nome:</strong> #{ativ.nome}</li>
 					                            	</c:forEach>
 					                            </ul>
@@ -125,10 +128,12 @@
 										</c:choose>
 					             </div>
 					             <div class="modal-footer">
-					                <button type="button" class="btn" data-dismiss="modal">#{eventoMB.evenSel.existeInscrito ? 'Fechar' : 'Não'}</button>
+					                <p:commandButton styleClass="btn btn-secundary ui-widget-button-outline-secondary-rcf" value="#{eventoMB.editEvento.existeInscrito ? 'Fechar' : 'Não'}"
+						                onstart="closeModal('newConfirmDel')"
+						                actionListener="#{eventoMB.doPrepareSave()}" update=":msgs :formtbl" />
 					                <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
-					                   rendered="#{eventoMB.evenSel.existeInscrito ? 'false' : 'true'}"
-					                   actionListener="#{eventoMB.doRemove(eventoMB.evenSel)}" update=":msgs :formtbl"  >
+					                   rendered="#{eventoMB.editEvento.existeInscrito ? 'false' : 'true'}"
+					                   actionListener="#{eventoMB.doRemove(eventoMB.editEvento)}" update=":msgs :formtbl"  >
 					                   <p:ajax onstart="closeModal('newConfirmDel')" />
 					                </p:commandButton>	                                                
 					             </div>
@@ -147,11 +152,50 @@
                         <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito ? (eventoMB.editEvento.doEditEven eq 'true' ? 'true' : 'false') : 'false'}">
 		                	<div class="col-md-12 col-lg-12">
 		                    	<div class="alert alert-warning" role="alert">
-									Atenção!, Não é possivel realizar alteração nesse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+									Não é possivel realizar alteração nesse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
 								</div>
 		                    </div>
 	                    </p:panelGrid>
                         <div class="col-md-12 col-lg-12">
+                        	<c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">
+							<div class="row mb-3">
+								<c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
+									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+										<div class="card no-border-rcf shadow ui-card-rcf">
+											<div class="row">
+												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Vagas" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.vagas - ativ.qtdInscrito}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Configurar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<div class="btn-group" role="group" aria-label="Basic example">
+				                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
+				                                          icon="ui-icon-search" title="Consultar"
+				                                          actionListener="#{eventoMB.doConsultaAtiv(ativ)}" update=":formHtmlModal"
+				                                          process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf">
+				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+				                                       </p:commandButton>
+				                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
+				                                          icon="#{ativ.estaInscrito eq 'True' ? 'ui-icon-check' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'ui-icon-closethick' : 'ui-icon-plus')}" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever')}" 
+				                                          value="#{ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever'}" disabled="#{ativ.estaInscrito ? 'true' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'true' : 'false')}"
+				                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
+				                                          process="@this" oncomplete="" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf">
+				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+				                                       </p:commandButton>
+			                                       </div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</div>  
+                           </c:if>
                            <div class="row mb-3 border-rcf pt-4 bg-white shadow">
                            	<div class="col-lg-2 col-md-2 col-sm-2 col-small-3-rcf form-group text-right text-truncate">
                               	<label for="titulo" class="col-form-label">Título:</label>
@@ -371,45 +415,7 @@
 	                              </div>
                            </div>
                            
-                           <c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">
-							<div class="row">
-								<c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
-									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
-										<div class="card no-border-rcf shadow ui-card-rcf">
-											<div class="row">
-												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
-													#{ativ.nome}
-												</div>
-											</div>
-											<div class="row">
-												<div data-label="Vagas" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
-													#{ativ.vagas - ativ.qtdInscrito}
-												</div>
-											</div>
-											<div class="row">
-												<div data-label="Configurar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
-													<div class="btn-group" role="group" aria-label="Basic example">
-				                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
-				                                          icon="ui-icon-search" title="Consultar"
-				                                          actionListener="#{eventoMB.doConsultaAtiv(ativ)}" update=":formHtmlModal"
-				                                          process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf">
-				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-				                                       </p:commandButton>
-				                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
-				                                          icon="#{ativ.estaInscrito eq 'True' ? 'ui-icon-check' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'ui-icon-closethick' : 'ui-icon-plus')}" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever')}" 
-				                                          value="#{ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever'}" disabled="#{ativ.estaInscrito ? 'true' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'true' : 'false')}"
-				                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
-				                                          process="@this" oncomplete="" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf">
-				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
-				                                       </p:commandButton>
-			                                       </div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</c:forEach>
-							</div>  
-                           </c:if>  
+                             
                         </div>
                      </h:form>
                      
@@ -505,7 +511,7 @@
 	                              		</div>
 	                              		<div class="form-group col-lg-6 col-md-12 col-sm-12">
 	                                 		<label class="form-control bg-light border border-light" id="infoInicioEven">
-	                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.horaFim, 'formato': 'HH:mm'})}
+	                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'HH:mm'})}
 	                                 		</label>
 	                              		</div>
 		                               </div>
@@ -577,6 +583,7 @@
 	                        <div class="card-body no-border-rcf">
 						        	<ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
 						            	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{event.descricao}</li>
+						            	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Data:</strong> #{eventoMB.formatarDataFromTela({'data': event.dataInicio, 'formato': 'dd/MM'})} às #{eventoMB.formatarDataFromTela({'data': event.dataInicio, 'formato': 'HH:mm'})}</li>
 										<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Vagas:</strong> #{event.vagas - event.qtdInscrito} de #{event.vagas}</li>
 									</ul>
 	                           
@@ -587,7 +594,7 @@
 	                            </p:commandButton>
 	                        </div>
 	                        <div class="card-footer no-border-rcf text-muted">
-	                           #{0 > event.qtdDifTemp ? '' : event.qtdDifTemp} #{event.tpDifTemp eq 'dias' ? 'dias' : (event.tpDifTemp eq 'horas' ? 'horas' : (event.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
+	                           #{event.qtdDifTemp eq 0 ? 'Pouco' : event.qtdDifTemp} #{event.qtdDifTemp eq 0 ? 'tempo' : (event.qtdDifTemp eq 1 ? 'minuto' : event.tpDifTemp)} atrás
 	                        </div>
 	                     </div>
 	                  </div>

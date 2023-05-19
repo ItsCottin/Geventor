@@ -42,6 +42,9 @@ import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.NRCasaUsuarioException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.business.util.PasswordUtils;
+import br.com.pluri.eventor.enums.CustoEnum;
+import br.com.pluri.eventor.enums.StatusInscritoEnum;
+import br.com.pluri.eventor.enums.TipoAtividadeEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.DiferencaData;
@@ -104,7 +107,6 @@ public class EventoMB extends BaseMB {
 	private static final long serialVersionUID = 1L;
 	private boolean confirmaExclui = false;
 	public boolean modoConsulta;
-	public Evento evenSel;
 	public Atividade atividade;
 	private Endereco enderecoDoCEP;
 	private String usaTelefone;
@@ -120,7 +122,6 @@ public class EventoMB extends BaseMB {
 			onEventos();
 			estados = estadoSB.findAll();
 			this.modoConsulta = false;
-			this.evenSel = new Evento();
 			this.editEvento = new Evento();
 			this.editEvento.setGuid(PasswordUtils.generateGUID());
 			findAllEventoMenosMeus();
@@ -138,7 +139,7 @@ public class EventoMB extends BaseMB {
 	public void findAllEventoMenosMeus(){
 		try {
 			this.allEvenMenosMeus = new ArrayList<Evento>();
-			for (Evento even : eventoSB.findAllEventoMenosMeusRecen(getCurrentUserId())){
+			for (Evento even : eventoSB.findAllEventoMenosMeusComAtivExistPorTipoAtivRecen(getCurrentUserId(), TipoAtividadeEnum.COMUM.tipo)){
 				DiferencaData dd = calcDifDate(even.getDataAlter(), getDateNow());
 				even.setQtdDifTemp(dd.getValor());
 				even.setTpDifTemp(dd.getUnidade());
@@ -149,6 +150,13 @@ public class EventoMB extends BaseMB {
 		} catch (SQLException e) {
 			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
 		}
+	}
+	
+	public DiferencaData getDifDateFromTela(Map<Date, Object> params) {
+		Date datainicio = (Date) params.get("datainicio");
+		Date datafim = (Date) params.get("datafim");
+		DiferencaData dd = calcDifDate(datainicio, datafim);
+		return dd;
 	}
 	
 	public void onTabChange(TabChangeEvent event) {
@@ -166,7 +174,7 @@ public class EventoMB extends BaseMB {
 	}
 	
 	public void getQtdVagasInAtividadesByEvento(Long idEven) {
-		for (Atividade ativ : atividadeSB.findByEventos(idEven)) {
+		for (Atividade ativ : atividadeSB.findByIdEven(idEven)) {
 			this.vagasInAtividades = vagasInAtividades + ativ.getVagas();
 		}
 	}
@@ -293,7 +301,7 @@ public class EventoMB extends BaseMB {
 			}
 			if(editEvento.getId() != null && validaPeriodoAtiv){
 				List<Atividade> newAtiv = new ArrayList<Atividade>();
-				this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
+				this.editEvento.setAtividades(atividadeSB.findByIdEven(editEvento.getId()));
 				for (Atividade ativ : editEvento.getAtividades()){
 					ativ.setForaPeriodoInicio(false);
 					ativ.setForaPeriodoFim(false);
@@ -324,6 +332,12 @@ public class EventoMB extends BaseMB {
 				if(editEvento.getAtividades() != null) {
 					if(editEvento.getAtividades().size() > 0) {
 						for (Atividade ativ : editEvento.getAtividades()){
+							if(ativ.getOrganizacao().equals(TipoAtividadeEnum.GERENCIA.tipo)) {
+								if(!ativ.getNome().contains(editEvento.getTitulo())) {
+									ativ.setNome(MessageBundleLoader.getMessage("nome.ativ.gerencia", new Object[] {editEvento.getTitulo()}));
+									ativ.setDetalhes(MessageBundleLoader.getMessage("detalhe.ativ.gerencia", new Object[] {editEvento.getTitulo(), getCurrentUser().getUsername()}));
+								}
+							}
 							atividadeSB.editAtiv(ativ, editEvento.getId());
 							showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {ativ.getNome()}));
 						}
@@ -331,6 +345,9 @@ public class EventoMB extends BaseMB {
 				}
 			}
 			if (isCad) {
+				Atividade ativ = setRetAtivGerente();
+				atividadeSB.insert(ativ, editEvento.getId());
+				inscritosSB.insert(setRetInscritoGerente(ativ));
 				showInfoMessage(MessageBundleLoader.getMessage("even.insert_sucess", new Object[] {editEvento.getTitulo()}));
 			} else {
 				showInfoMessage(MessageBundleLoader.getMessage("even.update_sucess", new Object[] {editEvento.getTitulo()}));
@@ -344,6 +361,29 @@ public class EventoMB extends BaseMB {
 			this.editEvento.setVagas(1);
 			showErrorMessage(e.getMessage());
 		}
+	}
+	
+	public Atividade setRetAtivGerente() {
+		Atividade ativ = new Atividade();
+		ativ.setDataInicio(editEvento.getDataInicio());
+		ativ.setDataFim(editEvento.getDataFim());
+		ativ.setDetalhes(MessageBundleLoader.getMessage("detalhe.ativ.gerencia", new Object[] {editEvento.getTitulo(), getCurrentUser().getUsername()}));
+		ativ.setEvento(editEvento);
+		ativ.setNome(MessageBundleLoader.getMessage("nome.ativ.gerencia", new Object[] {editEvento.getTitulo()}));
+		ativ.setOrganizacao(TipoAtividadeEnum.GERENCIA.tipo);
+		ativ.setIsgratuito(true);
+		ativ.setPreco("Gratuito");
+		ativ.setUsaPeriodoEven(true);
+		ativ.setVagas(1);
+		return ativ;
+	}
+	
+	public UsuarioAtividade setRetInscritoGerente(Atividade ativ) {
+		UsuarioAtividade inscrito = new UsuarioAtividade();
+		inscrito.setAtividade(ativ);
+		inscrito.setStatus(StatusInscritoEnum.APROVADO.status);
+		inscrito.setUsuario(usuarioSB.findById(getCurrentUserId()));
+		return inscrito;
 	}
 	
 	public void doSavePopUp(){
@@ -405,7 +445,9 @@ public class EventoMB extends BaseMB {
 				}
 				List<Atividade> myAtividade = new ArrayList<Atividade>();
 				for(UsuarioAtividade insc : inscritosSB.findMyInscricoes(getCurrentUserId())){
-					myAtividade.add(insc.getAtividade());
+					if(!insc.getAtividade().evento.getId().equals(editEvento.getId())) {
+						myAtividade.add(insc.getAtividade());
+					}
 				}
 				for(Atividade ativ : myAtividade){
 					if(dataEstaDentroPeriodo(ativ.getDataInicio(), ativ.getDataFim(), editEvento.getDataInicio(), editEvento.getDataFim())){
@@ -444,6 +486,7 @@ public class EventoMB extends BaseMB {
 				inscritosNaAtiv.clear();
 			}
 			atividadeSB.delete(ativ);
+			showInfoMessage(MessageBundleLoader.getMessage("ativ.delete_sucess", new Object[] {ativ.getNome()}));
 		}
 		exclui.setAtividades(null);
 		eventoSB.delete(exclui);
@@ -473,7 +516,7 @@ public class EventoMB extends BaseMB {
 		onPrepareEditOuConsulta(edit, true);
 		this.editEvento.setDoEditEven(false);
 		if (request.equals("card")){
-			setAtividadeSeEstaInscrito(atividadeSB.findByEventos(edit.getId()));
+			setAtividadeSeEstaInscrito(atividadeSB.findByIdEvenAndTipoAtiv(edit.getId(), TipoAtividadeEnum.COMUM.tipo));
 		} else {
 			this.resultadoAtividadeByEvento = null;
 		}
@@ -503,29 +546,40 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
+	@SuppressWarnings("null")
 	public void doIncrever(Atividade ativ){
-		UsuarioAtividade inscrito = new UsuarioAtividade();
-		Usuario usuario = new Usuario();
-		usuario = usuarioSB.findById(getCurrentUserId());
-		inscrito.setStatus("Pendente");
-		inscrito.setUsuario(usuario);
-		inscrito.setAtividade(ativ);
-		inscritosSB.insert(inscrito);
-		setAtividadeSeEstaInscrito(atividadeSB.findByEventos(ativ.evento.getId()));
-		
+		try {
+			for (UsuarioAtividade myinsc : inscritosSB.findMyInscricoes(getCurrentUserId())) {
+				if(!myinsc.getAtividade().getId().equals(ativ.getId()) && 
+						dataEstaDentroPeriodo(myinsc.getAtividade().getDataInicio(), myinsc.getAtividade().getDataFim(), ativ.getDataInicio(), ativ.getDataFim())) {
+					throw new PeriodoDataInvalidaException(MessageBundleLoader.getMessage("critica.inscritojacomprometido", new Object[] {myinsc.getAtividade().getNome(), ativ.getNome()}));
+				}
+			}
+			UsuarioAtividade inscrito = inscritosSB.findSeEstaInscritoNaAtividade(ativ.getId(), getCurrentUserId());
+			if(inscrito == null) {
+				inscrito = new UsuarioAtividade();
+				inscrito.setUsuario(usuarioSB.findById(getCurrentUserId()));
+				inscrito.setAtividade(ativ);
+				inscrito.setStatus(StatusInscritoEnum.PENDENTE.status);
+			}
+			inscritosSB.insert(inscrito);
+			setAtividadeSeEstaInscrito(atividadeSB.findByIdEvenAndTipoAtiv(ativ.evento.getId(), TipoAtividadeEnum.COMUM.tipo));
+		} catch (PeriodoDataInvalidaException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 	
 	public void onPrepareEditOuConsulta(Evento edit, Boolean consulta) throws SQLException {
 		doPrepareSave();
 		this.modoConsulta = consulta;
-		this.editEvento = eventoSB.findById(edit.getId());
+		this.editEvento = edit;
 		if(editEvento.getGuid() == null || editEvento.getGuid().equals("")){
 			this.editEvento.setGuid(PasswordUtils.generateGUID());
 		}
-		this.editEvento.setAtividades(atividadeSB.findByEventos(editEvento.getId()));
+		this.editEvento.setAtividades(atividadeSB.findByIdEven(editEvento.getId()));
 		this.editEvento.setMesmoDia(false);
 		this.editEvento.setExisteInscrito(false);
-		if(eventoSB.qtdInscritoInEvento(editEvento.getId()) > 0){
+		if(eventoSB.qtdInscritoInEventoPorTipoAtiv(editEvento.getId(), TipoAtividadeEnum.COMUM.tipo) > 0){
 			this.modoConsulta = true;
 			editEvento.setExisteInscrito(true);
 		}
@@ -535,7 +589,7 @@ public class EventoMB extends BaseMB {
 	
 	public void doPrepareInsert(){
 		this.editEvento = new Evento();
-		this.editEvento.setVlr("Pago");
+		this.editEvento.setVlr(CustoEnum.PAGO.custo);
 	}
 	
 	public void findEnderecoByCEP(){
@@ -575,12 +629,11 @@ public class EventoMB extends BaseMB {
 	public void doPrepareDel(Evento even){
 		try {
 			even.setExisteInscrito(false);
-			if(eventoSB.qtdInscritoInEvento(even.getId()) > 0){
+			if(eventoSB.qtdInscritoInEventoPorTipoAtiv(even.getId(), TipoAtividadeEnum.COMUM.tipo) > 0){
 				even.setExisteInscrito(true);
 			}
-			even.setAtividades(atividadeSB.findByEventos(even.getId()));
-			this.evenSel = new Evento();
-			this.evenSel = even;
+			even.setAtividades(atividadeSB.findByIdEven(even.getId()));
+			this.editEvento = even;
 		} catch (SQLException e) {
 			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
 		}

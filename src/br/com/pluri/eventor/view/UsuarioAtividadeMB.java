@@ -49,7 +49,7 @@ public class UsuarioAtividadeMB extends BaseMB {
 	}
 	
 	public void findInscritosMyEventos(){
-		this.usuAtiv = usuAtivSB.findIncritosNoEventoByUsuarioLogado(getCurrentUserId());
+		this.usuAtiv = usuAtivSB.findIncritosNoEventoByUsuarioLogadoV2(getCurrentUserId());
 	}
 	
 	public void findMyInscricoes(){

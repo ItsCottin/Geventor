@@ -21,7 +21,12 @@ public interface AtividadeDAO extends BaseDAO<Atividade> {
 	@Query("select a from Atividade a " +
 			" inner join a.evento e " +
 			" where e.id = :id")
-	public List<Atividade> findByEventos (@Param("id") Long idEvento);
+	public List<Atividade> findByIdEven (@Param("id") Long idEvento);
+	
+	@Query("select a from Atividade a " +
+			" inner join a.evento e " +
+			" where e.id = :id and a.organizacao = :tpAtiv")
+	public List<Atividade> findByIdEvenAndTipoAtiv (@Param("id") Long idEvento, @Param("tpAtiv") String tpAtiv);
 	
 	@Query("select a from Atividade a " +
 			" inner join a.evento e " +

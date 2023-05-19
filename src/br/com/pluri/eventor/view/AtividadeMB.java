@@ -33,6 +33,7 @@ import br.com.pluri.eventor.business.EventoSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
+import br.com.pluri.eventor.enums.TipoAtividadeEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
 import br.com.pluri.eventor.model.UsuarioAtividade;
@@ -56,7 +57,6 @@ public class AtividadeMB extends BaseMB {
 	private Atividade editAtividade = new Atividade();
 	public boolean modoConsulta;
 	public Evento evenSel;
-	public Atividade ativSel;
 	private List<Evento> resultadoEvento;
 	private int vagasRestant;	
 	public Long idEvento;
@@ -70,7 +70,6 @@ public class AtividadeMB extends BaseMB {
 		onEventos();
 		this.modoConsulta = false;
 		onAllAtividade();
-		this.ativSel = new Atividade();
 		this.dataValidada = false;
 	}
 	
@@ -100,6 +99,7 @@ public class AtividadeMB extends BaseMB {
 	
 	// Metodo criado para alterar a atividade entre eventos.
 	public void onEventoChangeV2(){
+		editAtividade.setVagas(0);
 		editAtividade.evento = eventoSB.findById(idEvento);
 		setQtdVagasRest();
 		this.evenSemVaga = false;
@@ -238,6 +238,21 @@ public class AtividadeMB extends BaseMB {
 		}
 	}
 	
+	public void onSetDataEvenNaAtiv() {
+		if(editAtividade.getEvento() != null) {
+			if(editAtividade.isUsaPeriodoEven()) {
+				this.editAtividade.setDataInicio(editAtividade.evento.getDataInicio());
+				this.editAtividade.setDataFim(editAtividade.evento.getDataFim());
+			} else {
+				this.editAtividade.setDataInicio(null);
+				this.editAtividade.setDataFim(null);
+			}
+		} else {
+			this.editAtividade.setUsaPeriodoEven(false);
+			showInfoMessage(MessageBundleLoader.getMessage("ativ.info_no_even"));
+		}
+	}
+	
 	public void onChangeGratuito(){
 		if(editAtividade.isIsgratuito()){
 			editAtividade.setPreco("Gratuito");
@@ -315,11 +330,10 @@ public class AtividadeMB extends BaseMB {
 	public void doPrepareDel(Atividade ativ){
 		try {
 			ativ.setExisteInscrito(false);
-			if(atividadeSB.qtdInscritoInAtividade(ativ.getId()) > 0){
+			if(atividadeSB.qtdInscritoInAtividade(ativ.getId()) > 0 && ativ.getOrganizacao().equals(TipoAtividadeEnum.COMUM.tipo)){
 				ativ.setExisteInscrito(true);
 			}
-			this.ativSel = new Atividade();
-			this.ativSel = ativ;
+			this.editAtividade = ativ;
 		} catch (SQLException e) {
 			showErrorMessage(MessageBundleLoader.getMessage("critica.erroconexaosql"));
 		}
@@ -331,7 +345,7 @@ public class AtividadeMB extends BaseMB {
 		this.editAtividade.setDoEditAtiv(true);
 		if(edit.evento != null){
 			if (isVigente(edit.evento.getDataInicio())){
-				if(!editAtividade.isExisteInscrito()){
+				if(!editAtividade.isExisteInscrito() && editAtividade.getOrganizacao().equals(TipoAtividadeEnum.COMUM.tipo)){
 					this.modoConsulta = false;
 				}
 			} else {
@@ -361,14 +375,17 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void prepareEditOuConsulta(Atividade edit) throws SQLException{
-		this.editAtividade = atividadeSB.findById(edit.getId());
+		this.editAtividade = edit;
 		this.idEvento = editAtividade.evento.getId();
 		this.editAtividade.setEventonaovigente(false);
 		this.editAtividade.setExisteInscrito(false);
 		this.editAtividade.setQtdInscrito(atividadeSB.qtdInscritoInAtividade(editAtividade.getId()));
-		if(editAtividade.getQtdInscrito() > 0){
+		if(editAtividade.getQtdInscrito() > 0 && editAtividade.getOrganizacao().equals(TipoAtividadeEnum.COMUM.tipo)){
 			this.modoConsulta = true;
 			editAtividade.setExisteInscrito(true);
+		}
+		if(editAtividade.getOrganizacao().equals(TipoAtividadeEnum.GERENCIA.tipo)) {
+			this.modoConsulta = true;
 		}
 		setQtdVagasRest();
 		getInfoDataEven();
@@ -379,28 +396,29 @@ public class AtividadeMB extends BaseMB {
 	
 	public void setQtdVagasRest(){
 		this.vagasRestant = 0;
-		for (Atividade ativ : atividadeSB.findByEventos(idEvento)){
-			if(editAtividade.getId() != null) {
-				if (!editAtividade.getId().equals(ativ.getId())){
-					this.vagasRestant = vagasRestant + ativ.getVagas();
-				}
-			} else {
-				this.vagasRestant = vagasRestant + ativ.getVagas();
-			}
+		for (Atividade ativ : atividadeSB.findByIdEven(idEvento)){
+			this.vagasRestant = vagasRestant + ativ.getVagas();
 		}
 		this.vagasRestant = eventoSB.findById(idEvento).getVagas() - vagasRestant;
 	}
 	
+	public void setQtdVagasComInputTela() {
+		setQtdVagasRest();
+		this.vagasRestant = vagasRestant - editAtividade.getVagas();
+	}
+	
 	public void validaInputVaga(){
 		if(editAtividade.evento != null){
-			if(vagasRestant < editAtividade.getVagas()){
+			setQtdVagasRest();
+			this.vagasRestant = vagasRestant - editAtividade.getVagas();
+			if(vagasRestant < 0){
 				showErrorMessage(MessageBundleLoader.getMessage("critica.vagamaiordisponivel"));
 				editAtividade.setVagas(1);
-				setQtdVagasRest();
+				setQtdVagasComInputTela();
 			} else if(editAtividade.getVagas() == 0) {
 				showErrorMessage(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
 				editAtividade.setVagas(1);
-				setQtdVagasRest();
+				setQtdVagasComInputTela();
 			} else {
 				setQtdVagasRest();
 				this.vagasRestant = vagasRestant - editAtividade.getVagas();

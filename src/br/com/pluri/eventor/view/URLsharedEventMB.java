@@ -63,7 +63,7 @@ public class URLsharedEventMB extends BaseMB {
 	
 	public void getIdEvento() throws SQLException {
 	    this.evento = eventoSB.findByGUID(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("id").toString());
-	    this.evento.setAtividades(atividadeSB.findByEventos(evento.getId()));
+	    this.evento.setAtividades(atividadeSB.findByIdEven(evento.getId()));
 	    List<Atividade> newAtiv = new ArrayList<Atividade>();
 	    for (Atividade ativ : evento.getAtividades()) {
 	    	ativ.setQtdInscrito(atividadeSB.qtdInscritoSitInAtividade("Aprovado", ativ.getId()));

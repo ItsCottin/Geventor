@@ -30,6 +30,11 @@ public class UsuarioAtividadeSB extends BaseSB {
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogadoV2(Long idUsuario) {
+		return usuarioAtividadeDAO.findIncritosNoEventoByUsuarioLogadoV2(idUsuario);
+	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<UsuarioAtividade> findIncritosNoEventoByUsuarioLogadoByStatus(Long idUsuario, String status) {
 		return usuarioAtividadeDAO.findIncritosNoEventoByUsuarioLogadoByStatus(idUsuario, status);
 	}
@@ -43,6 +48,13 @@ public class UsuarioAtividadeSB extends BaseSB {
 	public List<UsuarioAtividade> findMyInscricoes(Long idUsuario) {
 		return usuarioAtividadeDAO.findMyInscricoes(idUsuario);
 	}
+	
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	public List<UsuarioAtividade> findMyInscricoesMenosStatus(Long idUsuario, String status) {
+		return usuarioAtividadeDAO.findMyInscricoesMenosStatus(idUsuario, status);
+	}
+	
+	
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public List<UsuarioAtividade> findAllInscritosByIdAtividade(Long idAtiv) {
