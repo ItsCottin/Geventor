@@ -30,11 +30,17 @@
         </property>
     </bean>
     
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	    <property name="basename">
+	        <value>resources/messages</value>
+	    </property>
+	</bean>
+    
 	<bean id="eventor" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost/sql10607033?characterEncoding=utf8" />
-		<property name="username" value="root" />
-		<property name="password" value="i1BREUu533" />
+		<property name="url" value="jdbc:mysql://mysqlserverrcf.mysql.database.azure.com/TCCRCF" />
+		<property name="username" value="masterrcf" />
+		<property name="password" value="i1BREUu558" />
 	</bean>
 	
 	<bean id="entityManagerFactory"

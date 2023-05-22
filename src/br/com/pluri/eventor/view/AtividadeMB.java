@@ -58,12 +58,15 @@ public class AtividadeMB extends BaseMB {
 	public boolean modoConsulta;
 	public Evento evenSel;
 	private List<Evento> resultadoEvento;
-	private int vagasRestant;	
 	public Long idEvento;
 	public boolean dataValidada;
 	public String infoDataInicioEven;
 	public String infoDataFimEven;
 	public boolean evenSemVaga;
+	
+	private int vagasRestant;
+	private int vagaTotalEven;
+	private int vagaOldAtiv;
 	
 	@PostConstruct
 	public void PostConstruct(){
@@ -153,36 +156,23 @@ public class AtividadeMB extends BaseMB {
 		this.editAtividade.setPreco(editAtividade.getPreco());
 	}
 	
-	public Date formatDateForValidacao(Date data){
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(data);
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		return data = calendar.getTime();
-	}
-	
 	public void validaDataInicio(){
 		try {
 			if(editAtividade.getDataInicio() != null){
 				this.dataValidada = false;
 				validaDataIniAtivDataFimAtiv();
-				editAtividade.setMesmodiainicio(false);
-				Date dataEven = formatDateForValidacao(editAtividade.evento.getDataInicio());
-				Date dataAtiv = formatDateForValidacao(editAtividade.getDataInicio());
-				
-				int result = dataAtiv.compareTo(dataEven);
-				if(result < 0){
-					throw new PeriodoDataInvalidaException(
-							MessageBundleLoader.getMessage("ativ.datemenordataeven", 
+				if(editAtividade.getDataInicio().before(editAtividade.evento.getDataInicio())){
+					throw new PeriodoDataInvalidaException(MessageBundleLoader.getMessage("ativ.datemenordataeven", 
 									new Object[] {formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy"), 
-												  formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy")}));
+											formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy")}));
+				}
+				if(editAtividade.getDataInicio().after(editAtividade.evento.getDataFim())){
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("ativ.datemaiordataeven", 
+									new Object[] {formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy"), 
+											formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy")}));
 				}
 				this.dataValidada = true;
-				if (result == 0){
-					editAtividade.setMesmodiainicio(true);
-				}
 			}
 		} catch (PeriodoDataInvalidaException e){
 			showErrorMessage(e.getMessage());
@@ -195,23 +185,19 @@ public class AtividadeMB extends BaseMB {
 			if(editAtividade.getDataFim() != null){
 				this.dataValidada = false;
 				validaDataIniAtivDataFimAtiv();
-				editAtividade.setMesmodiafim(false);
-				
-				Date dataEven = formatDateForValidacao(editAtividade.evento.getDataFim());
-				Date dataAtiv = formatDateForValidacao(editAtividade.getDataFim());
-				
-				int result = dataAtiv.compareTo(dataEven);
-				if(result > 0){
+				if(editAtividade.getDataFim().after(editAtividade.evento.getDataFim())){
 					throw new PeriodoDataInvalidaException(
 							MessageBundleLoader.getMessage("ativ.datemaiordataeven", 
 									new Object[] {formatarData(editAtividade.getDataFim(), "dd/MM/yyyy"), 
-											formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy")}, 
-									Locale.getDefault()));
+											formatarData(editAtividade.evento.getDataFim(), "dd/MM/yyyy")}));
+				}
+				if(editAtividade.getDataFim().before(editAtividade.evento.getDataInicio())){
+					throw new PeriodoDataInvalidaException(
+							MessageBundleLoader.getMessage("ativ.datemenordataeven", 
+									new Object[] {formatarData(editAtividade.getDataFim(), "dd/MM/yyyy"), 
+										formatarData(editAtividade.evento.getDataInicio(), "dd/MM/yyyy")}));
 				}
 				this.dataValidada = true;
-				if (result == 0){
-					editAtividade.setMesmodiafim(true);
-				}
 			}
 		} catch (PeriodoDataInvalidaException e){
 			showErrorMessage(e.getMessage());
@@ -222,8 +208,7 @@ public class AtividadeMB extends BaseMB {
 	public void validaDataIniAtivDataFimAtiv(){
 		try {
 			if(editAtividade.getDataFim() != null && editAtividade.getDataInicio() != null) {
-				int result = editAtividade.getDataInicio().compareTo(editAtividade.getDataFim());
-				if(result > 0){
+				if(editAtividade.getDataInicio().after(editAtividade.getDataFim())){
 					throw new PeriodoDataInvalidaException(
 							MessageBundleLoader.getMessage("date.iniciomaiorfim", 
 									new Object[] {formatarData(editAtividade.getDataInicio(), "dd/MM/yyyy"), 
@@ -358,6 +343,7 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void doPrepareSave(){
+		this.vagaOldAtiv = 0;
 		this.evenSemVaga = false;
 		this.editAtividade = new Atividade();
 		onEventos();
@@ -395,11 +381,16 @@ public class AtividadeMB extends BaseMB {
 	}
 	
 	public void setQtdVagasRest(){
-		this.vagasRestant = 0;
+		this.vagasRestant = eventoSB.findById(idEvento).getVagas();
 		for (Atividade ativ : atividadeSB.findByIdEven(idEvento)){
-			this.vagasRestant = vagasRestant + ativ.getVagas();
+			if(editAtividade.getId() != null){
+				if(!ativ.getId().equals(editAtividade.getId())){
+					this.vagasRestant = vagasRestant - ativ.getVagas();
+				}
+			} else {
+				this.vagasRestant = vagasRestant - ativ.getVagas();
+			}
 		}
-		this.vagasRestant = eventoSB.findById(idEvento).getVagas() - vagasRestant;
 	}
 	
 	public void setQtdVagasComInputTela() {
@@ -409,19 +400,17 @@ public class AtividadeMB extends BaseMB {
 	
 	public void validaInputVaga(){
 		if(editAtividade.evento != null){
-			setQtdVagasRest();
-			this.vagasRestant = vagasRestant - editAtividade.getVagas();
+			setQtdVagasComInputTela();
 			if(vagasRestant < 0){
 				showErrorMessage(MessageBundleLoader.getMessage("critica.vagamaiordisponivel"));
 				editAtividade.setVagas(1);
 				setQtdVagasComInputTela();
-			} else if(editAtividade.getVagas() == 0) {
+			} else if(editAtividade.getVagas() == 0){
 				showErrorMessage(MessageBundleLoader.getMessage("critica.qtdminimavagas"));
 				editAtividade.setVagas(1);
 				setQtdVagasComInputTela();
 			} else {
-				setQtdVagasRest();
-				this.vagasRestant = vagasRestant - editAtividade.getVagas();
+				setQtdVagasComInputTela();
 			}
 		}
 	}
