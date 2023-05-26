@@ -33,16 +33,55 @@
 		
     <h:form id="menuForm" >		
 	    <nav class="navbar navbar-expand-lg fixed-top shadow navbar-dark navbar-offcanvas" style="background-color: #47235e;">
-	    	<div class="mr-3">
+	    	<div class="mr-3 #{userContextMB.logado eq true ? 'd-none d-sm-block' : ''}">
 	        	<a class="navbar-brand mr-auto">PLURI LTDA</a>
 	        </div>
 	        <p:panelGrid rendered="#{userContextMB.logado eq false ? 'false' : 'true'}">
-				<button class="navbar-toggler d-block me-3" type="button" id="navToggle">
+				<button class="navbar-toggler d-block me-3 ui-border-color-transparent" type="button" id="navToggle">
 		            <span class="navbar-toggler-icon"></span>
 		        </button>
+		        <div class="dropdown dropdown-position-initial-rcf d-block ml-4">
+		        	<h:form id="formNotif">
+						<a data-toggle="dropdown" class="no-border-rcf" aria-expanded="false">
+							<span class="badge">
+						    <h:graphicImage library="svg" name="bell_white.svg" type="svg" style="width: 20px;" />
+						    <strong class="bg-danger text-white p-1 rounded">${fn:length(notificacaoMB.notificacoes[visualizado eq false])}</strong></span>
+					    </a>
+					 	<div class="dropdown-menu ui-notificacao-dropdown-rcf no-border-rcf p-3">
+						  	<c:forEach var="notif" items="#{notificacaoMB.notificacoes}" step="1" begin="0">
+								<div class="card border-rcf ui-card-rcf mb-3 ui-bg-color-amarelo-claro-rcf">
+									<div class="row">
+										<div data-label="#{notif.tipo}:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+											#{notif.titulo}
+										</div>
+									</div>
+									<div class="row">
+										<div data-label="Descrição:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+											#{notif.detalhe}
+										</div>
+									</div>
+									<div class="row">
+										<div data-label="Ações:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+											<p:commandButton immediate="true" icon="ui-icon-trash" id="btn_id"
+							                	title="Excluir" actionListener="#{notificacaoMB.doRemove(notif)}"
+							                    update=":msgs, formNotif" styleClass="ui-icon-button-rcf" /> 
+										</div>
+									</div>
+								</div>
+							</c:forEach>
+							<div class="card no-border-rcf">
+								<p:commandButton immediate="true" icon="ui-icon-trash" value="Limpar" id="btn_exluirTudo"
+						        	oncomplete="openModal('newConfirmDel')" update=":msgs" styleClass="text-muted ui-widget-button-outline-secondary-rcf ui-bg-width-rcf ui-widget-button-ajust-text" />
+							</div>
+					  	</div>
+				  </h:form>
+				</div>
+	        </p:panelGrid>
+	        <p:panelGrid rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" styleClass="ui-aling-item-rigth-rcf me-3">
+	        	
 	        </p:panelGrid>
 	        <div class="ui-aling-item-left-rcf">
-	        	<h:outputLink styleClass="navbar-toggler d-block" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+	        	<h:outputLink styleClass="navbar-toggler ui-border-color-transparent d-block" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
 					<h:outputText value="Sair" />
 				</h:outputLink>
 	        </div>
@@ -58,9 +97,6 @@
 	                    <p:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/evento.xhtml" />
 	                </li>
 	                <li class="nav-item">
-	                    <p:link styleClass="nav-link" value="Calendário" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/calendario.xhtml" />
-	                </li>
-	                <li class="nav-item">
 	                    <p:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/atividade.xhtml" />
 	                </li>
 	                <li class="nav-item">
@@ -68,6 +104,9 @@
 	                </li>
 	                <li class="nav-item">
 	                    <p:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/conta.xhtml" />
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Sobre" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/sobre.xhtml" />
 	                </li>
 	            </ul>
 	        </div>
@@ -93,14 +132,10 @@
 						         <div class="modal-body">
 						               <div class="col-md-12 col-lg-12">
 						                  	<ul class="list-group first-init-reply">
-						                  		<li class="list-group-item list-group-item-ajust-rcf"><h5 class="mb-3">v0.3.1 - 22 de Maio de 2023</h5></li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">1. Implementado nova lógica de validação de Data Inicio e Data Fim dando suporte para proxima fase da Implementação de Validações de Periodos de Atividades.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">2. Adicionado campo de 'Duração' na Lista de 'Meus Eventos' e criado um método para calcular o periodo de duas datas para ser utilizado na exibição desse campo.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">3. Implementado nova Lógica para Cadastro de 'Atividade Gerência' e adicionado registro de Inscrito nessa Atividade vinculando o usuario que Cadastrou o Evento como o 'Organizador' do Evento.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">4. Adicionado campo de 'Tipo' na tela de 'Minhas Atividades'.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">5. Corrigido bug de calculo de vagas na tela de Cadastro e Alteração de Atividade.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">5. Ajustado validações de Data Inicio e Data Fim nas telas de Cadastro e Alteração de Atividade.</li>
-	  											<li class="list-group-item list-group-item-ajust-rcf">6. Ajustado tela de Todos Eventos para trazer somente os eventos que contém Atividades disponíveis.</li>
+						                  		<li class="list-group-item list-group-item-ajust-rcf"><h5 class="mb-3">v0.3.2 - Em construção</h5></li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">1. Ajustado layout de Menu adicionando regras de exibição para o 'PLURI LTDA', removido bordas dos botões de 'Sair' e 'Menu' e adicionado novo Botão de 'Notificações'.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">2. Ajustado CSS para exibir corretamente os componentes PrimeFaces 'Time Line' e 'Calendário'.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">3. Calendário movido para 'Inicio' do sistema, e o conteúdo presente antes no 'Inicio' movido para o menu 'Sobre'.</li>
   											</ul>
 						               </div>
 						         </div>
@@ -129,7 +164,7 @@
 		<div class="ui-aling-item-left-rcf">
 			<div class="nav-link">
 	       		<a class="text-muted text-reset font-weight-lighter text-secondary">Versão:</a>
-	       		<p:commandLink class="text-muted text-reset font-weight-lighter text-secondary" value="v0.3.1" onclick="openModal('modalConsVersao')"/>
+	       		<p:commandLink class="text-muted font-weight-lighter text-secondary" value="v0.3.2" onclick="openModal('modalConsVersao')"/>
 	       		
 	       		
 	       		</div>

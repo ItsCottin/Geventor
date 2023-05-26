@@ -67,16 +67,12 @@ public class EventoSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	 public Evento findById(Long id){
 		 Evento resultado = eventoDAO.findOne(id);
-		 resultado.setHoraInicio(resultado.getDataInicio());
-		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;
 	 }
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	 public Evento findByGUID(String guid){
 		 Evento resultado = eventoDAO.findByGUID(guid);
-		 resultado.setHoraInicio(resultado.getDataInicio());
-		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;
 	 }
 	

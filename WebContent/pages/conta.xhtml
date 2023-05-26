@@ -161,10 +161,10 @@
                         </div>
                     </div>
                     <div class="row mb-3 border-rcf shadow bg-white">
-                    	<div class="col-sm-3 col-small-6-rcf form-group text-right text-truncate">
+                    	<div class="col-sm-4 col-md-3 col-small-6-rcf form-group text-right text-truncate">
                             <label for="atualizarsenha" class="col-form-label">Atualizar Senha?</label>
                         </div>
-                        <div class="col-sm-3 col-small-6-rcf form-group">
+                        <div class="col-sm-4 col-md-3 col-small-6-rcf form-group">
                             <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
                                 value="#{usuarioMB.editUsuario.atualizaSenha}" label="Atualiza Senha"
                                 id="atualizasenha" disabled="#{usuarioMB.modoConsulta}" >
@@ -175,25 +175,26 @@
                                   	noSelectionOption="true" />
                             </h:selectOneMenu>
                         </div>
+                        <div class="col-sm-4 col-md-3 col-md-3 col-lg-0"></div>
                         
-                        <div class="col-sm-5 col-small-6-rcf col-lg-3 form-group text-right">
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 form-group text-right">
                             <label for="senhaatual" class="col-form-label">Senha Atual:</label>
                         </div>
-                        <div class="col-sm-7 col-small-6-rcf col-lg-3 form-group">
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 form-group">
                             <h:inputText class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senhaatual" value="#{usuarioMB.editUsuario.oldsenha}" label="Senha Atual"
                             	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
                         </div>
-                        <div class="col-sm-5 col-small-6-rcf col-lg-3 form-group text-right">
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 form-group text-right">
                             <label for="senha" class="col-form-label">Nova Senha:</label>
                         </div>
-                        <div class="col-sm-7 col-small-6-rcf col-lg-3 form-group">
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 form-group">
                             <p:password class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senha" value="#{usuarioMB.editUsuario.senha}" label="Nova Senha"
                             	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
                         </div>
-                        <div class="col-sm-5 col-small-6-rcf col-lg-4 col-xl-3 form-group text-right">
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 col-xl-3 form-group text-right text-truncate">
                             <label for="senha2" class="col-form-label">Confirmar nova senha:</label>
                         </div>
-                        <div class="col-sm-7 col-small-6-rcf col-lg-4 col-xl-3 form-group">
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 col-xl-3 form-group">
                             <p:password class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senha2" value="#{usuarioMB.editUsuario.confirmSenha}" label="Confirmar nova senha"
                             	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
                         </div>

@@ -109,16 +109,7 @@ public class Evento extends BaseORM {
     private String tpDifTemp;
 	
 	@Transient
-	private Date horaInicio;
-	
-	@Transient
-	private Date horaFim;
-	
-	@Transient
 	private boolean existeInscrito;
-	
-	@Transient
-	private boolean mesmoDia;
 	
 	@JoinColumn(name="ID_USUA", referencedColumnName="ID_USUA")
 	@ManyToOne

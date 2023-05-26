@@ -32,6 +32,7 @@ import br.com.pluri.eventor.business.DistritoSB;
 import br.com.pluri.eventor.business.EnderecoSB;
 import br.com.pluri.eventor.business.EstadoSB;
 import br.com.pluri.eventor.business.EventoSB;
+import br.com.pluri.eventor.business.NotificacaoSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.UsuarioSB;
 import br.com.pluri.eventor.business.exception.CEPInvalidoException;
@@ -45,12 +46,14 @@ import br.com.pluri.eventor.business.util.PasswordUtils;
 import br.com.pluri.eventor.enums.CustoEnum;
 import br.com.pluri.eventor.enums.StatusInscritoEnum;
 import br.com.pluri.eventor.enums.TipoAtividadeEnum;
+import br.com.pluri.eventor.enums.TipoNotificacaoEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Cidade;
 import br.com.pluri.eventor.model.DiferencaData;
 import br.com.pluri.eventor.model.Endereco;
 import br.com.pluri.eventor.model.Estado;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.Notificacao;
 import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.model.UsuarioAtividade;
 
@@ -96,12 +99,18 @@ public class EventoMB extends BaseMB {
 	@Autowired
 	private UsuarioAtividadeSB inscritosSB;
 	
+	@Autowired
+	private NotificacaoSB notificacaoSB;
+	
 	private List<Atividade> resultadoAtividadeByEvento;
 	private List<Evento> resultadoEvento;
 	private Evento editEvento;
 	private List<Cidade> cidades;
 	private List<Estado> estados;
-	private int indexTab = 0;
+	
+	// TODO Avaliar se houve impacto na tela e remover esse metodo caso não houve impacto
+	//private int indexTab = 0;
+	
 	private List<Evento> resultEven;
 	private List<Evento> allEvenMenosMeus;
 	private static final long serialVersionUID = 1L;
@@ -136,6 +145,16 @@ public class EventoMB extends BaseMB {
 		}
 	}
 	
+	public void onSetNotificacao(String detalhe, String titulo, Usuario usuario, String tipo) {
+		Notificacao noti = new Notificacao();
+		noti.setTitulo(titulo);
+		noti.setDetalhe(detalhe);
+		noti.setUsuario(usuario);
+		noti.setTipo(tipo);
+		noti.setVisualizado(false);
+		notificacaoSB.insert(noti);
+	}
+	
 	public void findAllEventoMenosMeus(){
 		try {
 			this.allEvenMenosMeus = new ArrayList<Evento>();
@@ -159,11 +178,12 @@ public class EventoMB extends BaseMB {
 		return dd;
 	}
 	
-	public void onTabChange(TabChangeEvent event) {
-	    TabView tabView = (TabView) event.getComponent();
-	    int activeTabIndex = tabView.getActiveIndex();
-	    this.indexTab = activeTabIndex;
-	}
+	// TODO Avaliar se houve impacto na tela e remover esse metodo caso não houve impacto
+	//public void onTabChange(TabChangeEvent event) {
+	//    TabView tabView = (TabView) event.getComponent();
+	//    int activeTabIndex = tabView.getActiveIndex();
+	//    this.indexTab = activeTabIndex;
+	//}
 	
 	public void onEstadoChange(){
 		if(editEvento.getEstado() == null){
@@ -337,6 +357,19 @@ public class EventoMB extends BaseMB {
 									ativ.setNome(MessageBundleLoader.getMessage("nome.ativ.gerencia", new Object[] {editEvento.getTitulo()}));
 									ativ.setDetalhes(MessageBundleLoader.getMessage("detalhe.ativ.gerencia", new Object[] {editEvento.getTitulo(), getCurrentUser().getUsername()}));
 								}
+							} else {
+								for (UsuarioAtividade insc : inscritosSB.findAllInscritosByIdAtividade(ativ.getId())) {
+									// TODO Testar funcionamento desse For
+									if(ativ.isForaPeriodoInicio()) {
+										onSetNotificacao(MessageBundleLoader.getMessage("notif.mudancadatainicio.ativ.detalhe", new Object[] {ativ.getNome(), 
+												formatarData(ativ.getDataInicio(), "dd/MM/yyyy") + " as " + formatarData(ativ.getDataInicio(), "HH:mm")}), ativ.getNome(), insc.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
+									}
+									if(ativ.isForaPeriodoFim()) {
+										onSetNotificacao(MessageBundleLoader.getMessage("notif.mudancadatainicio.ativ.detalhe", new Object[] {ativ.getNome(), 
+												formatarData(ativ.getDataFim(), "dd/MM/yyyy") + " as " + formatarData(ativ.getDataFim(), "HH:mm")}), ativ.getNome(), insc.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
+									}
+									onSetNotificacao(MessageBundleLoader.getMessage("notif.alteracao.even.detalhe", new Object[] {editEvento.getTitulo()}), editEvento.getTitulo(), insc.getUsuario(), TipoNotificacaoEnum.EVENTO.tipo);
+								}
 							}
 							atividadeSB.editAtiv(ativ, editEvento.getId());
 							showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {ativ.getNome()}));
@@ -481,6 +514,9 @@ public class EventoMB extends BaseMB {
 			inscritosNaAtiv = inscritosSB.findAllInscritosByIdAtividade(ativ.getId());
 			if(inscritosNaAtiv.size() > 0){
 				for(UsuarioAtividade insc : inscritosNaAtiv){
+					// TODO testar o funcionamento de notificacoes desse for
+					onSetNotificacao(MessageBundleLoader.getMessage("notif.delete.ativ.detalhe", new Object[] {ativ.getNome()}), ativ.getNome(), insc.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
+					onSetNotificacao(MessageBundleLoader.getMessage("notif.delete.even.detalhe", new Object[] {editEvento.getTitulo()}), editEvento.getTitulo(), insc.getUsuario(), TipoNotificacaoEnum.EVENTO.tipo);
 					inscritosSB.delete(insc);
 				}
 				inscritosNaAtiv.clear();
@@ -563,6 +599,7 @@ public class EventoMB extends BaseMB {
 				inscrito.setStatus(StatusInscritoEnum.PENDENTE.status);
 			}
 			inscritosSB.insert(inscrito);
+			onSetNotificacao(MessageBundleLoader.getMessage("notif.newinscritoinativ.detalhe", new Object[] {inscrito.getUsuario().getNome() ,ativ.getNome()}), ativ.getNome(), ativ.evento.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
 			setAtividadeSeEstaInscrito(atividadeSB.findByIdEvenAndTipoAtiv(ativ.evento.getId(), TipoAtividadeEnum.COMUM.tipo));
 		} catch (PeriodoDataInvalidaException e) {
 			showInfoMessage(e.getMessage());
@@ -577,7 +614,6 @@ public class EventoMB extends BaseMB {
 			this.editEvento.setGuid(PasswordUtils.generateGUID());
 		}
 		this.editEvento.setAtividades(atividadeSB.findByIdEven(editEvento.getId()));
-		this.editEvento.setMesmoDia(false);
 		this.editEvento.setExisteInscrito(false);
 		if(eventoSB.qtdInscritoInEventoPorTipoAtiv(editEvento.getId(), TipoAtividadeEnum.COMUM.tipo) > 0){
 			this.modoConsulta = true;

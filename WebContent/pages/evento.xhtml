@@ -65,18 +65,18 @@
 										<div class="row">
 											<div data-label="Configurar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
 												<p:commandButton immediate="true" id="btnConNew_#{even.id}"
-			                                    icon="ui-icon-search" title="Consultar"
-			                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
-			                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-			                                 </p:commandButton>
-			                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
-			                                    icon="ui-icon-wrench" title="Editar"
-			                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
-			                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
-			                                 </p:commandButton>
-			                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
-			                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
-			                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" /> 
+				                                    icon="ui-icon-search" title="Consultar"
+				                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
+				                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+				                                 </p:commandButton>
+				                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
+				                                    icon="ui-icon-wrench" title="Editar"
+				                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
+				                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+				                                 </p:commandButton>
+				                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
+				                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
+				                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" /> 
 											</div>
 										</div>
 									</div>

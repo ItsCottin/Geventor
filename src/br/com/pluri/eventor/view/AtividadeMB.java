@@ -30,12 +30,16 @@ import br.com.etechoracio.common.view.BaseMB;
 import br.com.etechoracio.common.view.MessageBundleLoader;
 import br.com.pluri.eventor.business.AtividadeSB;
 import br.com.pluri.eventor.business.EventoSB;
+import br.com.pluri.eventor.business.NotificacaoSB;
 import br.com.pluri.eventor.business.UsuarioAtividadeSB;
 import br.com.pluri.eventor.business.exception.LoginJaCadastradoException;
 import br.com.pluri.eventor.business.exception.PeriodoDataInvalidaException;
 import br.com.pluri.eventor.enums.TipoAtividadeEnum;
+import br.com.pluri.eventor.enums.TipoNotificacaoEnum;
 import br.com.pluri.eventor.model.Atividade;
 import br.com.pluri.eventor.model.Evento;
+import br.com.pluri.eventor.model.Notificacao;
+import br.com.pluri.eventor.model.Usuario;
 import br.com.pluri.eventor.model.UsuarioAtividade;
 
 @Getter
@@ -52,6 +56,9 @@ public class AtividadeMB extends BaseMB {
 	
 	@Autowired
 	private UsuarioAtividadeSB inscritosSB;
+	
+	@Autowired
+	private NotificacaoSB notificacaoSB;
 	
 	private List<Atividade> resultadoAtividadeByEvento;
 	private Atividade editAtividade = new Atividade();
@@ -89,6 +96,10 @@ public class AtividadeMB extends BaseMB {
 				showInfoMessage(MessageBundleLoader.getMessage("ativ.insert_sucess", new Object[] {editAtividade.getNome()}));
 			}else{
 				atividadeSB.editAtiv(editAtividade, idEvento);
+				for (UsuarioAtividade insc : inscritosSB.findAllInscritosByIdAtividade(editAtividade.getId())) {
+					// TODO Testar funcionamento desse For
+					onSetNotificacao(MessageBundleLoader.getMessage("notif.alteracao.ativ.detalhe", new Object[] {editAtividade.getNome()}), editAtividade.getNome(), insc.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
+				}
 				showInfoMessage(MessageBundleLoader.getMessage("ativ.update_sucess", new Object[] {editAtividade.getNome()}));
 			}
 			RequestContext.getCurrentInstance().execute("selAba('visualizar')");
@@ -98,6 +109,16 @@ public class AtividadeMB extends BaseMB {
 			showErrorMessage(e.getMessage());
 			this.editAtividade.setVagas(1);
 		}
+	}
+	
+	public void onSetNotificacao(String detalhe, String titulo, Usuario usuario, String tipo) {
+		Notificacao noti = new Notificacao();
+		noti.setTitulo(titulo);
+		noti.setDetalhe(detalhe);
+		noti.setUsuario(usuario);
+		noti.setTipo(tipo);
+		noti.setVisualizado(false);
+		notificacaoSB.insert(noti);
 	}
 	
 	// Metodo criado para alterar a atividade entre eventos.
@@ -292,6 +313,8 @@ public class AtividadeMB extends BaseMB {
 		inscritosNaAtiv = inscritosSB.findAllInscritosByIdAtividade(exclui.getId());
 		if(inscritosNaAtiv.size() > 0){
 			for(UsuarioAtividade insc : inscritosNaAtiv){
+				// TODO testar o funcionamento da notificacao desse for
+				onSetNotificacao(MessageBundleLoader.getMessage("notif.delete.ativ.detalhe", new Object[] {exclui.getNome()}), exclui.getNome(), insc.getUsuario(), TipoNotificacaoEnum.ATIVIDADE.tipo);
 				inscritosSB.delete(insc);
 			}
 			inscritosNaAtiv.clear();

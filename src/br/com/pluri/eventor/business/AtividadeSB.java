@@ -39,8 +39,6 @@ public class AtividadeSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	 public Atividade findByNome(String nome){
 		 Atividade resultado = atividadeDAO.findByNome(nome);
-		 resultado.setHoraInicio(resultado.getDataInicio());
-		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;
 	 }
 	
@@ -79,8 +77,6 @@ public class AtividadeSB extends BaseSB {
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	 public Atividade findById(Long id){
 		 Atividade resultado = atividadeDAO.findOne(id);
-		 resultado.setHoraInicio(resultado.getDataInicio());
-		 resultado.setHoraFim(resultado.getDataFim());
 		 return resultado;
 	 }
 	

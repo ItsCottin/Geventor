@@ -59,13 +59,6 @@ public class Atividade extends BaseORM {
 	@Column(name="IS_PERIODO_EVEN_ATIVI")
 	private boolean usaPeriodoEven;
 	
-	//Atributos transientes
-	@Transient
-	private Date horaInicio;
-		
-	@Transient
-	private Date horaFim;
-	
 	@Transient
 	private boolean doEditAtiv;
 	
@@ -91,16 +84,10 @@ public class Atividade extends BaseORM {
 	private boolean isgratuito;
 	
 	@Transient
-	private boolean mesmodiainicio;
-	
-	@Transient
 	private boolean existeInscrito;
 	
 	@Transient
 	private boolean eventonaovigente;
-	
-	@Transient
-	private boolean mesmodiafim;
 	
 	@ManyToOne
 	@JoinColumn(name="ID_EVEN", referencedColumnName="ID_EVEN")

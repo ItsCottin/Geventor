@@ -58,25 +58,11 @@ public class UserContextMB extends BaseMB {
 			SecurityContextHolder.getContext().setAuthentication
 				(authenticationManager.authenticate(authentication));
 			afterAuthentication();
-			//showInfoMessage(context.getMessage("cpferror.invalid_format", null, Locale.getDefault()));
 			navigate(PAGE_HOME);
 		}catch(AuthenticationException e){
 			showErrorMessage(e.getMessage());
 		}
-	}
-	
-	//public void doLogout() throws IOException {
-	//    ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-	//    HttpSession session = (HttpSession) externalContext.getSession(false);
-	//   session.invalidate();
-	//    externalContext.redirect(externalContext.getRequestContextPath() + "/loginV2.xhtml");
-	//    //return "/loginV2.xhtml?faces-redirect=true";
-	//}
-	
-	//public String redirectToLoginPage() {
-	//    return "/loginV2.xhtml?faces-redirect=true";
-	//}
-	
+	}	
 	
 	
 	

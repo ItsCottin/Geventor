@@ -10,11 +10,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import lombok.Getter;
@@ -107,5 +104,8 @@ public class Usuario extends BaseORM {
 	
 	@OneToMany(mappedBy="usuario")
 	private List<UsuarioAtividade> usuarioAtividade;
+	
+	@OneToMany(mappedBy="usuario")
+	private List<Notificacao> notificacoes;
 	
 }
