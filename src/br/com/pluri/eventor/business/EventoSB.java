@@ -49,14 +49,14 @@ public class EventoSB extends BaseSB {
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public int qtdInscritoInEvento(Long  idEven) throws SQLException{
-		BigInteger bigInt = eventoDAO.qtdInscritoInEvento(idEven);
-		return bigInt.intValue();
+		int bigInt = eventoDAO.qtdInscritoInEvento(idEven);
+		return bigInt;
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public int qtdInscritoInEventoPorTipoAtiv(Long  idEven, String tipoAtiv) throws SQLException{
-		BigInteger bigInt = eventoDAO.qtdInscritoInEventoPorTipoAtiv(idEven, tipoAtiv);
-		return bigInt.intValue();
+		int bigInt = eventoDAO.qtdInscritoInEventoPorTipoAtiv(idEven, tipoAtiv);
+		return bigInt;
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -88,7 +88,8 @@ public class EventoSB extends BaseSB {
 	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public List<Evento> findAllEventoMenosMeusComAtivExistPorTipoAtivRecen(Long idUsu, String tpAtiv){
-		return eventoDAO.findAllEventoMenosMeusComAtivExistPorTipoAtivRecen(idUsu, tpAtiv);
+		List<Evento> obj = eventoDAO.findAllEventoMenosMeusComAtivExistPorTipoAtivRecen(idUsu, tpAtiv);
+		return obj;
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)

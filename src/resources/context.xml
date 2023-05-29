@@ -37,8 +37,8 @@
 	</bean>
     
 	<bean id="eventor" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://mysqlserverrcf.mysql.database.azure.com/TCCRCF" />
+		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+		<property name="url" value="jdbc:sqlserver://modulum.database.windows.net:1433;database=MODULUM;user=masterrcf@modulum;password=i1BREUu558;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;" />
 		<property name="username" value="masterrcf" />
 		<property name="password" value="i1BREUu558" />
 	</bean>

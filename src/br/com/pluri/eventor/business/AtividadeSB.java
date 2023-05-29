@@ -1,7 +1,5 @@
 package br.com.pluri.eventor.business;
 
-
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -43,15 +41,13 @@ public class AtividadeSB extends BaseSB {
 	 }
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public int qtdInscritoInAtividade(Long  idAtiv) throws SQLException{
-		BigInteger bigInt = atividadeDAO.qtdInscritoInAtividade(idAtiv);
-		return bigInt.intValue();
+	public int qtdInscritoInAtividade(Long idAtiv) throws SQLException{
+		return atividadeDAO.qtdInscritoInAtividade(idAtiv);
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public int qtdInscritoSitInAtividade(String status ,Long  idAtiv) throws SQLException{
-		BigInteger bigInt = atividadeDAO.qtdInscritoSitInAtividade(status, idAtiv);
-		return bigInt.intValue();
+		return atividadeDAO.qtdInscritoSitInAtividade(status, idAtiv);
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)

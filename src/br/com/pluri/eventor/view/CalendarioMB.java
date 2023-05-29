@@ -56,12 +56,15 @@ public class CalendarioMB extends BaseMB {
 		this.minhasAtividades = atividadeSB.findAllAtividadeByUsuario(getCurrentUserId());
 		eventModel = new DefaultScheduleModel();
 		for(Atividade ativ : minhasAtividades){
-			event.setStartDate(ativ.getDataInicio());
-			event.setEndDate(ativ.getDataFim());
-			event.setTitle(ativ.getNome());
-			event.setId(ativ.getId().toString());
+			this.event.setStartDate(ativ.getDataInicio());
+			this.event.setEndDate(ativ.getDataFim());
+			this.event.setTitle(ativ.getNome());
+			this.event.setId(ativ.getId().toString());
 		}
-		eventModel.addEvent(event);
+		if(event.getId() != null){
+			eventModel.addEvent(event);
+		}
+		
 	}
 	
 	public void onEventMove(ScheduleEntryMoveEvent event){
