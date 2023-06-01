@@ -13,7 +13,7 @@
 			<property name="hibernate.format_sql" value="false"/>
 
 			<property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-			<property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://modulum.database.windows.net:1433;database=GEVENTOR;user=masterrcf@modulum;password=i1BREUu558;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://modulum.database.windows.net:1433;database=MODULUM;user=masterrcf@modulum;password=i1BREUu558;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"/>
 			<property name="javax.persistence.jdbc.user" value="masterrcf"/>
 			<property name="javax.persistence.jdbc.password" value="i1BREUu558"/>
 			
