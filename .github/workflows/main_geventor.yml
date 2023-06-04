@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'geventor'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_968638D4849C4FF6B5168B7C1642EECD }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_48D917DA9AF64694BA3D1D80FFF1591C }}
           package: '*.war'
