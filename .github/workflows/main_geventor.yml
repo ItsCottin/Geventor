@@ -18,18 +18,23 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Build and package WAR
+      - name: Build Java app
         run: |
-          # Execute os comandos necessários para compilar o código e gerar o arquivo .war
-          # Por exemplo, se você usa o Eclipse, pode usar o comando 'Export -> WAR file' para gerar o arquivo .war manualmente
-          # Em seguida, mova o arquivo .war para o diretório de build
-          cp path/to/your/war/file.war ${{ github.workspace }}/target/
+          mkdir -p target/WEB-INF/classes
+          cp -R WebContent/* target/
+          javac -d target/WEB-INF/classes src/**/*.java
+          jar cvf myapp.war -C target .
+
+      - name: Copy libraries to WEB-INF/lib
+        run: |
+          mkdir -p target/WEB-INF/lib
+          cp -R lib/* target/WEB-INF/lib/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.war'
+          path: myapp.war
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,4 +56,4 @@ jobs:
           app-name: 'geventor'
           slot-name: 'production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_0edf4bc1a0fd47eab02663c977766b9b }}
-          package: '*.war'
+          package: 'myapp.war'
