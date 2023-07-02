@@ -58,7 +58,7 @@ public interface UsuarioAtividadeDAO extends BaseDAO<UsuarioAtividade> {
 		public List<UsuarioAtividade> findAtividadesNoEventoByUsuarioLogado (@Param("idUsu") Long idUsu, @Param("idEven") Long idEven);
 		
 		@Modifying
-		@Query(value = "DELETE FROM TBL_USUARIO_ATIVIDADE WHERE ID_ATIVI = :idAtiv", nativeQuery = true)
+		@Query(value = "DELETE FROM TBL_G_USUARIO_ATIVIDADE WHERE ID_ATIVI = :idAtiv", nativeQuery = true)
 		public void deleteByIdAtiv(@Param("idAtiv") Long idAtiv);
 	
 }

@@ -12,7 +12,7 @@ import br.com.pluri.eventor.model.Notificacao;
 @Repository
 public interface NotificacaoDAO extends BaseDAO<Notificacao> {
 	
-	@Query(value = "SELECT * FROM TBL_NOTIFICACAO WHERE ID_USUA = :idUsuario", nativeQuery = true)
+	@Query(value = "SELECT * FROM TBL_G_NOTIFICACAO WHERE ID_USUA = :idUsuario", nativeQuery = true)
 	public List<Notificacao> findAllNotificacaoByUsuario(@Param ("idUsuario") Long idUsuario);
 
 }

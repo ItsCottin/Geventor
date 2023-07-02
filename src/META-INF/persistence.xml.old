@@ -13,9 +13,9 @@
 			<property name="hibernate.format_sql" value="false"/>
 
 			<property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-			<property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://db_cottin.mssql.somee.com;database=db_cottin;user=itscottin_SQLLogin_1@db_cottin;password=mj6tz6ynmp;encrypt=false;trustServerCertificate=false;loginTimeout=30;"/>
-			<property name="javax.persistence.jdbc.user" value="itscottin_SQLLogin_1"/>
-			<property name="javax.persistence.jdbc.password" value="mj6tz6ynmp"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://cottin.database.windows.net:1433;database=cottin;user=masterrcf@cottin;password=i1BREUu533;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"/>
+			<property name="javax.persistence.jdbc.user" value="masterrcf"/>
+			<property name="javax.persistence.jdbc.password" value="i1BREUu533"/>
 			
 		</properties>
 

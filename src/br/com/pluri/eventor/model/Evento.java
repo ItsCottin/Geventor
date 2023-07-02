@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="TBL_EVENTO")
+@Table(name="TBL_G_EVENTO")
 public class Evento extends BaseORM {
 	
 	@Id

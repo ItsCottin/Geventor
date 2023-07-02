@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name="TBL_USUARIO_ATIVIDADE")
+@Table(name="TBL_G_USUARIO_ATIVIDADE")
 public class UsuarioAtividade extends BaseORM {
 	
 	

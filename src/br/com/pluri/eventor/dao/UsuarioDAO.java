@@ -18,7 +18,6 @@ public interface UsuarioDAO extends BaseDAO<Usuario> {
 	
 	public Usuario findById (Long id);
 	
-	// TODO Erro de: org.hibernate.QueryException: could not resolve property: atividade of
 	@Query("select u from Usuario u " +
 			" inner join u.usuarioAtividade a " +
 			" inner join a.atividade e " +

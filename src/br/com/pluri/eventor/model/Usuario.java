@@ -23,7 +23,7 @@ import br.com.pluri.eventor.enums.TipoUsuarioEnum;
 @Getter
 @Setter
 @Entity
-@Table(name="TBL_USUARIO")
+@Table(name="TBL_G_USUARIO")
 public class Usuario extends BaseORM {
 	
 	@Id

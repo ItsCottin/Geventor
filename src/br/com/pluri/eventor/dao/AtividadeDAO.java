@@ -32,9 +32,9 @@ public interface AtividadeDAO extends BaseDAO<Atividade> {
 			" where e.usuario.id = :id")
 	public List<Atividade> findAllAtividadeByUsuario (@Param("id") Long idUsu);
 	
-	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS IN ('Pendente', 'Aprovado') AND ID_ATIVI = :idAtiv", nativeQuery = true)
+	@Query(value = "SELECT COUNT(*) FROM TBL_G_USUARIO_ATIVIDADE WHERE STATUS IN ('Pendente', 'Aprovado') AND ID_ATIVI = :idAtiv", nativeQuery = true)
 	public int qtdInscritoInAtividade (@Param("idAtiv") Long idAtiv);
 	
-	@Query(value = "SELECT COUNT(*) FROM TBL_USUARIO_ATIVIDADE WHERE STATUS = :status AND ID_ATIVI = :idAtiv", nativeQuery = true)
+	@Query(value = "SELECT COUNT(*) FROM TBL_G_USUARIO_ATIVIDADE WHERE STATUS = :status AND ID_ATIVI = :idAtiv", nativeQuery = true)
 	public int qtdInscritoSitInAtividade (@Param("status") String status, @Param("idAtiv") Long idAtiv);
 }

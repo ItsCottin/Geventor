@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="TBL_NOTIFICACAO")
+@Table(name="TBL_G_NOTIFICACAO")
 public class Notificacao extends BaseORM {
 	
 	@Id
