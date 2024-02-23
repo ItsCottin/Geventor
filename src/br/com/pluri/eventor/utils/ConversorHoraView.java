@@ -24,7 +24,7 @@ public class ConversorHoraView implements Converter {
         try {
             return format.parse(value);
         } catch (ParseException e) {
-            throw new ConverterException(MessageBundleLoader.getMessage("critica.converter.horadata"), e);
+            throw new ConverterException(MessageBundleLoader.getMessage("critica.converter.hora"), e);
         }
     }
  
