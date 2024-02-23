@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.Scope;
 /**
  * Escopo personalizado Spring para JSF 2.0.
  * 
- * @author Rogério de Morais
+ * @author Rogerio de Morais
  *
  */
 public class ViewScoped implements Scope {

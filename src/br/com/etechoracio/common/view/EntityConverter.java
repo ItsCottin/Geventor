@@ -14,10 +14,10 @@ import br.com.etechoracio.common.model.BaseORM;
  * 
  * <pre>
  * Last Modified  $Date: 2013/09/17 16:48:31 $
- * Last Modified by $Author: Rogério de Morais $
+ * Last Modified by $Author: Rogerio de Morais $
  * </pre>
  * 
- * @author Rogério de Morais
+ * @author Rogerio de Morais
  * @version $Revision: 1.0 $
  */
 @FacesConverter(value = "entityConverter")

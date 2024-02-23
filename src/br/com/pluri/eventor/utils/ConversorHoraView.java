@@ -11,6 +11,8 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
+import br.com.etechoracio.common.view.MessageBundleLoader;
+
 @FacesConverter(forClass = java.util.Date.class)
 public class ConversorHoraView implements Converter {
 
@@ -22,7 +24,7 @@ public class ConversorHoraView implements Converter {
         try {
             return format.parse(value);
         } catch (ParseException e) {
-            throw new ConverterException("Não foi possível converter a data.", e);
+            throw new ConverterException(MessageBundleLoader.getMessage("critica.converter.horadata"), e);
         }
     }
  
