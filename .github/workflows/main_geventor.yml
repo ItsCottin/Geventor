@@ -21,8 +21,12 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Compile the project
+        run: javac -classpath "${{ github.workspace }}/lib/*.jar" src/*.java -d bin
+          # Coloque aqui os comandos para compilar o seu projeto Dynamic Web Project
+          # Por exemplo:
+          # javac -classpath "caminho/para/bibliotecas/*.jar" src/*.java -d bin
+          # Certifique-se de ajustar o comando de compilação de acordo com a estrutura do seu projeto
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
