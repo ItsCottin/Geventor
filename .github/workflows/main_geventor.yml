@@ -22,11 +22,9 @@ jobs:
           java-version: '8'
 
       - name: Compile the project
-        run: javac -classpath "${{ github.workspace }}/WebContent/WEB-INF/lib/*.jar" -sourcepath ${{ github.workspace }}/src/sources.txt -d ${{ github.workspace }}
-          # Coloque aqui os comandos para compilar o seu projeto Dynamic Web Project
-          # Por exemplo:
-          # javac -classpath "caminho/para/bibliotecas/*.jar" src/*.java -d bin
-          # Certifique-se de ajustar o comando de compilação de acordo com a estrutura do seu projeto
+        run: |
+          find "${{ github.workspace }}/src" -name "*.java" > sources.txt
+          javac -classpath "${{ github.workspace }}/WebContent/WEB-INF/lib/*.jar" -sourcepath "${{ github.workspace }}/src" @sources.txt -d "${{ github.workspace }}"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
