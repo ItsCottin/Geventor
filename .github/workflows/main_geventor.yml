@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy WAR app to Azure Web App - geventor
 
 on:
@@ -11,49 +14,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Java version
         uses: actions/setup-java@v1
         with:
           java-version: '8'
 
-      - name: Build Java app
-        run: |
-          mkdir -p target/WEB-INF/classes
-          cp -R WebContent/* target/
-          javac -d target/WEB-INF/classes src/**/*.java
-          jar cvf myapp.war -C target .
-
-      - name: Copy libraries to WEB-INF/lib
-        run: |
-          mkdir -p target/WEB-INF/lib
-          cp -R lib/* target/WEB-INF/lib/
+      - name: Compile the project
+        run: javac -classpath "${{ github.workspace }}/WebContent/WEB-INF/lib/*.jar" ${{ github.workspace }}/src/*/*.java -d bin
+          # Coloque aqui os comandos para compilar o seu projeto Dynamic Web Project
+          # Por exemplo:
+          # javac -classpath "caminho/para/bibliotecas/*.jar" src/*.java -d bin
+          # Certifique-se de ajustar o comando de compilação de acordo com a estrutura do seu projeto
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: java-app
-          path: myapp.war
+          path: '${{ github.workspace }}/target/*.war'
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'production'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: java-app
-
+      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'geventor'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_0edf4bc1a0fd47eab02663c977766b9b }}
-          package: 'myapp.war'
+          slot-name: 'Production'
+          package: '*.war'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BBDF4A38B32C4B9D83507E645FD52111 }}
