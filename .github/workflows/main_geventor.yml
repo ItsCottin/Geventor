@@ -30,7 +30,7 @@ jobs:
       - name: Package WAR file
         run: |
           cd ${{ github.workspace }}/WebContent
-          jar -cvf ${GITHUB_WORKSPACE}/java-app/geventor.war *
+          jar -cvf ${GITHUB_WORKSPACE}/geventor.war *
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
