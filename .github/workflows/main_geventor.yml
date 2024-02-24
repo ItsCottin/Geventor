@@ -21,8 +21,16 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Compile the project
+        run: |
+          find "${{ github.workspace }}/src" -name "*.java" > sources.txt
+          jar_files="$(find "${{ github.workspace }}/WebContent/WEB-INF/lib/" -name "*.jar" -printf '%p:')"
+          javac -classpath "${jar_files%:}" -sourcepath "${{ github.workspace }}/src" @sources.txt -d "${{ github.workspace }}"
+          
+      - name: Package WAR file
+        run: |
+          cd ${{ github.workspace }}/WebContent
+          jar -cvf ${GITHUB_WORKSPACE}/geventor.war *
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
