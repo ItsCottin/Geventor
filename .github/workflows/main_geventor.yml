@@ -21,11 +21,6 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Compile the project
-        run: |
-          find "${{ github.workspace }}/src" -name "*.java" > sources.txt
-          javac -classpath "${{ github.workspace }}/WebContent/WEB-INF/lib/*.jar" -sourcepath "${{ github.workspace }}/src" @sources.txt -d "${{ github.workspace }}"
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
