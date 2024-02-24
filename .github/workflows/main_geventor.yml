@@ -21,22 +21,14 @@ jobs:
         with:
           java-version: '8'
 
-      - name: Compile the project
-        run: |
-          find "${{ github.workspace }}/src" -name "*.java" > sources.txt
-          jar_files="$(find "${{ github.workspace }}/WebContent/WEB-INF/lib/" -name "*.jar" -printf '%p:')"
-          javac -classpath "${jar_files%:}" -sourcepath "${{ github.workspace }}/src" @sources.txt -d "${{ github.workspace }}"
-          
-      - name: Package WAR file
-        run: |
-          cd ${{ github.workspace }}/WebContent
-          jar -cvf ${GITHUB_WORKSPACE}/geventor.war *
+      - name: Build with Maven
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: java-app
-          path: '${{ github.workspace }}/*.war'
+          path: '${{ github.workspace }}/target/*.war'
 
   deploy:
     runs-on: ubuntu-latest
@@ -58,4 +50,4 @@ jobs:
           app-name: 'geventor'
           slot-name: 'Production'
           package: '*.war'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BBDF4A38B32C4B9D83507E645FD52111 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E058286F98CC4455AA5CE5DAFE93DEF7 }}
