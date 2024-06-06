@@ -38,9 +38,9 @@
     
 	<bean id="eventor" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-		<property name="url" value="jdbc:sqlserver://db_cottin.mssql.somee.com;database=db_cottin;user=itscottin_SQLLogin_1@db_cottin;password=mj6tz6ynmp;encrypt=false;trustServerCertificate=false;loginTimeout=30;" />
-		<property name="username" value="itscottin_SQLLogin_1" />
-		<property name="password" value="mj6tz6ynmp" />
+		<property name="url" value="jdbc:sqlserver://modulum.mssql.somee.com;database=modulum;user=Cottin_SQLLogin_1@modulum;password=o4kd997ajw;encrypt=false;trustServerCertificate=false;loginTimeout=30;" />
+		<property name="username" value="Cottin_SQLLogin_1" />
+		<property name="password" value="o4kd997ajw" />
 	</bean>
 	
 	<bean id="entityManagerFactory"
